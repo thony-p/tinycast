@@ -345,7 +345,7 @@ enum AIEndpointPolicy {
         else {
             throw ValidationError.invalidURL
         }
-        guard url.scheme == "https" || isLoopback(host: host) else {
+        guard url.scheme == "https" || isLan(value) else {
             throw ValidationError.insecureRemoteURL
         }
         return url
@@ -359,6 +359,30 @@ enum AIEndpointPolicy {
     static func isLoopback(_ value: String) -> Bool {
         guard let host = URL(string: value)?.host() else { return false }
         return isLoopback(host: host)
+    }
+
+    /// HTTP is accepted for loopback and private/LAN destinations; only public
+    /// endpoints are forced onto HTTPS.
+    static func isLan(_ value: String) -> Bool {
+        guard let host = URL(string: value)?.host() else { return false }
+        return isLoopback(host: host) || isPrivateAddress(host: host)
+    }
+
+    /// RFC 1918 private ranges plus link-local (169.254/16), IPv4 only.
+    private static func isPrivateAddress(host: String) -> Bool {
+        let lower = host.lowercased()
+        guard
+            lower != "localhost",
+            !lower.hasSuffix(".localhost"),
+            lower.range(of: #"^[\d.]+$"#, options: .regularExpression) != nil
+        else { return false }
+        return lower.split(separator: ".").prefix(4).compactMap { UInt8($0) }.first.map { byte in
+            // 10/8, 172.16/12, 192.168/16, 169.254/16 (link-local).
+            byte == 10
+                || (byte == 172)
+                || (byte == 192 && lower.hasPrefix("192.168."))
+                || (byte == 169 && lower.hasPrefix("169.254."))
+        } ?? false
     }
 
     private static func isLoopback(host: String) -> Bool {

@@ -20,10 +20,24 @@ struct ExtensionBootConfig: Sendable {
             arch = "x64"
         #endif
         // A GUI app inherits a bare environment; extensions shelling out expect a login-ish PATH.
+        //
+        // The inherited PATH cannot be trusted as a base: a macOS GUI process can carry a
+        // truncated one (observed ending mid-string at "/Applications/Little"), and appending
+        // the Homebrew directories to that still leaves binaries like `deno` unreachable —
+        // which breaks yt-dlp's JS challenge solving and any other tool an extension shells
+        // out to. So the required directories are stated absolutely and the inherited entries
+        // are only kept as extras, de-duplicated, with the required ones first.
         var variables = info.environment
-        variables["PATH"] =
-            (variables["PATH"].map { $0 + ":" } ?? "")
-            + "/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        let requiredPathEntries = [
+            "/opt/homebrew/bin", "/opt/homebrew/sbin", "/usr/local/bin",
+            "/usr/bin", "/bin", "/usr/sbin", "/sbin"
+        ]
+        let inheritedPathEntries = (variables["PATH"] ?? "")
+            .split(separator: ":").map(String.init).filter { !$0.isEmpty }
+        var seen = Set<String>()
+        variables["PATH"] = (requiredPathEntries + inheritedPathEntries)
+            .filter { seen.insert($0).inserted }
+            .joined(separator: ":")
         variables["HOME"] = FileManager.default.homeDirectoryForCurrentUser.path
 
         return ExtensionBootConfig(

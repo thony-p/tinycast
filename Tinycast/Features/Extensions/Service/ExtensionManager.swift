@@ -284,16 +284,30 @@ final class ExtensionManager: ExtensionRuntimeDelegate, ExtensionHostContext {
     }
 
     /// A deep link names owner/extension/command; the owner is a hint, the slug decides.
+    ///
+    /// A link that names no command (`extensions/<author>/<extension>`, which is what
+    /// Raycast's own "Launch Extension" action emits) resolves to the extension's first
+    /// runnable command instead of failing — the caller then has something to run.
     func resolve(_ link: ExtensionDeepLink) -> (InstalledExtension, ExtensionCommand)? {
         let candidates = installed.filter { link.matches(manifestName: $0.manifest.name) }
         guard
             let owner = link.extensionCandidates.lazy.compactMap({ want in
                 candidates.first { $0.manifest.name.lowercased() == want.lowercased() }
-            }).first ?? candidates.first,
-            let command = owner.manifest.commands.first(where: {
-                $0.name.lowercased() == link.commandName.lowercased()
-            })
+            }).first ?? candidates.first
         else { return nil }
+
+        if let wanted = link.commandName {
+            guard
+                let command = owner.manifest.commands.first(where: {
+                    $0.name.lowercased() == wanted.lowercased()
+                })
+            else { return nil }
+            return (owner, command)
+        }
+
+        // No command named: prefer one that can actually run, else the first declared.
+        let runnable = owner.manifest.commands.first(where: { $0.mode.isSupported })
+        guard let command = runnable ?? owner.manifest.commands.first else { return nil }
         return (owner, command)
     }
 
@@ -873,7 +887,9 @@ final class ExtensionManager: ExtensionRuntimeDelegate, ExtensionHostContext {
 
     func launch(_ link: ExtensionDeepLink) throws {
         guard let (owner, command) = resolve(link) else {
-            throw LaunchError.unknownCommand(link.commandName)
+            // A link may legitimately name no command; describe what was actually missing.
+            let described = link.commandName ?? "\(link.extensionName) (not installed)"
+            throw LaunchError.unknownCommand(described)
         }
         Task {
             await run(

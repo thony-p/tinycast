@@ -859,11 +859,36 @@ struct ExtensionTests {
             url: URL(string: "tinycast://extensions/linear/linear/create-issue")!)
         check("deeplink mirrors raycast:// as tinycast://", tiny == canonical)
 
-        let bare = ExtensionDeepLink.parse(url: URL(string: "raycast://extensions/demo/search")!)
+        // Two body segments are `extensions/<author>/<extension>` — the shape Raycast's own
+        // "Launch Extension" action emits. It names no command, so `commandName` is nil and
+        // the author scopes the lookup. Reading them as `<extension>/<command>` was the bug:
+        // the owner was swallowed and the extension name misread as a command, which resolved
+        // to nothing and reopened the launcher without any error.
+        let commandless = ExtensionDeepLink.parse(
+            url: URL(string: "raycast://extensions/pernielsentikaer/installed-extensions")!)
         check(
-            "deeplink without an owner parses",
+            "deeplink without a command keeps the author and drops the command",
+            commandless?.ownerOrAuthor == "pernielsentikaer"
+                && commandless?.extensionName == "installed-extensions"
+                && commandless?.commandName == nil,
+            String(describing: commandless))
+
+        // One body segment is a bare `extensions/<extension>`.
+        let bare = ExtensionDeepLink.parse(url: URL(string: "raycast://extensions/demo")!)
+        check(
+            "deeplink naming only an extension parses",
             bare?.ownerOrAuthor == nil && bare?.extensionName == "demo"
-                && bare?.commandName == "search")
+                && bare?.commandName == nil,
+            String(describing: bare))
+
+        // Three body segments still resolve owner/extension/command.
+        let named = ExtensionDeepLink.parse(
+            url: URL(string: "raycast://extensions/demo/demo/search")!)
+        check(
+            "deeplink with owner, extension and command parses",
+            named?.ownerOrAuthor == "demo" && named?.extensionName == "demo"
+                && named?.commandName == "search",
+            String(describing: named))
 
         let args = ExtensionDeepLink.parse(
             url: URL(
@@ -890,11 +915,16 @@ struct ExtensionTests {
             "deeplink reads fallback text and background launch",
             full?.fallbackText == "hello" && full?.launchType == .background)
 
+        // `com.raycast:/extensions/demo/search` is two body segments, i.e. author + extension
+        // with no command — the same shape as Raycast's "Launch Extension" link. The path form
+        // itself must still parse (that is what this test guards).
         let legacy = ExtensionDeepLink.parse(
             url: URL(string: "com.raycast:/extensions/demo/search")!)
         check(
             "deeplink reads the com.raycast path form",
-            legacy?.extensionName == "demo" && legacy?.commandName == "search")
+            legacy?.ownerOrAuthor == "demo" && legacy?.extensionName == "search"
+                && legacy?.commandName == nil,
+            String(describing: legacy))
 
         check(
             "deeplink rejects a non-extensions link",
@@ -908,7 +938,7 @@ struct ExtensionTests {
 
         check(
             "deeplink matches a scoped install by slug",
-            bare?.matches(manifestName: "owner/demo") == true)
+            commandless?.matches(manifestName: "pernielsentikaer/installed-extensions") == true)
         check(
             "deeplink matches a short install from a scoped link",
             canonical?.matches(manifestName: "linear") == true)

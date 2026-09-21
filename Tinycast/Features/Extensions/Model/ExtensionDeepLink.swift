@@ -5,7 +5,10 @@ import Foundation
 struct ExtensionDeepLink: Sendable, Equatable {
     let ownerOrAuthor: String?
     let extensionName: String
-    let commandName: String
+    /// Absent when the link names only an extension — Raycast's own "Launch Extension"
+    /// action emits `extensions/<author>/<extension>`, so this must stay optional rather
+    /// than be mistyped as a command name.
+    let commandName: String?
     let arguments: [String: String]
     let fallbackText: String?
     let launchType: ExtensionLaunchType
@@ -34,17 +37,27 @@ struct ExtensionDeepLink: Sendable, Equatable {
         if let host = url.host, !host.isEmpty { segments.append(host) }
         segments += url.pathComponents.filter { $0 != "/" }
         segments = segments.map { $0.removingPercentEncoding ?? $0 }
-        guard segments.count >= 3, segments[0].lowercased() == "extensions" else { return nil }
+        // `raycast://extensions/<name>` is host "extensions" plus one path component, so the
+        // minimum is two segments — the old `>= 3` guard rejected that link before the switch
+        // below could handle it.
+        guard segments.count >= 2, segments[0].lowercased() == "extensions" else { return nil }
         let body = Array(segments.dropFirst())
-        guard body.count >= 2 else { return nil }
+        guard !body.isEmpty else { return nil }
         let ownerOrAuthor: String?
         let extensionName: String
-        let commandName: String
+        let commandName: String?
         switch body.count {
-        case 2:
+        case 1:
+            // `extensions/<extension>` — no command named at all.
             ownerOrAuthor = nil
             extensionName = body[0]
-            commandName = body[1]
+            commandName = nil
+        case 2:
+            // `extensions/<author>/<extension>` — Raycast's "Launch Extension" shape. The
+            // author scopes the lookup; there is no command, so the coordinator chooses one.
+            ownerOrAuthor = body[0]
+            extensionName = body[1]
+            commandName = nil
         case 3:
             ownerOrAuthor = body[0]
             extensionName = body[1]
@@ -54,7 +67,8 @@ struct ExtensionDeepLink: Sendable, Equatable {
             extensionName = body[body.count - 2]
             commandName = body[body.count - 1]
         }
-        guard !extensionName.isEmpty, !commandName.isEmpty else { return nil }
+        guard !extensionName.isEmpty else { return nil }
+        if let commandName, commandName.isEmpty { return nil }
         let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
         var arguments: [String: String] = [:]
         var fallbackText: String?

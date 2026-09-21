@@ -1653,6 +1653,7 @@ export const nodeModules = {
   tls: unsupportedModule("tls"),
   dns: unsupportedModule("dns"),
   stream: streamModule,
+  diagnostics_channel: diagnosticsChannelModule,
   "stream/web": webStreamModule,
   "stream/promises": { pipeline: (...stages) => pipelinePromise(stages), finished: finishedPromise },
   worker_threads: unsupportedModule("worker_threads", { isMainThread: true }),
@@ -1671,11 +1672,95 @@ function requireStub(name) {
   throw new Error(`createRequire is not supported in Tinycast extensions (tried to load "${name}").`);
 }
 
+// ─── diagnostics_channel ────────────────────────────────────────────
+//
+// A real (inert) implementation rather than a refuse-on-use stub: undici calls
+// `channel(...)` while its module body evaluates, so a throw here fails the whole
+// command before it can render — that is how undici-bundling extensions died with a
+// raw stack trace. Publishing to a channel with no subscribers is a no-op, so the
+// observable behaviour for every extension is identical to Node's.
+class DiagnosticsChannel {
+  constructor(name) {
+    this.name = name;
+    this._subscribers = new Set();
+  }
+  get hasSubscribers() {
+    return this._subscribers.size > 0;
+  }
+  subscribe(listener) {
+    if (typeof listener !== "function") {
+      throw new TypeError("The 'listener' argument must be of type function.");
+    }
+    this._subscribers.add(listener);
+    return () => this.unsubscribe(listener);
+  }
+  unsubscribe(listener) {
+    this._subscribers.delete(listener);
+  }
+  publish(message, name) {
+    for (const listener of this._subscribers) {
+      // A throwing subscriber must not take the publisher down, matching Node.
+      try {
+        listener(message, name);
+      } catch {
+        /* swallowed: diagnostics must never break the caller */
+      }
+    }
+  }
+  bindStore() {
+    return this;
+  }
+  unbindStore() {
+    return this;
+  }
+  runStores(context, fn, thisArg, ...args) {
+    return fn.apply(thisArg, args);
+  }
+}
+
+const diagnosticsChannels = new Map();
+
+function diagnosticsChannel(name) {
+  const key = String(name);
+  let channel = diagnosticsChannels.get(key);
+  if (!channel) {
+    channel = new DiagnosticsChannel(key);
+    diagnosticsChannels.set(key, channel);
+  }
+  return channel;
+}
+
+/// Node's `tracingChannel` groups lifecycle channels; undici only needs the shape.
+function tracingChannel(nameOrChannels) {
+  const names =
+    typeof nameOrChannels === "string"
+      ? { start: `${nameOrChannels}:start`, end: `${nameOrChannels}:end`, asyncStart: `${nameOrChannels}:asyncStart`, asyncEnd: `${nameOrChannels}:asyncEnd`, error: `${nameOrChannels}:error` }
+      : nameOrChannels;
+  const out = {};
+  for (const [role, name] of Object.entries(names)) out[role] = diagnosticsChannel(name);
+  out.subscribe = () => {};
+  out.unsubscribe = () => {};
+  out.traceSync = (fn, context, thisArg, ...args) => fn.apply(thisArg, args);
+  out.tracePromise = (fn, context, thisArg, ...args) => Promise.resolve(fn.apply(thisArg, args));
+  out.traceCallback = (fn, position, context, thisArg, ...args) => fn.apply(thisArg, args);
+  out.hasSubscribers = false;
+  return out;
+}
+
+const diagnosticsChannelModule = {
+  channel: diagnosticsChannel,
+  hasSubscribers: (name) => diagnosticsChannel(name).hasSubscribers,
+  subscribe: (name, listener) => diagnosticsChannel(name).subscribe(listener),
+  unsubscribe: (name, listener) => diagnosticsChannel(name).unsubscribe(listener),
+  tracingChannel,
+  Channel: DiagnosticsChannel,
+};
+
 // Every remaining Node builtin resolves to a refuse-on-use stub. Bundles reference the whole
 // long tail (http2, domain, repl, …) from dependencies that only touch them on paths an
 // extension never reaches, so a require-time throw would fail extensions that actually work.
 const REMAINING_BUILTINS = [
-  "assert/strict", "console", "diagnostics_channel", "dns/promises", "domain", "http2",
+  "assert/strict", "console", "dns/promises", "domain", "http2",
   "inspector/promises", "path/posix", "path/win32", "readline/promises", "repl",
   "stream/consumers", "sys", "trace_events", "util/types", "wasi", "sea", "sqlite", "test",
   "test/reporters",

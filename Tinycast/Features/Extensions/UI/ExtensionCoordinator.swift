@@ -81,7 +81,8 @@ final class ExtensionCoordinator {
             return
         }
         guard let (owner, command) = extensions.resolve(link) else {
-            core.showMessage("No installed extension provides '\(link.commandName)'", tone: .danger)
+            let described = link.commandName.map { "'\($0)'" } ?? "a runnable command"
+            core.showMessage("No installed extension provides \(described)", tone: .danger)
             return
         }
         guard command.mode.isSupported else {

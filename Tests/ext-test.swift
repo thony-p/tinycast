@@ -1108,7 +1108,7 @@ struct ExtensionTests {
             ExtensionAccessoriesView_labelForTest(
                 screen.items.first?.node.array("accessories").dropFirst(4).first)
                 == "afe6c5530785b6cc6b1c6453384731bd,f7ce0b653d2d72a4,5d11c49af18b4b3e482508362bd2c857,"
-                + "eb7b227687302ff167fef6a04d9f99f3,"
+                + "ddf564c62048c654ae449eec16187c63,"
                 + "hello tonycast,17d614f379a9359077e95577fd31c20a,ERR_OSSL_BAD_DECRYPT,"
                 + "ERR_CRYPTO_INVALID_KEYLEN,ERR_CRYPTO_INVALID_DIGEST,6cba6dd1d44f53a3",
             String(describing: screen.items.first?.node.array("accessories").dropFirst(4).first))

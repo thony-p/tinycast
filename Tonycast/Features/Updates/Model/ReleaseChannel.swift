@@ -7,10 +7,14 @@ enum ReleaseChannel: Sendable {
     /// A local build. It has no release stream, and never updates itself.
     case development
 
+    /// The bundle ids that carry a release stream. A renamed fork keeps its own ids out of
+    /// here deliberately: `.stable` and `.beta` accept upstream's artifacts, and installing
+    /// one would overwrite the fork with a stock build. Add the fork's ids only alongside a
+    /// `ReleaseFeed` that serves the fork's own releases.
     init(bundleID: String?) {
         switch bundleID {
-        case "com.tonycast.app": self = .stable
-        case "com.tonycast.app.beta": self = .beta
+        case "com.tinycast.app": self = .stable
+        case "com.tinycast.app.beta": self = .beta
         default: self = .development
         }
     }

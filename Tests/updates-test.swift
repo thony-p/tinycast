@@ -100,14 +100,20 @@ struct UpdatesTests {
     // MARK: - ReleaseChannel
 
     static func derivesChannels() {
-        let stable = ReleaseChannel(bundleID: "com.tonycast.app")
-        let beta = ReleaseChannel(bundleID: "com.tonycast.app.beta")
-        let dev = ReleaseChannel(bundleID: "com.tonycast.app.dev")
+        let stable = ReleaseChannel(bundleID: "com.tinycast.app")
+        let beta = ReleaseChannel(bundleID: "com.tinycast.app.beta")
+        let dev = ReleaseChannel(bundleID: "com.tinycast.app.dev")
+        // A renamed fork's ids belong to no release stream: stable/beta accept upstream
+        // artifacts, and installing one would overwrite the fork.
+        let fork = ReleaseChannel(bundleID: "com.tonycast.app")
+        let forkBeta = ReleaseChannel(bundleID: "com.tonycast.app.beta")
 
         expect(stable == .stable, "the stable bundle id is the stable channel")
         expect(beta == .beta, "the beta bundle id is the beta channel")
         expect(dev == .development, "the dev bundle id is a local build")
         expect(ReleaseChannel(bundleID: nil) == .development, "a missing bundle id never updates")
+        expect(fork == .development, "a renamed fork never updates from upstream")
+        expect(forkBeta == .development, "nor from upstream's beta channel")
 
         expect(stable.updatesItself && beta.updatesItself, "both shipped channels update")
         expect(!dev.updatesItself, "a local build does not update itself")

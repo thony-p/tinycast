@@ -2,7 +2,7 @@ import AppleArchive
 import Foundation
 import System
 
-/// Compiles the shipped bundle and archive layer, so a `.tinycast` can't quietly change shape.
+/// Compiles the shipped bundle and archive layer, so a `.tonycast` can't quietly change shape.
 @main
 @MainActor
 struct BackupArchiveTest {
@@ -62,7 +62,7 @@ struct BackupArchiveTest {
             counts: ["clipboard": 1, "notes": 1])
         try? bundle.writeManifest(manifest)
 
-        let archive = root.appendingPathComponent("out.tinycast")
+        let archive = root.appendingPathComponent("out.tonycast")
         let opened = root.appendingPathComponent("open")
         do {
             try BackupArchive.seal(directory: source, into: archive)
@@ -171,7 +171,7 @@ struct BackupArchiveTest {
     }
 
     static func rejectsGarbage(in root: URL) {
-        let file = root.appendingPathComponent("garbage.tinycast")
+        let file = root.appendingPathComponent("garbage.tonycast")
         try? Data("not an archive".utf8).write(to: file)
         let into = root.appendingPathComponent("garbage-out")
         do {
@@ -194,7 +194,7 @@ struct BackupArchiveTest {
     /// A hostile archive must not write outside the directory the caller chose.
     static func refusesTraversal(in root: URL) {
         // Header-by-header: `writeDirectoryContents` refuses to emit the `..` path we need here.
-        let archive = root.appendingPathComponent("evil.tinycast")
+        let archive = root.appendingPathComponent("evil.tonycast")
         let payload = Data("escaped".utf8)
         guard
             let destination = ArchiveByteStream.fileStream(
@@ -240,7 +240,7 @@ struct BackupArchiveTest {
 
     /// A link entry names no `..` at all, and reading through it would leave the extract.
     static func refusesSymbolicLinks(in root: URL) {
-        let archive = root.appendingPathComponent("linked.tinycast")
+        let archive = root.appendingPathComponent("linked.tonycast")
         guard
             let destination = ArchiveByteStream.fileStream(
                 path: FilePath(archive.path), mode: .writeOnly, options: [.create, .truncate],

@@ -36,7 +36,7 @@ The **Insert…** menu adds placeholders for you.
 
 ## Destinations
 
-Tinycast works out what a link is from how it looks:
+Tonycast works out what a link is from how it looks:
 
 | You write                                           | It becomes                        |
 | --------------------------------------------------- | --------------------------------- |
@@ -179,6 +179,6 @@ You can also bring quicklinks across from a
 
 ## Where they are kept
 
-Quicklinks live in `quicklinks.sqlite3` in Tinycast's Application Support folder. If that file ever
-cannot be opened, Tinycast **reports it and never deletes it**. Your links are something you made, not
+Quicklinks live in `quicklinks.sqlite3` in Tonycast's Application Support folder. If that file ever
+cannot be opened, Tonycast **reports it and never deletes it**. Your links are something you made, not
 something that can be rebuilt.

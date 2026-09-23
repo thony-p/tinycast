@@ -24,13 +24,13 @@ provider protocol and the connections behind it.
   backups — an import must never arm it.
 - **One funnel, whichever way an action started.** A shortcut and a launcher row both land on
   `QuickActionCoordinator.run(_:)`, which reads `paletteCoordinator.targetApp` **before** hiding the
-  palette — once the palette is gone, the frontmost app is Tinycast, and the action would read its
+  palette — once the palette is gone, the frontmost app is Tonycast, and the action would read its
   own window. Hiding there rather than at each caller is what keeps the two paths identical.
 - **Enabling is consent, and it is the only place Accessibility is requested.** The toggle confirms
   through `DialogController` first and then calls `Permissions.ensureAccessibility()`, the pattern
   `SnippetCoordinator.setSnippetsEnabled` established. Everything else — a shortcut press, a
   delivery — uses `isAccessibilityTrusted()` and degrades to a HUD.
-- **Tinycast is never an event target.** `QuickActionRunner.selection(in:using:)` refuses our own
+- **Tonycast is never an event target.** `QuickActionRunner.selection(in:using:)` refuses our own
   bundle identifier, and `TextInjector.targetAcceptsInjection` refuses it again before every event post,
   along with anything raised while Secure Event Input is up. A shortcut pressed with Settings
   frontmost, or in a password field, does nothing and says so.
@@ -98,7 +98,7 @@ started.
 | Summarize | provider | panel, always | no |
 | a custom action | provider | panel | no |
 
-A custom action previews by default, switchable to Replace per row: Tinycast cannot know whether an
+A custom action previews by default, switchable to Replace per row: Tonycast cannot know whether an
 arbitrary prompt transforms the text or answers a question about it, and only the second destroys what
 it replaces. No diff, for the same reason.
 
@@ -120,7 +120,7 @@ takes the choice with it.
 `VisibilityStore.allowsHotKey` because `quickActionsEnabled` is the master switch. The four keep their
 `CommandID`s, so no shortcut or preference key moved. A custom action binds
 `HotKeyAction.quickAction(id:)` under `hotkey.quickAction.<uuid>`, indexed in `boundQuickActionIDs` so
-`HotKeyManager.start` can prune a binding whose action was deleted while Tinycast was off.
+`HotKeyManager.start` can prune a binding whose action was deleted while Tonycast was off.
 
 **The pane draws its own `AliasField`.** The four are named in `SettingsTab.ownedCommands`, so
 Settings → Commands no longer draws theirs. Without it, `deleteCustomQuickAction` would be clearing an
@@ -169,7 +169,7 @@ the panel. System Settings has no anchor for the sheet itself, so the last click
 
 ## The panel
 
-`QuickActionPanel` is Tinycast's **fourth borderless surface**, beside the dialog, the notes panel
+`QuickActionPanel` is Tonycast's **fourth borderless surface**, beside the dialog, the notes panel
 and the join preview. It takes the same recipe — `panelScrim`, then `VisualEffectView`, then the
 clip — and sits at `.floating` like the join preview, so a failure report still lands on top of it.
 Its footer speaks the same button language as a dialog's — `ModalActionButtonStyle`, with Replace
@@ -241,7 +241,7 @@ The Accessibility tier replaces the live selection atomically, under the five-ru
 in [snippets.md](snippets.md#text-delivery-and-pasteboard-safety) — Quick Actions simply enter it with
 no keyword, so rule 2 never applies. The event tiers behind it type or paste over the selection, which
 every app treats as replacing it — but that is the target app's behaviour rather than something
-Tinycast asserts, so it is the part worth checking by hand.
+Tonycast asserts, so it is the part worth checking by hand.
 
 **A replacement that never lands says so, and keeps the reply.** Every tier can decline, and a shortcut
 that quietly did nothing is indistinguishable from a shortcut that is not bound. `DeliveryCompletion`
@@ -258,7 +258,7 @@ failure handler, so automatic expansion stays silent as before.
 - Replace mode, with a slow route selected: the message pill says `Fixing Grammar…` with a blue
   spinner while the model works, and the result message takes its place.
 - Run one from the launcher (⌘Space → "Fix Grammar") with text selected behind it: the palette
-  closes and the selection in the displaced app is what gets acted on, not Tinycast's own field.
+  closes and the selection in the displaced app is what gets acted on, not Tonycast's own field.
 - Uncheck an action's launcher checkbox: the row leaves ⌘Space, and its shortcut still works.
 - Add a custom action, bind a shortcut, run it from the shortcut and from ⌘Space, then rename it and
   confirm the shortcut, the Replace choice and the checkbox all survived.
@@ -266,7 +266,7 @@ failure handler, so automatic expansion stays silent as before.
   and ⌘Space, and the chord is free for something else to take.
 - Type "quick actions" in ⌘Space: the section lists the shipped four beside the custom ones.
 - Give Fix Grammar and a custom action an alias in the pane, then type each alias in ⌘Space.
-- Press a shortcut with Tinycast's own Settings window frontmost: refused, with a HUD.
+- Press a shortcut with Tonycast's own Settings window frontmost: refused, with a HUD.
 - Press one in a password field: refused.
 - Summarize a long selection: the panel streams, grows without the title drifting, and scrolls past
   `quickActionPanelBody`.

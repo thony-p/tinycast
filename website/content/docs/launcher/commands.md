@@ -3,7 +3,7 @@ title: Commands
 description: Every built-in command, and the shell commands you write yourself.
 ---
 
-Commands are things Tinycast does, reachable by name from the launcher. Some are built in. Others
+Commands are things Tonycast does, reachable by name from the launcher. Some are built in. Others
 are shell commands you write.
 
 ## Built-in commands
@@ -24,7 +24,7 @@ feature's own pane, and only appear while the feature is on. The rest live in **
 | [Window Management](/docs/features/window-layouts) | Create Window Layout · Create Layout from Current Windows                                                                                                                                          |
 | [Quicklinks](/docs/launcher/quicklinks)            | Create Quicklink · Search Quicklinks · Import Quicklinks · Export Quicklinks                                                                                                                       |
 | [Snippets](/docs/features/snippets)                | Search Snippets · Create Snippet                                                                                                                                                                   |
-| Commands                                           | Calculator History · [Open Camera](/docs/features/camera) · Export Backup · Import Backup · Import from Raycast · Check for Updates · Settings · About Tinycast · Support Tinycast · Quit Tinycast |
+| Commands                                           | Calculator History · [Open Camera](/docs/features/camera) · Export Backup · Import Backup · Import from Raycast · Check for Updates · Settings · About Tonycast · Support Tonycast · Quit Tonycast |
 
 Two more appear only for what you type: **Open in Browser** and **Run Shell Command**. See
 [Fallbacks](/docs/launcher/fallbacks).
@@ -32,7 +32,7 @@ Two more appear only for what you type: **Open in Browser** and **Run Shell Comm
 Each command's row has a launcher checkbox, a shortcut recorder and an alias field.
 
 **Every built-in command can take a global shortcut**, except Open in Browser and Run Shell Command,
-which need text to work on, and Quit Tinycast, so no stray key press can quit the app.
+which need text to work on, and Quit Tonycast, so no stray key press can quit the app.
 
 A command that opens a screen works like a toggle: press its shortcut again to close it.
 
@@ -79,13 +79,13 @@ its settings, but nothing can run it until you tick it again.
 | Shell       | `/bin/zsh -lc <command>`                            |
 | Folder      | Its Run In folder, or your home folder              |
 | Input       | None; anything that asks for input gets end-of-file |
-| Environment | Inherited, plus `TINYCAST=1`                        |
+| Environment | Inherited, plus `TONYCAST=1`                        |
 
-**There is no Terminal window and no timeout.** Tinycast never stops a running command on its own,
-and a command keeps running if Tinycast quits. The one exception is the **Stop** button in the output
+**There is no Terminal window and no timeout.** Tonycast never stops a running command on its own,
+and a command keeps running if Tonycast quits. The one exception is the **Stop** button in the output
 window.
 
-If the Run In folder no longer exists, the command does not run, and Tinycast tells you which folder
+If the Run In folder no longer exists, the command does not run, and Tonycast tells you which folder
 is missing. Running it somewhere else would be worse.
 
 ### Arguments
@@ -115,10 +115,10 @@ command exits with **127**.
 Turning it on uses `-ilc`, which reads `.zshrc`. That also runs everything else your shell startup
 does, like oh-my-zsh's auto-update or a theme's background helpers.
 
-`TINYCAST=1` lets your `.zshrc` skip that work:
+`TONYCAST=1` lets your `.zshrc` skip that work:
 
 ```bash
-[[ -n $TINYCAST ]] && return
+[[ -n $TONYCAST ]] && return
 ```
 
 Measured against a real `.zshrc`: about 10 ms to start with it off, about 65 ms with it on.
@@ -144,7 +144,7 @@ The window keeps the last 256 KB of output. Scroll up and it stops following new
 to the bottom and it follows again.
 
 With **Load shell environment** on, anything your `.zshrc` prints shows up here too. The
-`TINYCAST=1` check above keeps it quiet.
+`TONYCAST=1` check above keeps it quiet.
 
 ### Needs confirmation
 

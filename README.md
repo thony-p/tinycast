@@ -1,12 +1,12 @@
-# Tinycast
+# Tonycast
 
 **A tiny, fully native macOS launcher. One hotkey, everything you reach for all day, under 100 MB of
 RAM.**
 
 <p align="center">
-  <a href="https://github.com/abue-ammar/tinycast/releases/latest">
+  <a href="https://github.com/abue-ammar/tonycast/releases/latest">
     <img alt="Latest release"
-         src="https://img.shields.io/github/v/release/abue-ammar/tinycast?sort=semver&style=flat&label=release&color=1F6FEB"></a>
+         src="https://img.shields.io/github/v/release/abue-ammar/tonycast?sort=semver&style=flat&label=release&color=1F6FEB"></a>
   <img alt="Swift 6.0"
        src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat&logo=swift&logoColor=white">
   <img alt="macOS 26 or later"
@@ -15,10 +15,10 @@ RAM.**
     <img alt="License: AGPL-3.0"
          src="https://img.shields.io/badge/License-AGPL--3.0-3DA639?style=flat"></a>
   <a href="https://discord.gg/v2Eeb4QQy3">
-    <img alt="Join the Tinycast Discord"
+    <img alt="Join the Tonycast Discord"
          src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat&logo=discord&logoColor=white"></a>
-  <a href="https://tinycast.dev/support">
-    <img alt="Support Tinycast"
+  <a href="https://tonycast.dev/support">
+    <img alt="Support Tonycast"
          src="https://img.shields.io/badge/Support-Tip%20the%20dev-EA4AAA?style=flat&logo=polar&logoColor=white"></a>
 </p>
 
@@ -28,17 +28,17 @@ real Raycast extensions**, rendered as native SwiftUI. Free, open source, and st
 For anything private, email [iabueammar@gmail.com](mailto:iabueammar@gmail.com).
 
 <p align="center">
-  <img src="docs/screenshot.png" alt="Tinycast command palette" width="720">
+  <img src="docs/screenshot.png" alt="Tonycast command palette" width="720">
 </p>
 
 ## Support
 
-Tinycast is **free, and it stays that way**. If it earns a place in your daily flow, a one-off tip helps
+Tonycast is **free, and it stays that way**. If it earns a place in your daily flow, a one-off tip helps
 keep it actively maintained. GitHub Sponsors isn't available in my country, so please support here:
 
 <p align="center">
-  <a href="https://tinycast.dev/support">
-    <img alt="Support Tinycast" width="188" height="44" src="docs/support-button.svg"></a><br>
+  <a href="https://tonycast.dev/support">
+    <img alt="Support Tonycast" width="188" height="44" src="docs/support-button.svg"></a><br>
   <sub>Payments are handled securely by <a href="https://polar.sh">Polar.sh</a>.</sub>
 </p>
 
@@ -80,38 +80,38 @@ keep it actively maintained. GitHub Sponsors isn't available in my country, so p
 First, add the tap:
 
 ```sh
-brew trust --tap abue-ammar/tinycast   # required for third-party taps
-brew tap abue-ammar/tinycast
+brew trust --tap abue-ammar/tonycast   # required for third-party taps
+brew tap abue-ammar/tonycast
 ```
 
 Then run the one line that matches your Mac:
 
 | Your Mac                         | Install                                  |
 | -------------------------------- | ---------------------------------------- |
-| Apple silicon, macOS 26 or newer | `brew install --cask tinycast`           |
-| Intel, macOS 26                  | `brew install --cask tinycast-universal` |
+| Apple silicon, macOS 26 or newer | `brew install --cask tonycast`           |
+| Intel, macOS 26                  | `brew install --cask tonycast-universal` |
 
 Not sure which you have? **Apple menu → About This Mac.** Homebrew checks too, and refuses the
 wrong one.
 
-Want early builds? `brew install --cask tinycast@beta` puts `Tinycast Beta.app` beside the stable
+Want early builds? `brew install --cask tonycast@beta` puts `Tonycast Beta.app` beside the stable
 app, with its own settings and permissions. Apple silicon, macOS 26+.
 
 Homebrew clears the macOS quarantine flag on every install and update, so there is nothing else to
-run. Downloading a DMG from [Releases](https://github.com/abue-ammar/tinycast/releases) instead?
-Tinycast is self-signed, so clear the flag once:
-`xattr -dr com.apple.quarantine "/Applications/Tinycast.app"`.
+run. Downloading a DMG from [Releases](https://github.com/abue-ammar/tonycast/releases) instead?
+Tonycast is self-signed, so clear the flag once:
+`xattr -dr com.apple.quarantine "/Applications/Tonycast.app"`.
 
 ## Permissions
 
-**Accessibility** — needed when Tinycast pastes or expands text into another app, and the only
+**Accessibility** — needed when Tonycast pastes or expands text into another app, and the only
 permission snippet keyword expansion needs. You're prompted when you first use a feature that needs
 it; grant access in **System Settings → Privacy & Security → Accessibility**. Snippets ship
 disabled, and keystrokes are matched locally, never stored and never sent anywhere.
 
 ## Using it
 
-1. Open **Settings → General** and record a global shortcut to summon Tinycast.
+1. Open **Settings → General** and record a global shortcut to summon Tonycast.
 2. Press it anywhere → the palette floats in. Type to filter, **↵** to launch.
 3. **Tab** switches between Apps and Clipboard; **↑/↓** move, **Esc** dismisses.
 4. **Settings → Shortcuts** — search an app or custom command and record a global shortcut.
@@ -131,7 +131,7 @@ standards, the design system and one document per feature.
 > encouraged. A PR that doesn't close an issue marked `approved` is closed automatically however good
 > the patch is, and the work is wasted. Docs-only fixes are the one exception.
 >
-> Tinycast's feature set is deliberately closed, and "another launcher has it" is not a reason on its
+> Tonycast's feature set is deliberately closed, and "another launcher has it" is not a reason on its
 > own. Ask whether a feature is wanted before you ask for it.
 
 Read **[CONTRIBUTING.md](CONTRIBUTING.md)** first — it covers the memory budget every PR is held to,
@@ -143,11 +143,11 @@ Questions, ideas, or just want to follow along? **[Join the Discord](https://dis
 
 ## Star History
 
-<a href="https://www.star-history.com/?repos=abue-ammar%2Ftinycast&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=abue-ammar%2Ftonycast&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=abue-ammar/tinycast&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=abue-ammar/tinycast&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=abue-ammar/tinycast&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=abue-ammar/tonycast&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=abue-ammar/tonycast&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=abue-ammar/tonycast&type=date&legend=top-left" />
  </picture>
 </a>
 

@@ -1,7 +1,7 @@
 name: Release
 
 # Shown in the Actions list instead of a bare "Release" — carries the version + channel.
-run-name: "Tinycast ${{ inputs.version }} · ${{ inputs.channel }} #${{ github.run_number }}"
+run-name: "Tonycast ${{ inputs.version }} · ${{ inputs.channel }} #${{ github.run_number }}"
 
 # Manually triggered from the Actions tab. Pick a channel and a base version;
 # beta builds get an auto-incrementing suffix so re-running never collides.
@@ -49,10 +49,10 @@ jobs:
           CHANNEL="${{ github.event.inputs.channel }}"
           BASE_VERSION="${{ github.event.inputs.version }}"
           # Each channel is a distinct, side-by-side app: its own display name + bundle id,
-          # and its own Homebrew cask in the abue-ammar/homebrew-tinycast tap.
+          # and its own Homebrew cask in the abue-ammar/homebrew-tonycast tap.
           case "$CHANNEL" in
-            beta)   SUFFIX="-beta.${GITHUB_RUN_NUMBER}";  DISPLAY="Tinycast Beta";  BUNDLE="com.tinycast.app.beta";  CASK="tinycast@beta";  PRERELEASE=true ;;
-            stable) SUFFIX="";                            DISPLAY="Tinycast";       BUNDLE="com.tinycast.app";       CASK="tinycast";       PRERELEASE=false ;;
+            beta)   SUFFIX="-beta.${GITHUB_RUN_NUMBER}";  DISPLAY="Tonycast Beta";  BUNDLE="com.tonycast.app.beta";  CASK="tonycast@beta";  PRERELEASE=true ;;
+            stable) SUFFIX="";                            DISPLAY="Tonycast";       BUNDLE="com.tonycast.app";       CASK="tonycast";       PRERELEASE=false ;;
           esac
           FULL="${BASE_VERSION}${SUFFIX}"
           {
@@ -60,8 +60,8 @@ jobs:
             echo "display_name=${DISPLAY}"
             echo "bundle_id=${BUNDLE}"
             echo "cask_name=${CASK}"
-            echo "dmg_file=Tinycast-${FULL}.dmg"
-            echo "zip_file=Tinycast-${FULL}.zip"
+            echo "dmg_file=Tonycast-${FULL}.dmg"
+            echo "zip_file=Tonycast-${FULL}.zip"
             echo "prerelease=${PRERELEASE}"
           } >> "$GITHUB_OUTPUT"
 
@@ -82,7 +82,7 @@ jobs:
           security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "${P12_PASSWORD}" -A -T /usr/bin/codesign
           # Let codesign use the key without an interactive prompt.
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KPW" "$KEYCHAIN" >/dev/null
-          # Prepend to the search list so xcodebuild's codesign finds "Tinycast Self-Signed".
+          # Prepend to the search list so xcodebuild's codesign finds "Tonycast Self-Signed".
           security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | sed 's/"//g')
           rm -f "$RUNNER_TEMP/cert.p12"
 
@@ -97,10 +97,10 @@ jobs:
         run: |
           # ARCHS pinned to what this channel has always shipped: trusting ARCHS_STANDARD is what
           # let a thin arm64 build reach Intel users once already (compat/README.md).
-          xcodebuild -project Tinycast.xcodeproj -scheme Tinycast -configuration Release \
+          xcodebuild -project Tonycast.xcodeproj -scheme Tonycast -configuration Release \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             ARCHS=arm64 ONLY_ACTIVE_ARCH=NO \
-            CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Tinycast Self-Signed" \
+            CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Tonycast Self-Signed" \
             OTHER_CODE_SIGN_FLAGS="--timestamp=none" \
             PRODUCT_NAME="$DISPLAY_NAME" PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
             MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
@@ -148,7 +148,7 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: Tinycast-${{ steps.meta.outputs.full_version }}
+          name: Tonycast-${{ steps.meta.outputs.full_version }}
           path: dist/
 
       # The changelog GitHub derives from the merged PRs, with the install text below a marker the
@@ -196,7 +196,7 @@ jobs:
             exit 0
           fi
           SHA="$(shasum -a 256 "dist/${DMG_FILE}" | awk '{print $1}')"
-          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/abue-ammar/homebrew-tinycast.git" tap
+          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/abue-ammar/homebrew-tonycast.git" tap
           CASK_FILE="tap/Casks/${CASK}.rb"
           if [ ! -f "$CASK_FILE" ]; then
             echo "::error::$CASK_FILE not found in tap."
@@ -234,7 +234,7 @@ jobs:
           fi
           if [ "${CHANNEL}" = "stable" ]; then COLOR=3066993; else COLOR=15844367; fi
           RELEASE_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${TAG}"
-          INSTALL="brew install --cask abue-ammar/tinycast/${CASK}"
+          INSTALL="brew install --cask abue-ammar/tonycast/${CASK}"
           # Build with jq so backticks stay literal (printf in single quotes escaped them,
           # which Discord rendered as verbatim backticks instead of a code block).
           # Components V2 forbids a top-level `content`, so @everyone is a text component, and
@@ -277,7 +277,7 @@ jobs:
       VERSION: ${{ needs.build.outputs.full_version }}
       DISPLAY_NAME: ${{ needs.build.outputs.display_name }}
       BUNDLE_ID: ${{ needs.build.outputs.bundle_id }}
-      CASK: tinycast-universal
+      CASK: tonycast-universal
     steps:
       - uses: actions/checkout@v7
 
@@ -318,10 +318,10 @@ jobs:
         env:
           BUILD_NUMBER: ${{ github.run_number }}
         run: |
-          xcodebuild -project Tinycast.xcodeproj -scheme Tinycast -configuration Release \
+          xcodebuild -project Tonycast.xcodeproj -scheme Tonycast -configuration Release \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
-            CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Tinycast Self-Signed" \
+            CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Tonycast Self-Signed" \
             OTHER_CODE_SIGN_FLAGS="--timestamp=none" \
             PRODUCT_NAME="$DISPLAY_NAME" PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
             MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
@@ -366,12 +366,12 @@ jobs:
           ln -s /Applications "$STAGE/Applications"
           mkdir -p dist
           diskutil image create from "$STAGE" --format UDZO --volumeName "$DISPLAY_NAME" \
-            "dist/Tinycast-Universal-${VERSION}.dmg"
-          ditto -c -k --keepParent --sequesterRsrc "$APP" "dist/Tinycast-Universal-${VERSION}.zip"
+            "dist/Tonycast-Universal-${VERSION}.dmg"
+          ditto -c -k --keepParent --sequesterRsrc "$APP" "dist/Tonycast-Universal-${VERSION}.zip"
 
       - uses: actions/upload-artifact@v7
         with:
-          name: Tinycast-Universal-${{ needs.build.outputs.full_version }}
+          name: Tonycast-Universal-${{ needs.build.outputs.full_version }}
           path: dist/
 
       # Upload, never create: the build job owns the release. Uploading second also keeps the thin
@@ -381,8 +381,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release upload "v${VERSION}" \
-            "dist/Tinycast-Universal-${VERSION}.dmg" \
-            "dist/Tinycast-Universal-${VERSION}.zip"
+            "dist/Tonycast-Universal-${VERSION}.dmg" \
+            "dist/Tonycast-Universal-${VERSION}.zip"
 
       - name: Update Homebrew cask
         env:
@@ -392,8 +392,8 @@ jobs:
             echo "::warning::HOMEBREW_TAP_TOKEN secret not set — skipping cask bump."
             exit 0
           fi
-          SHA="$(shasum -a 256 "dist/Tinycast-Universal-${VERSION}.dmg" | awk '{print $1}')"
-          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/abue-ammar/homebrew-tinycast.git" tap
+          SHA="$(shasum -a 256 "dist/Tonycast-Universal-${VERSION}.dmg" | awk '{print $1}')"
+          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/abue-ammar/homebrew-tonycast.git" tap
           CASK_FILE="tap/Casks/${CASK}.rb"
           if [ ! -f "$CASK_FILE" ]; then
             echo "::error::$CASK_FILE not found in tap."

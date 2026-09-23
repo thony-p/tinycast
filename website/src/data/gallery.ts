@@ -1,4 +1,4 @@
-// Drives the "Tinycast in action" gallery + lightbox. Each item is a tile in
+// Drives the "Tonycast in action" gallery + lightbox. Each item is a tile in
 // the grid and a slide in the lightbox. `src`/`thumb`/`poster` are URLs as
 // rendered — root-absolute for `public/`, absolute for anything on R2.
 // `width`/`height` are the media's real pixel size (used for lightbox aspect);
@@ -23,9 +23,9 @@ export type GalleryItem = {
 export const galleryItems: GalleryItem[] = [
   {
     type: "video",
-    src: `${site.cdn}/tinycast-in-action.mp4`,
+    src: `${site.cdn}/tonycast-in-action.mp4`,
     poster: "/screenshot.png",
-    title: "Tinycast in action",
+    title: "Tonycast in action",
     caption: "A quick tour — launcher, clipboard, calculator, and more.",
     width: 3024,
     height: 1964,

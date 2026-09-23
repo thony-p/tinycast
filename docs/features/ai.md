@@ -1,6 +1,6 @@
 # AI providers and chat
 
-Tinycast has one app-wide provider layer for features that need text generation. AI Chat chooses its
+Tonycast has one app-wide provider layer for features that need text generation. AI Chat chooses its
 model from the chat header; callers ask `AppCore.aiProvider()` for the current provider and stream an
 `AIRequest`.
 AI Chat is the first consumer and [Quick Actions](quick-actions.md) the second; the provider layer
@@ -19,12 +19,12 @@ depends on neither, and Quick Actions carries its own route rather than borrowin
   OpenCode and Cursor visible with an individual toggle for each, all off by default. Turning one off cancels
   its check, clears its catalog and releases its process; Apple Intelligence is the default route when
   available, and saved API connections stay available.
-- **Every request carries Tinycast's own preamble, and the user's text goes after it.**
+- **Every request carries Tonycast's own preamble, and the user's text goes after it.**
   `AIInstructions.compose` builds `AIRequest.instructions`: a fixed preamble that tells the model
   where it is running and what the app can do, then whatever Settings → AI holds. The preamble
   keeps the model a general-purpose assistant — the app facts are reference for when the user asks,
   never a scope limit — and asks for honest comparisons; it does not instruct the model to favour
-  Tinycast over anything else. It is not shown in the pane, and `AIPreamble.swift` holds the only
+  Tonycast over anything else. It is not shown in the pane, and `AIPreamble.swift` holds the only
   copy of it — edit the prompt there, not here. `compose` returns `nil` when the user has turned
   the system prompt off, and every transport drops a nil instruction, so a turn then carries none.
 - **API keys live only in the login Keychain.** `AIConnection` persists the provider, endpoint and
@@ -54,9 +54,9 @@ depends on neither, and Quick Actions carries its own route rather than borrowin
   reader *removed*; a Mac with Apple Intelligence switched off keeps its stored selection and is told
   why, because silently moving someone from a free, private, local model onto a billed endpoint is
   the one redirection this feature must never perform.
-- **Installed commands reuse their own login.** Tinycast launches the user's `codex`, `claude`, `grok` or
+- **Installed commands reuse their own login.** Tonycast launches the user's `codex`, `claude`, `grok` or
   `opencode` executable without asking for or storing another key. Codex inherits the user's normal
-  home and credential-store setting; Claude, Grok, OpenCode and Cursor inherit their normal configuration. Tinycast
+  home and credential-store setting; Claude, Grok, OpenCode and Cursor inherit their normal configuration. Tonycast
   never reads those credential files, browser cookies or undocumented web endpoints.
 - **Codex tools are unavailable.** The app-server launches with tool capabilities disabled, approvals
   set to never and a read-only, network-disabled sandbox. Any server approval request is declined.
@@ -81,8 +81,8 @@ depends on neither, and Quick Actions carries its own route rather than borrowin
   `dontAsk` permissions and a workspace sandbox, and never `--always-approve`, so a user's always-approve
   config cannot arm tools for this route. OpenCode runs `--pure` with deny-all permissions, disabled
   sharing and a private working directory. Cursor runs `agent -p --mode ask` with `--trust` against
-  Tinycast's private workspace and never `--force` / `--yolo` / `--approve-mcps`; ask mode blocks edits.
-  Each deletes the session or chat it created once the child exits, and Tinycast never reaches into the
+  Tonycast's private workspace and never `--force` / `--yolo` / `--approve-mcps`; ask mode blocks edits.
+  Each deletes the session or chat it created once the child exits, and Tonycast never reaches into the
   user's own config to do it. **Only Claude keeps the user's MCP servers out of the process**, through
   `--strict-mcp-config` with an empty config — and even that yields to an installed managed MCP policy,
   which makes the CLI reject both flags. Grok, OpenCode and Cursor load the global config either way,
@@ -159,16 +159,16 @@ as `.codex`, so an existing selection survives the rename.
 
 The base URL stays editable for every preset because gateways and organization proxies are legitimate
 destinations. `AIHTTPConfiguration.endpointURL` accepts a complete endpoint or appends the transport's
-completion path. Gemini requests identify Tinycast through `x-goog-api-client`; OpenRouter requests
+completion path. Gemini requests identify Tonycast through `x-goog-api-client`; OpenRouter requests
 carry the app title.
 
 Each connection has an ordered, deduplicated list of exact model identifiers. While its editor is open,
-Tinycast asks the configured provider for the models available to the entered key and uses the result
+Tonycast asks the configured provider for the models available to the entered key and uses the result
 for search-as-you-type completion and validation. It never renders the whole provider catalog at once;
 selected models stay visible and search shows at most twelve additions. Discovery is debounced,
 cacheless and never persists the typed key. A
 custom gateway may not implement a model-list endpoint, so exact identifiers can always be entered
-manually. Tinycast does not ship or guess an API catalog that can become stale. Codex gets its models
+manually. Tonycast does not ship or guess an API catalog that can become stale. Codex gets its models
 and reasoning efforts from `model/list`; OpenCode gets identifiers and model-specific variants from
 `opencode models --pure --verbose`. Claude exposes the CLI's stable `sonnet`, `opus` and `haiku`
 aliases, with the CLI's effort levels on the supported Opus and Sonnet families. Cursor lists models
@@ -178,7 +178,7 @@ Turning thinking off is a reasoning effort, not a second control: `reasoningOpti
 the connection's catalogued efforts, or — for a connection with no catalog to publish one — `Default`
 and `None`. `takesThinkingField` decides who gets that pair: an OpenAI-shaped preset whose base URL is
 not that preset's own, because a preset pointed away from its own API is a gateway, and a gateway is
-the only destination Tinycast can offer the switch to honestly. Picking `None` sends
+the only destination Tonycast can offer the switch to honestly. Picking `None` sends
 `"thinking": {"type": "disabled"}`, which is how DeepSeek and the endpoints that copied its contract
 answer without reasoning first. A vendor API is never offered the pair and so is never sent a field it
 does not define — which matters precisely because the preset alone says nothing about the destination
@@ -248,7 +248,7 @@ loaded still marked running belonged to a process that is gone, so it reads back
 repair a message left streaming gets.
 
 `ChatHistoryStore` writes `ai-chats.sqlite3` below the bundle-specific Application Support directory.
-It uses the system SQLite already linked by Tinycast, stores no provider credentials, and repairs a
+It uses the system SQLite already linked by Tonycast, stores no provider credentials, and repairs a
 reply left streaming by a prior process into an interrupted failure when loaded.
 
 ## Palette integration
@@ -301,7 +301,7 @@ and `MCPCoordinator` the twentieth.
   the selection reading **Apple Intelligence** without asking for anything.
 - With it switched off in System Settings, the pane says so and chat says so; neither moves the
   reader onto a configured API connection.
-- Install and sign in to each supported command outside Tinycast, choose one of its discovered models,
+- Install and sign in to each supported command outside Tonycast, choose one of its discovered models,
   and confirm Chat and each model-backed Quick Action use it without showing a credential field.
 - Sign out of an installed command, press Check Again, and confirm its models leave both pickers while
   the stored selection is repaired according to the normal routing rule.
@@ -326,14 +326,14 @@ and `MCPCoordinator` the twentieth.
 login shell, so a stale copy in another prefix never shadows the one Terminal runs. Only when the shell
 names no absolute executable does it fall back to the app's PATH, the normal Homebrew and local-bin
 locations and every nvm Node version, newest first — a fallback that can pick a different copy. The
-commands are never installed by Tinycast; Settings links to their own install docs and offers a sign-in
+commands are never installed by Tonycast; Settings links to their own install docs and offers a sign-in
 command to copy. `InstalledAIManager` probes Claude, Grok, OpenCode and Cursor off-main, in parallel.
 Claude's auth status gates three model aliases; a successful Grok or OpenCode model list is both its auth
 check and catalog; Cursor's `status --format json` gates `--list-models`.
 
 `ChatGPTSubscriptionManager` retains its historical type name but now owns only the installed Codex
 app-server lifecycle and discovered account metadata. Production never sets `CODEX_HOME`, so the
-server uses the same login and credential store as the user's normal Codex command. Tinycast supplies
+server uses the same login and credential store as the user's normal Codex command. Tonycast supplies
 only a private working directory. The server stops after ten idle minutes, when AI is switched off or
 when the app terminates, and restarts on demand. Account state, model availability and rate-limit
 windows come from the supported app-server protocol.
@@ -342,7 +342,7 @@ windows come from the supported app-server protocol.
 
 It creates an ephemeral thread for each request, injects prior user/assistant messages, and
 streams agent-message deltas, plus `item/started` for the reasoning and web-search items that feed the
-bubble's status line. System messages become developer instructions alongside Tinycast's fixed
+bubble's status line. System messages become developer instructions alongside Tonycast's fixed
 no-tools boundary. Cancellation interrupts the active turn, including one the server has started but
 not yet named: Stop arms that thread, and whichever of `turn/started` or the `turn/start` response
 names the turn first spends a single `turn/interrupt` on it.
@@ -353,7 +353,7 @@ developer instructions say whether the model may reach the web so the two cannot
 out as `image` input parts with data URLs, and as `input_image` when prior turns are injected.
 
 `InstalledCLITurnRunner` handles Claude, Grok, OpenCode and Cursor behind the same provider protocol. It
-frames Tinycast's instructions and bounded conversation history as stdin (or a private `--prompt-file` for
+frames Tonycast's instructions and bounded conversation history as stdin (or a private `--prompt-file` for
 Grok, whose CLI requires a path), consumes newline-delimited JSON, and never puts prompt text on the
 process command line. Claude uses stream JSON, `--effort` and no session persistence.
 Grok uses `streaming-messages-json` and `--effort`, with `--deny *` so tools cannot run even when the
@@ -384,7 +384,7 @@ transport code at all.
 | Grok command | never | never | never | the global config still loads — `--deny *` refuses the call |
 | OpenCode command | never | never | never | the global config still loads — `permission: deny` refuses the call |
 | Cursor command | never | never | never | the global config still loads — ask mode and withheld approval refuse the call |
-| OpenRouter | `plugins: [{id: "web"}]` — OpenRouter's own layer, any model | `image_url` part, only for models whose catalog lists the `image` modality | never yet — its catalog publishes a `file` modality Tinycast does not read | `tools` + `role: "tool"` turns |
+| OpenRouter | `plugins: [{id: "web"}]` — OpenRouter's own layer, any model | `image_url` part, only for models whose catalog lists the `image` modality | never yet — its catalog publishes a `file` modality Tonycast does not read | `tools` + `role: "tool"` turns |
 | OpenAI | not offered | `image_url` part, assumed supported | `file` part with `filename` and a `file_data` data URL | `tools` + `role: "tool"` turns |
 | Gemini / compatible | not offered | `image_url` part, assumed supported | never — a gateway that has not implemented the part bills the upload before rejecting it | `tools` + `role: "tool"` turns |
 | Anthropic | not offered | base64 `image` block | base64 `document` block, ahead of the text block | `tools` + `tool_use` / `tool_result` blocks |
@@ -410,7 +410,7 @@ It's still excluded from backups — which Mac may send prompts to a search engi
 Nothing *guesses* at a capability: images ride on what the model's own catalog said, and a vendor
 API that does not take one simply returns its error. What is gated is only what a route provably
 cannot carry — a PDF to a text transport — refused at the composer with a HUD naming the reason.
-`AIModelCapabilities.documents` is true only for the two HTTP shapes whose bodies Tinycast writes;
+`AIModelCapabilities.documents` is true only for the two HTTP shapes whose bodies Tonycast writes;
 a gateway that has not implemented the `file` part would bill the upload before rejecting it, which
 is why documents are *not* assumed the way images are. An attachment is never dropped on the way
 out: answering a question about a document the model never received is the one outcome this must
@@ -486,7 +486,7 @@ width and clipped the search field well short of the button.
 
 ## Settings and backup boundary
 
-Settings → AI is a normal grouped `Form` inside Tinycast's existing Settings window. Its top AI
+Settings → AI is a normal grouped `Form` inside Tonycast's existing Settings window. Its top AI
 section owns the feature switch and the **Providers → Manage…** action, and **Default model** below
 it picks the app-wide route and its reasoning effort. Provider management opens as a sheet, where
 **Installed AI** reports Codex, Claude, Grok, OpenCode and Cursor separately as checking, ready, sign-in required,
@@ -514,7 +514,7 @@ box already withholds their own text, so a switch that spared the preamble would
 preamble is the part that is billed on every turn for every user and has no other way off. Off
 disables the editor rather than hiding it, so what is being withheld stays readable. One thing it
 deliberately cannot reach: the Codex route always prepends its own instruction never to invoke
-tools, run commands or touch files. That is a sandbox boundary on a local CLI, not Tinycast
+tools, run commands or touch files. That is a sandbox boundary on a local CLI, not Tonycast
 describing itself, and a user switch must not be able to lift it.
 
 `mcpEnabled` and `mcpServers` are excluded for the reasons in [mcp.md](mcp.md).

@@ -167,7 +167,7 @@ region setting. **Nothing ever asks for your location.**
 
 Shared words are assigned on purpose: `dollars` could be 22 currencies, `francs` 10, `pounds` 9,
 `pesos` 8 and `rupees` 6. A word that stays truly ambiguous gets **no card at all**. `krona` is both
-Swedish and Icelandic, so Tinycast will not guess.
+Swedish and Icelandic, so Tonycast will not guess.
 
 Slang does not work: **`quid` and `bucks` get no card.** `rmb` and `renminbi` do, because the ISO
 4217 standard itself calls the currency "Yuan Renminbi".
@@ -179,7 +179,7 @@ Units come before money, so `10 pounds to kg` is weight, `10 pounds to euros` is
 ### Rates
 
 Rates are saved on your Mac and refreshed every 24 hours, counted from when they were saved.
-Restarting Tinycast never fetches again early, so opening it with a fresh copy makes **zero**
+Restarting Tonycast never fetches again early, so opening it with a fresh copy makes **zero**
 network requests.
 
 Crypto is best effort. If coin prices fail to load, money still works and coins try again in 30
@@ -253,7 +253,7 @@ Cities come from the time zone database built into macOS, plus about a hundred c
 not name, like Salzburg or Basel. Accents are optional, so `zurich` works. Common short names work
 too: `pst`, `cet`, `jst`, `sf`, `nyc`, `ldn`, and airport codes like `lhr`, `nrt` and `sfo`.
 
-It all works offline. Tinycast does not look cities up online.
+It all works offline. Tonycast does not look cities up online.
 
 ## Percent, ratios and lists
 

@@ -1,4 +1,4 @@
-# Tinycast documentation
+# Tonycast documentation
 
 Start with [`AGENTS.md`](../AGENTS.md) at the repo root — it is the short version, and it links here for
 anything that needs more than a line.
@@ -19,7 +19,7 @@ contradicts the code is a defect, so fix it in the commit that made it wrong.
 ## Features
 
 One document per feature, covering its invariants and internals. A few span more than one source
-folder — `palette.md` covers `Tinycast/Palette/`, `backup.md` covers two. Every one of them **must**
+folder — `palette.md` covers `Tonycast/Palette/`, `backup.md` covers two. Every one of them **must**
 open with an `## Invariants` section; read it before changing anything in that area.
 
 [palette](features/palette.md) ·
@@ -47,8 +47,7 @@ open with an `## Invariants` section; read it before changing anything in that a
 [backup](features/backup.md) ·
 [Raycast import](features/raycast-import.md) ·
 [Raycast extensions](features/extensions.md) ·
-[updates](features/updates.md) ·
-[support](features/support.md)
+[updates](features/updates.md)
 
 ## Contributing
 

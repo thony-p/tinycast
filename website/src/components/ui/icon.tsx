@@ -2,7 +2,7 @@ import { useId, type SVGProps } from "react";
 
 type BrandIconProps = { size?: number } & SVGProps<SVGSVGElement>;
 
-// The Tinycast mark — the lightning-Z from the app icon, filled with the brand
+// The Tonycast mark — the lightning-Z from the app icon, filled with the brand
 // violet gradient. Single flat path (the app icon's blurred layers are dropped).
 export function Logo({ size = 22, ...props }: BrandIconProps) {
   // Per-instance, because the nav and the footer both render a Logo and a

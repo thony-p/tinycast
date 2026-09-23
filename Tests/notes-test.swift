@@ -25,10 +25,10 @@ struct NotesTests {
     private static func testRepositoryAndSearch() throws {
         let root = temporaryRoot("repository")
         defer { try? FileManager.default.removeItem(at: root) }
-        let support = root.appendingPathComponent("com.tinycast.app")
+        let support = root.appendingPathComponent("com.tonycast.app")
         let stable = try repository(in: root, support: support)
         let development = try repository(
-            in: root, support: root.appendingPathComponent("com.tinycast.app.dev"))
+            in: root, support: root.appendingPathComponent("com.tonycast.app.dev"))
 
         try FileManager.default.createDirectory(
             at: stable.notesDirectory, withIntermediateDirectories: true)
@@ -54,7 +54,7 @@ struct NotesTests {
         try Data("external".utf8).write(to: stable.fileURL(for: untitled.id), options: .atomic)
         try stable.save(id: untitled.id, source: source)
         check(
-            "Tinycast is the only writer, so a save replaces whatever is on disk",
+            "Tonycast is the only writer, so a save replaces whatever is on disk",
             try stable.load(untitled.id).source == source)
 
         let plan = try stable.create(title: "Plan")
@@ -125,7 +125,7 @@ struct NotesTests {
             !(try stable.list()).contains { $0.id == symlinkID })
 
         let empty = try repository(
-            in: root, support: root.appendingPathComponent("com.tinycast.app.empty"))
+            in: root, support: root.appendingPathComponent("com.tonycast.app.empty"))
         let emptyLoad = try empty.load(preferredID: nil)
         check("an empty collection loads no document", emptyLoad.0.isEmpty && emptyLoad.1 == nil)
         check(
@@ -983,7 +983,7 @@ struct NotesTests {
 
     private static func temporaryRoot(_ name: String) -> URL {
         FileManager.default.temporaryDirectory.appendingPathComponent(
-            "tinycast-notes-\(name)-\(UUID().uuidString)", isDirectory: true)
+            "tonycast-notes-\(name)-\(UUID().uuidString)", isDirectory: true)
     }
 
     private static func require<T>(_ value: T?) throws -> T {

@@ -1,5 +1,5 @@
 // The hero's recreated palette. Labels copy the real app's strings (the action
-// bar, section titles, placeholders), and every row names Tinycast's own
+// bar, section titles, placeholders), and every row names Tonycast's own
 // things or generic apps, so nothing here pretends to be someone's data.
 
 export type DemoRowIcon = "ghost" | "github" | "link" | "file" | "terminal";

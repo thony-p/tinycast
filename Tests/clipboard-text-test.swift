@@ -12,7 +12,7 @@ struct ClipboardTextTests {
 
     static func main() async throws {
         let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("tinycast-ocr-test-\(UUID().uuidString)")
+            .appendingPathComponent("tonycast-ocr-test-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
         let imageURL = directory.appendingPathComponent("scan.png")

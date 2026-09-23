@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
     default: pageTitle,
-    template: "%s — Tinycast",
+    template: "%s — Tonycast",
   },
   description: summary,
   applicationName: site.name,
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "The Tinycast command palette open over a macOS desktop, showing fuzzy app search.",
+        alt: "The Tonycast command palette open over a macOS desktop, showing fuzzy app search.",
       },
     ],
   },

@@ -83,22 +83,22 @@ Runs **on your Mac**. No key, no account, and nothing leaves the machine. When y
 it is the default.
 
 It reads and writes text only, with no web search and no attachments. If Apple Intelligence is
-switched off in System Settings, Tinycast tells you so. **It never quietly moves you to a paid API
+switched off in System Settings, Tonycast tells you so. **It never quietly moves you to a paid API
 instead.**
 
 ### Installed AI: Codex, Claude, Grok, OpenCode and Cursor
 
 If you already use the `codex`, `claude`, `grok`, `opencode` or `agent` (Cursor) command-line tools,
-Tinycast can use them with the account you are signed in to. **Tinycast never asks for or stores their keys.**
+Tonycast can use them with the account you are signed in to. **Tonycast never asks for or stores their keys.**
 
 Each one has its own switch, and all five ship off. The pane shows whether each is ready, missing,
 or needs you to sign in. It links to the install page and can copy the sign-in command for you.
 
-Tinycast uses them as plain chat. Claude, Grok and OpenCode run with tools, file access and shell access
-switched off. Cursor runs in Ask mode against Tinycast's private workspace: read-only exploration,
+Tonycast uses them as plain chat. Claude, Grok and OpenCode run with tools, file access and shell access
+switched off. Cursor runs in Ask mode against Tonycast's private workspace: read-only exploration,
 no edits, and no MCP auto-approval. Cursor's CLI has no way to start without your MCP configuration,
 so MCP servers you have already approved in Cursor still apply on this route — the Providers pane
-says so on the Cursor row. After each reply, Tinycast deletes the chat or session that turn
+says so on the Cursor row. After each reply, Tonycast deletes the chat or session that turn
 created — not your other saved chats.
 
 ### API connections
@@ -110,8 +110,8 @@ any **OpenAI Compatible** endpoint, including a local one like Ollama.
 - Remote endpoints must use HTTPS. Plain HTTP works only for `localhost`, `127.0.0.1` and `::1`,
   where a key is optional.
 - A key belongs to the address it was saved for. Point a connection at a different base URL and
-  Tinycast asks for a new key rather than sending the old one somewhere new.
-- While you edit a connection, Tinycast asks the provider which models your key can use, and you
+  Tonycast asks for a new key rather than sending the old one somewhere new.
+- While you edit a connection, Tonycast asks the provider which models your key can use, and you
   search that list as you type. If a gateway cannot list models, type the model ID by hand.
 
 For a gateway that copies DeepSeek's API, the reasoning effort menu offers **None**, which turns
@@ -136,7 +136,7 @@ Press <kbd>⌘</kbd><kbd>V</kbd> in the message box to attach what is on your cl
 Each attachment shows as a small pill beside what you type, with its own ✕. After two pills the rest
 fold into a `+N` count. <kbd>delete</kbd> in an empty message box removes the last one.
 
-Not every model can take every kind. Tinycast refuses at the moment you attach, and says why, rather
+Not every model can take every kind. Tonycast refuses at the moment you attach, and says why, rather
 than sending something the model will never see.
 
 | Route                               | Images               | PDFs | Text files |
@@ -152,7 +152,7 @@ Only files on your Mac are read. A copied web address is never downloaded.
 
 ## System prompt
 
-Tinycast sends a short note ahead of every conversation that tells the model where it is running.
+Tonycast sends a short note ahead of every conversation that tells the model where it is running.
 The **System prompt** box adds your own instructions after it.
 
 **Send a system prompt** (on by default) controls both. Turn it off and no instructions are sent at
@@ -168,7 +168,7 @@ With an API connection, the model can call tools from MCP servers you add. See
 
 ## Privacy and storage
 
-- Conversations are saved on your Mac in `ai-chats.sqlite3`, in Tinycast's Application Support
+- Conversations are saved on your Mac in `ai-chats.sqlite3`, in Tonycast's Application Support
   folder.
 - **Keep conversations** decides how long: **7 Days**, **30 Days**, **3 Months** or **Forever**
   (default). Old chats are only removed while AI is on, so a Mac with AI switched off keeps them.

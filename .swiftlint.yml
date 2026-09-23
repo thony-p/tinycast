@@ -3,14 +3,14 @@
 # about style a formatter would otherwise own. See docs/standards.md.
 
 included:
-  - Tinycast
+  - Tonycast
   - Tests
 
 excluded:
-  - Tinycast/DesignSystem/Scrolling/EdgeDissolve.swift
-  - Tinycast/DesignSystem/Scrolling/ThinScrollbar.swift
-  - Tinycast/Features/Emoji/Model/EmojiData.generated.swift
-  - Tinycast/Features/Calculator/Model/CurrencyData.generated.swift
+  - Tonycast/DesignSystem/Scrolling/EdgeDissolve.swift
+  - Tonycast/DesignSystem/Scrolling/ThinScrollbar.swift
+  - Tonycast/Features/Emoji/Model/EmojiData.generated.swift
+  - Tonycast/Features/Calculator/Model/CurrencyData.generated.swift
 
 # Noisy here, or actively wrong for this codebase.
 disabled_rules:

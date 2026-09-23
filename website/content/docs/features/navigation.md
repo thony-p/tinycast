@@ -26,7 +26,7 @@ front-to-back order. **Minimized windows come last.** Type to filter by window t
 - A minimized window is restored first.
 - A window on another Space pulls that Space forward.
 
-If the app quit between opening the list and pressing <kbd>return</kbd>, Tinycast tells you instead of
+If the app quit between opening the list and pressing <kbd>return</kbd>, Tonycast tells you instead of
 doing nothing.
 
 ## Search Menu Bar Items
@@ -44,7 +44,7 @@ it.
   change the target.
 - **Only items you could click are listed.** Disabled items, separators and hidden items are left
   out.
-- **Tinycast never opens menus to read them.** Some apps build a submenu only when you open it, so
+- **Tonycast never opens menus to read them.** Some apps build a submenu only when you open it, so
   those items may be missing. Opening menus behind your back would flash the app's UI every time.
 - Very large menus are capped at 4,000 items, and reading stops after about a second.
 
@@ -53,7 +53,7 @@ it.
 | Setting               | Default | What it does                                        |
 | --------------------- | ------- | --------------------------------------------------- |
 | Show Apple menu items | **Off** | Adds the Apple menu, which is the same in every app |
-| Disabled Applications | Empty   | Apps whose menus Tinycast will not read at all      |
+| Disabled Applications | Empty   | Apps whose menus Tonycast will not read at all      |
 
 An app on the Disabled Applications list is refused before its menus are read, not filtered
 afterwards.

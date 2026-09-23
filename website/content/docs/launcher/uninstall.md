@@ -3,7 +3,7 @@ title: Uninstall an app
 description: Remove an app along with the caches, preferences and containers it leaves behind.
 ---
 
-Dragging an app to the Trash leaves its support files scattered around your Library. Tinycast's
+Dragging an app to the Trash leaves its support files scattered around your Library. Tonycast's
 uninstaller finds them and moves them out together.
 
 **Everything goes to the Trash. Nothing is ever deleted.** That one promise is what makes the rest
@@ -60,7 +60,7 @@ the app **only if they link into it**, never because of their name.
 - `/private/var/db/receipts`, `~/Library/Keychains` and `/Library/Extensions`
 - Any of your document folders
 - Anything more than one level deep in a folder it scans
-- Tinycast itself
+- Tonycast itself
 
 ## Locked rows
 
@@ -71,7 +71,7 @@ cannot write to, or owned by someone else.
 Without Full Disk Access, for example, `~/Library/Containers`, `~/Library/Group Containers` and
 `~/Library/Cookies` are locked, while `~/Library/Application Scripts` right next to them is not.
 
-Tinycast **checks** for Full Disk Access and **never asks** for it. See
+Tonycast **checks** for Full Disk Access and **never asks** for it. See
 [Permissions](/docs/permissions#full-disk-access).
 
 `/usr/local/bin/code` stays locked because that folder belongs to the system. Removing it would need

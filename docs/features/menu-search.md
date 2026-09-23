@@ -63,7 +63,7 @@ ranking runs in memory over it, and activating a row re-resolves the live elemen
 
 `MenuSearchTarget.classify` splits a summon five ways — `searchable`, `excluded`, `selfTarget`,
 `menuLess` and `noApplication` — so each gets its own sentence instead of an empty list. `selfTarget`
-is checked before the menu-bar test, because Tinycast runs as an accessory and would otherwise read
+is checked before the menu-bar test, because Tonycast runs as an accessory and would otherwise read
 as menu-less; `excluded` is checked next, for the same reason.
 
 `MenuSearchSession` takes its walk as an injected `WalkOperation` — `(pid, showsAppleMenu)` — which

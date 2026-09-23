@@ -1,12 +1,12 @@
 ---
 title: Extensions
-description: Tinycast runs Raycast extensions natively, drawn with SwiftUI.
+description: Tonycast runs Raycast extensions natively, drawn with SwiftUI.
 ---
 
-Tinycast runs Raycast extensions: the same `package.json` and the same built command files, drawn
+Tonycast runs Raycast extensions: the same `package.json` and the same built command files, drawn
 natively in the palette.
 
-There is no Electron, no browser and no Node.js running inside Tinycast. Extensions run in
+There is no Electron, no browser and no Node.js running inside Tonycast. Extensions run in
 JavaScriptCore, which already ships with macOS, so this adds **nothing to the app's size**.
 
 **Settings → Extensions** holds the switch. It ships **off**, and turning it on asks first, because
@@ -25,7 +25,7 @@ While it is off, no folder is scanned, nothing shows in the launcher and no Java
 ## The one ongoing cost
 
 **One command runs at a time, and a running command keeps a JavaScript engine in memory until you
-leave it.** That is the only ongoing cost Tinycast has.
+leave it.** That is the only ongoing cost Tonycast has.
 
 Starting a command stops the one before and throws its engine away, so nothing carries over between
 runs. A fresh start takes about 7 ms once warm.

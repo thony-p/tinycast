@@ -5,7 +5,7 @@
 @source "../node_modules/fumadocs-ui/dist/**/*.js";
 
 /*
- * Tinycast design tokens — the single source of truth for the site.
+ * Tonycast design tokens — the single source of truth for the site.
  * Components must only use sizes, colors, and shadows defined here; Tailwind's
  * default text scale is disabled below so an off-scale size can't slip in.
  *
@@ -109,7 +109,7 @@
   /* Alpha overlays mix from this, so `bg-tint/5` inverts with the theme. */
   --color-tint: rgb(var(--tc-tint));
 
-  /* Tinycast brand — violet mark from the app icon, cyan as its counter-tone.
+  /* Tonycast brand — violet mark from the app icon, cyan as its counter-tone.
      Literal in both themes: they carry identity, not elevation. */
   --color-violet: #863bff;
   --color-violet-bright: #a875ff;
@@ -519,7 +519,7 @@
   }
 }
 
-/* Point Fumadocs' own palette at the Tinycast tokens, so the docs and the
+/* Point Fumadocs' own palette at the Tonycast tokens, so the docs and the
    marketing page are one design rather than two that happen to sit together. */
 :root,
 .dark {

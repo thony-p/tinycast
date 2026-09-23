@@ -42,7 +42,7 @@ struct CodexTurnTests {
             "reasoning effort belongs to the turn and does not mutate Codex settings")
         expect(
             !server.received.contains("config/value/write"),
-            "a Tinycast turn never writes the user's Codex configuration")
+            "a Tonycast turn never writes the user's Codex configuration")
 
         turn.cancel()
         let dropped = await server.awaitCondition { !server.runner.isActive }

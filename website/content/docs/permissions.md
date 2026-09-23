@@ -1,9 +1,9 @@
 ---
 title: Permissions
-description: What Tinycast asks for, why, and the moment it asks.
+description: What Tonycast asks for, why, and the moment it asks.
 ---
 
-Tinycast asks for a permission **only when you use a feature that needs it**, never at launch. The
+Tonycast asks for a permission **only when you use a feature that needs it**, never at launch. The
 launcher, the calculator, the emoji picker and search all work with no permission at all.
 
 **Settings → Permissions** shows where Accessibility and Calendars stand, and opens the right System
@@ -11,7 +11,7 @@ Settings pane for you.
 
 ## Accessibility
 
-macOS calls this "control your computer". In Tinycast it lets the app read from, and write to, the
+macOS calls this "control your computer". In Tonycast it lets the app read from, and write to, the
 window you were using before the palette opened.
 
 Grant it in **System Settings → Privacy & Security → Accessibility**, or from
@@ -41,7 +41,7 @@ rules.
 - Matching happens **only on your Mac**. Keystrokes are never stored and never sent anywhere.
 - The typing buffer holds at most 256 characters. It resets when you switch apps, press a shortcut
   with a modifier, when Secure Event Input is on, and after 15 seconds of no typing.
-- Tinycast uses a **listen-only** event tap under the Accessibility grant. It does not use Input
+- Tonycast uses a **listen-only** event tap under the Accessibility grant. It does not use Input
   Monitoring.
 - **A settings backup can never turn it on.** Importing a file someone sent you cannot switch on
   keystroke listening.
@@ -50,7 +50,7 @@ rules.
 
 The [Calendar](/docs/features/calendar) feature reads your events to find meeting links.
 
-Turning it on shows Tinycast's own explanation first, then the macOS prompt. The feature only counts
+Turning it on shows Tonycast's own explanation first, then the macOS prompt. The feature only counts
 as on once macOS says yes. If you said no earlier, **Settings → Permissions** sends you to the right
 System Settings pane to change it.
 
@@ -71,18 +71,18 @@ A few actions trigger their own macOS prompt the first time you run them:
   the standard Automation prompt.
 - **Toggle Bluetooth** raises the Bluetooth prompt.
 
-If you say no, Tinycast tells you and links to the right System Settings pane instead of silently
+If you say no, Tonycast tells you and links to the right System Settings pane instead of silently
 doing nothing.
 
 ## Full Disk Access
 
-Tinycast **checks** for Full Disk Access but **never asks** for it.
+Tonycast **checks** for Full Disk Access but **never asks** for it.
 
 The [uninstaller](/docs/launcher/uninstall) checks quietly to work out which files it can move.
 Without the grant, protected places like `~/Library/Containers`, `~/Library/Group Containers` and
 `~/Library/Cookies` show as locked rows instead. The worst case is a row you clear by hand.
 
-## What Tinycast never needs
+## What Tonycast never needs
 
 - **File access for File Search.** [File Search](/docs/features/file-search) reads the Spotlight
   index macOS already keeps. If Spotlight has not indexed something, you get fewer results, not a

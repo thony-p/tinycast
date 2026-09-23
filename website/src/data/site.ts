@@ -4,23 +4,23 @@
 // The page title and meta description, shared by the layout and /llms.txt. Google truncates a
 // description near 160 characters, so `summary` is written to land under it rather than be cut.
 export const pageTitle =
-  "Tinycast — everything on your Mac, one keystroke away";
+  "Tonycast — everything on your Mac, one keystroke away";
 export const summary =
   "Free and open source, fully native macOS launcher: app search, clipboard manager, snippets, custom commands, window management, BYOK AI and Raycast extensions.";
 
 export const site = {
-  name: "Tinycast",
+  name: "Tonycast",
   tagline: "The essentials, without the bloat.",
-  repo: "https://github.com/abue-ammar/tinycast",
-  url: "https://tinycast.dev",
-  // The R2 bucket behind cdn.tinycast.dev. Anything over Workers' 25 MiB
+  repo: "https://github.com/abue-ammar/tonycast",
+  url: "https://tonycast.dev",
+  // The R2 bucket behind cdn.tonycast.dev. Anything over Workers' 25 MiB
   // per-asset cap lives here instead of `public/` — see website/README.md.
-  cdn: "https://cdn.tinycast.dev",
+  cdn: "https://cdn.tonycast.dev",
   // Shown only until the build-time release lookup resolves, and if it fails.
   fallbackVersion: "v0.9.7",
   platform: "macOS 26+",
   license: "AGPL-3.0",
-  licenseUrl: "https://github.com/abue-ammar/tinycast/blob/main/LICENSE",
+  licenseUrl: "https://github.com/abue-ammar/tonycast/blob/main/LICENSE",
   community: {
     discord: "https://discord.gg/v2Eeb4QQy3",
   },
@@ -45,9 +45,9 @@ export const nav = [
 
 // The hero's two lines. Every other channel lives in docs/install.md, which is
 // where both install CTAs point.
-export const brewTrustCommand = "brew trust --tap abue-ammar/tinycast";
+export const brewTrustCommand = "brew trust --tap abue-ammar/tonycast";
 export const brewInstallCommand =
-  "brew install --cask abue-ammar/tinycast/tinycast";
+  "brew install --cask abue-ammar/tonycast/tonycast";
 
 // The logo wall under the hero, in render order. The track starts at the first
 // entry with the left edge under the mask, so the two least-known names lead

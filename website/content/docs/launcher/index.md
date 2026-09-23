@@ -1,6 +1,6 @@
 ---
 title: App launcher
-description: One search across everything Tinycast knows about, and how it decides what comes first.
+description: One search across everything Tonycast knows about, and how it decides what comes first.
 ---
 
 The launcher is the root screen. One search covers your apps, System Settings panes, commands,
@@ -44,7 +44,7 @@ typing `System Settings` lists both the app and its panes.
 
 ## How matching works
 
-Tinycast looks at several names for each entry, and trusts some more than others:
+Tonycast looks at several names for each entry, and trusts some more than others:
 
 | Name                                  | Example                                 |
 | ------------------------------------- | --------------------------------------- |
@@ -83,7 +83,7 @@ If you renamed an app in Finder, both the old and the new name find it.
 
 ## Learned ranking
 
-Tinycast learns which result you pick for a search, on your Mac, and moves it up next time.
+Tonycast learns which result you pick for a search, on your Mac, and moves it up next time.
 
 Pick WhatsApp after typing `wha`, and it also comes up sooner for `w` and `wh`. The more often and
 more recently you pick something, the stronger the boost.
@@ -94,7 +94,7 @@ launching a favorite with <kbd>⌘</kbd> and a number, listing a category, and O
 **Resetting.** For one entry: <kbd>⌘</kbd><kbd>K</kbd> → **Reset Ranking**, shown only when that entry
 has learned something. For everything: **Settings → General → Learned ranking → Reset**.
 
-What it learns stays in `launcher-ranking.json` in Tinycast's own folder and goes nowhere else.
+What it learns stays in `launcher-ranking.json` in Tonycast's own folder and goes nowhere else.
 
 ## Search scopes
 
@@ -105,7 +105,7 @@ The defaults cover `/Applications`, `/System/Applications`, both `Utilities` fol
 `/System/Library/CoreServices/Applications`, the hidden system folder where Safari really lives,
 `~/Applications`, and Finder on its own.
 
-Tinycast looks **one folder deep**, so `/Applications/Blackmagic Design/DaVinci Resolve.app` is found
+Tonycast looks **one folder deep**, so `/Applications/Blackmagic Design/DaVinci Resolve.app` is found
 without its own scope. Anything deeper needs a scope of its own. It never looks inside an app bundle.
 
 Scopes are saved with `~` shortened, so a backup still makes sense on another Mac. Changing them
@@ -132,7 +132,7 @@ politely, so an app with unsaved work still asks you to save. Restart waits up t
 the app to quit, then opens it again. If the app refuses to quit, nothing is reopened.
 
 To quit everything at once, use the **Quit All Applications**
-[system action](/docs/launcher/system-actions). It leaves Finder and Tinycast running.
+[system action](/docs/launcher/system-actions). It leaves Finder and Tonycast running.
 
 ## Hiding a result
 

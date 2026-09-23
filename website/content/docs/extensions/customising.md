@@ -12,7 +12,7 @@ commands goes to the same place.
 Whatever settings the extension declares, shown as native controls: checkbox, dropdown, text field,
 password field, file picker, folder picker or app picker.
 
-They are saved per extension in Tinycast's own folder, and removed when you uninstall it.
+They are saved per extension in Tonycast's own folder, and removed when you uninstall it.
 
 ## Launcher icon
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generate Tinycast/Features/Calculator/Model/CountryZoneData.generated.swift.
+// Generate Tonycast/Features/Calculator/Model/CountryZoneData.generated.swift.
 //
 // Usage: node Scripts/gen-countries.js [zone.tab cldr-territories.json]
 // Downloads the sources when paths aren't given. Run occasionally, commit the output.
@@ -116,7 +116,7 @@ async function main() {
   const out = path.resolve(
     __dirname,
     "..",
-    "Tinycast/Features/Calculator/Model/CountryZoneData.generated.swift",
+    "Tonycast/Features/Calculator/Model/CountryZoneData.generated.swift",
   );
   fs.writeFileSync(
     out,

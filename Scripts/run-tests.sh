@@ -11,7 +11,7 @@ set -uo pipefail
 SELF="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 cd "$(dirname "$0")/.." || exit 1
 
-BIN="${TMPDIR:-/tmp}/tinycast-harness"
+BIN="${TMPDIR:-/tmp}/tonycast-harness"
 mkdir -p "$BIN"
 
 # `--exec` is the worker half: xargs re-enters here once per queued harness.
@@ -35,10 +35,10 @@ if [ "${1:-}" = "--exec" ]; then
     # macOS ships no `timeout`, so the worker polls; a wedged harness must fail, not stall the suite.
     ticks=0
     while kill -0 "$pid" 2>/dev/null; do
-        if [ "$ticks" -ge $((TINYCAST_TEST_TIMEOUT * 5)) ]; then
+        if [ "$ticks" -ge $((TONYCAST_TEST_TIMEOUT * 5)) ]; then
             { pkill -KILL -P "$pid"; kill -KILL "$pid"; wait "$pid"; } 2>/dev/null
-            printf '\n[run-tests] killed after %ss without finishing\n' "$TINYCAST_TEST_TIMEOUT" >> "$BIN/$name.log"
-            fail "timed out after ${TINYCAST_TEST_TIMEOUT}s"
+            printf '\n[run-tests] killed after %ss without finishing\n' "$TONYCAST_TEST_TIMEOUT" >> "$BIN/$name.log"
+            fail "timed out after ${TONYCAST_TEST_TIMEOUT}s"
         fi
         ticks=$((ticks + 1))
         sleep 0.2
@@ -64,7 +64,7 @@ only="${1:-}"
 # xcodebuild never compiles the harnesses, so without this nothing in Tests/ resolves in an editor.
 # The source lists below are the only copy, which is why this lives here rather than in its own script.
 emit_db=0
-DB="${TMPDIR:-/tmp}/tinycast-compile-db.json"
+DB="${TMPDIR:-/tmp}/tonycast-compile-db.json"
 if [ "$only" = "--index" ]; then
     emit_db=1
     only=""
@@ -113,326 +113,326 @@ run() {
     printf '%s %s %s %s\n' "$pri" "$name" "$opt" "$*" >> "$QUEUE"
 }
 
-L=Tinycast/Features/Launcher/Model
+L=Tonycast/Features/Launcher/Model
 run slow -O fuzz-test      $L/SearchRelevance.swift $L/ScriptRomanization.swift \
                            $L/EntryNaming.swift $L/LauncherOrder.swift
 run slow -O corpus-test    $L/SearchRelevance.swift $L/ScriptRomanization.swift \
                            $L/EntryNaming.swift $L/LauncherOrder.swift \
                            $L/LauncherRankingStore.swift
 run file-search-test       $L/SearchRelevance.swift \
-                           Tinycast/Features/FileSearch/Model/*.swift
-run file-search-session-test Tinycast/Platform/Signposts.swift \
+                           Tonycast/Features/FileSearch/Model/*.swift
+run file-search-session-test Tonycast/Platform/Signposts.swift \
                              $L/SearchRelevance.swift \
-                             Tinycast/Features/FileSearch/Model/*.swift \
-                             Tinycast/Features/FileSearch/Service/*.swift
+                             Tonycast/Features/FileSearch/Model/*.swift \
+                             Tonycast/Features/FileSearch/Service/*.swift
 run menu-search-test       $L/SearchRelevance.swift \
-                           Tinycast/Features/MenuSearch/Model/*.swift \
-                           Tinycast/Features/MenuSearch/Service/*.swift
+                           Tonycast/Features/MenuSearch/Model/*.swift \
+                           Tonycast/Features/MenuSearch/Service/*.swift
 run window-switch-test     $L/SearchRelevance.swift \
-                           Tinycast/Features/WindowSwitcher/Model/*.swift
-run index file-search-performance Tinycast/Platform/Signposts.swift \
+                           Tonycast/Features/WindowSwitcher/Model/*.swift
+run index file-search-performance Tonycast/Platform/Signposts.swift \
                            $L/SearchRelevance.swift \
-                           Tinycast/Features/FileSearch/Model/*.swift \
-                           Tinycast/Features/FileSearch/Service/FileSearchService.swift
+                           Tonycast/Features/FileSearch/Model/*.swift \
+                           Tonycast/Features/FileSearch/Service/FileSearchService.swift
 run ranking-test           $L/SearchRelevance.swift $L/LauncherRankingStore.swift
 run scopes-test            $L/SearchScopes.swift
-run app-name-test          Tinycast/Platform/AppDisplayName.swift \
-                           Tinycast/Platform/BundleLocalization.swift \
+run app-name-test          Tonycast/Platform/AppDisplayName.swift \
+                           Tonycast/Platform/BundleLocalization.swift \
                            $L/SearchRelevance.swift
 run favorites-test         $L/FavoriteSlots.swift
-run apple-shortcut-test    Tinycast/Features/AppleShortcuts/Model/*.swift
-run calc-test              Tinycast/Features/Calculator/Model/*.swift
-run index calc-performance Tinycast/Features/Calculator/Model/*.swift
-run calendar-test          Tinycast/Features/Calendar/Model/*.swift
-run clipboard-test         Tinycast/Features/Clipboard/Model/ClipboardStore.swift \
-                           Tinycast/Features/Clipboard/Model/ClipboardFilter.swift \
-                           Tinycast/Features/Clipboard/Model/ClipboardFileKind.swift \
-                           Tinycast/Features/Clipboard/Model/ColorValue.swift \
-                           Tinycast/Features/Clipboard/Model/ColorFormat.swift \
-                           Tinycast/Features/Clipboard/Model/ColorSpaces.swift
+run apple-shortcut-test    Tonycast/Features/AppleShortcuts/Model/*.swift
+run calc-test              Tonycast/Features/Calculator/Model/*.swift
+run index calc-performance Tonycast/Features/Calculator/Model/*.swift
+run calendar-test          Tonycast/Features/Calendar/Model/*.swift
+run clipboard-test         Tonycast/Features/Clipboard/Model/ClipboardStore.swift \
+                           Tonycast/Features/Clipboard/Model/ClipboardFilter.swift \
+                           Tonycast/Features/Clipboard/Model/ClipboardFileKind.swift \
+                           Tonycast/Features/Clipboard/Model/ColorValue.swift \
+                           Tonycast/Features/Clipboard/Model/ColorFormat.swift \
+                           Tonycast/Features/Clipboard/Model/ColorSpaces.swift
 # `Q` is the URL detector a drag payload builds its link with, rather than a second one.
-Q=Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift
-run clipboard-search-test  Tinycast/Features/Clipboard/Model/*.swift $Q
-run clipboard-text-test    Tinycast/Features/Clipboard/Model/*.swift $Q \
-                           Tinycast/Features/Clipboard/Service/ClipboardTextExtractor.swift \
-                           Tinycast/Features/Clipboard/Service/ClipboardTextIndexer.swift \
-                           Tinycast/Features/Clipboard/Service/ClipboardTextWorker.swift
-run pasteboard-test        Tinycast/Platform/PasteboardFiles.swift \
-                           Tinycast/Features/Clipboard/Model/ClipboardStore.swift \
-                           Tinycast/Features/Clipboard/Model/ClipboardFilter.swift \
-                           Tinycast/Features/Clipboard/Model/ColorValue.swift \
-                           Tinycast/Features/Clipboard/Model/ColorFormat.swift \
-                           Tinycast/Features/Clipboard/Model/ColorSpaces.swift \
-                           Tinycast/Features/Clipboard/Service/ClipboardManager.swift \
-                           Tinycast/Features/Clipboard/Service/Paster.swift
+Q=Tonycast/Features/Quicklinks/Model/QuicklinkDestination.swift
+run clipboard-search-test  Tonycast/Features/Clipboard/Model/*.swift $Q
+run clipboard-text-test    Tonycast/Features/Clipboard/Model/*.swift $Q \
+                           Tonycast/Features/Clipboard/Service/ClipboardTextExtractor.swift \
+                           Tonycast/Features/Clipboard/Service/ClipboardTextIndexer.swift \
+                           Tonycast/Features/Clipboard/Service/ClipboardTextWorker.swift
+run pasteboard-test        Tonycast/Platform/PasteboardFiles.swift \
+                           Tonycast/Features/Clipboard/Model/ClipboardStore.swift \
+                           Tonycast/Features/Clipboard/Model/ClipboardFilter.swift \
+                           Tonycast/Features/Clipboard/Model/ColorValue.swift \
+                           Tonycast/Features/Clipboard/Model/ColorFormat.swift \
+                           Tonycast/Features/Clipboard/Model/ColorSpaces.swift \
+                           Tonycast/Features/Clipboard/Service/ClipboardManager.swift \
+                           Tonycast/Features/Clipboard/Service/Paster.swift
 run index clipboard-file-performance \
-                           Tinycast/Platform/PasteboardFiles.swift \
-                           Tinycast/Features/Clipboard/Model/ClipboardStore.swift \
-                           Tinycast/Features/Clipboard/Model/ClipboardFilter.swift \
-                           Tinycast/Features/Clipboard/Model/ColorValue.swift \
-                           Tinycast/Features/Clipboard/Model/ColorFormat.swift \
-                           Tinycast/Features/Clipboard/Model/ColorSpaces.swift \
-                           Tinycast/Features/Clipboard/Service/ClipboardManager.swift
-run emoji-test             Tinycast/Features/Emoji/Model/EmojiCatalog.swift \
-                           Tinycast/Features/Emoji/Model/EmojiGridGeometry.swift \
-                           Tinycast/Features/Emoji/Model/EmojiData.generated.swift
-run emoji-search-test      Tinycast/Features/Emoji/Model/EmojiCatalog.swift \
-                           Tinycast/Features/Emoji/Model/EmojiData.generated.swift \
-                           Tinycast/Features/Emoji/Service/EmojiIndex.swift \
-                           Tinycast/Features/Emoji/Service/FrequentEmojiStore.swift \
-                           Tinycast/Features/Emoji/Service/PinnedEmojiStore.swift \
-                           Tinycast/Features/Launcher/Model/SearchRelevance.swift \
-                           Tinycast/Platform/AppPaths.swift Tinycast/Platform/Memo.swift
+                           Tonycast/Platform/PasteboardFiles.swift \
+                           Tonycast/Features/Clipboard/Model/ClipboardStore.swift \
+                           Tonycast/Features/Clipboard/Model/ClipboardFilter.swift \
+                           Tonycast/Features/Clipboard/Model/ColorValue.swift \
+                           Tonycast/Features/Clipboard/Model/ColorFormat.swift \
+                           Tonycast/Features/Clipboard/Model/ColorSpaces.swift \
+                           Tonycast/Features/Clipboard/Service/ClipboardManager.swift
+run emoji-test             Tonycast/Features/Emoji/Model/EmojiCatalog.swift \
+                           Tonycast/Features/Emoji/Model/EmojiGridGeometry.swift \
+                           Tonycast/Features/Emoji/Model/EmojiData.generated.swift
+run emoji-search-test      Tonycast/Features/Emoji/Model/EmojiCatalog.swift \
+                           Tonycast/Features/Emoji/Model/EmojiData.generated.swift \
+                           Tonycast/Features/Emoji/Service/EmojiIndex.swift \
+                           Tonycast/Features/Emoji/Service/FrequentEmojiStore.swift \
+                           Tonycast/Features/Emoji/Service/PinnedEmojiStore.swift \
+                           Tonycast/Features/Launcher/Model/SearchRelevance.swift \
+                           Tonycast/Platform/AppPaths.swift Tonycast/Platform/Memo.swift
 run index emoji-search-performance \
-                           Tinycast/Features/Emoji/Model/EmojiCatalog.swift \
-                           Tinycast/Features/Emoji/Model/EmojiData.generated.swift \
-                           Tinycast/Features/Emoji/Service/EmojiIndex.swift \
-                           Tinycast/Features/Emoji/Service/FrequentEmojiStore.swift \
-                           Tinycast/Features/Launcher/Model/SearchRelevance.swift \
-                           Tinycast/Platform/AppPaths.swift Tinycast/Platform/Memo.swift
-run palette-selection-test Tinycast/Features/PaletteRowIndex.swift \
-                           Tinycast/Features/Emoji/Model/EmojiGridGeometry.swift
-run appearance-test        Tinycast/Platform/Appearance.swift \
-                           Tinycast/DesignSystem/Theme.swift \
-                           Tinycast/DesignSystem/InterfaceMetrics.swift \
-                           Tinycast/Features/Settings/AppAppearance.swift
-run interface-size-test    Tinycast/Platform/Appearance.swift \
-                           Tinycast/DesignSystem/Theme.swift \
-                           Tinycast/DesignSystem/InterfaceMetrics.swift \
-                           Tinycast/Features/Settings/InterfaceSize.swift \
-                           Tinycast/Features/Extensions/Model/ExtensionFormMetrics.swift
-run palette-placement-test Tinycast/Platform/Appearance.swift \
-                           Tinycast/DesignSystem/Theme.swift \
-                           Tinycast/DesignSystem/InterfaceMetrics.swift \
-                           Tinycast/Features/Settings/InterfaceSize.swift \
-                           Tinycast/Palette/PalettePlacement.swift
-run scroll-reveal-test     Tinycast/DesignSystem/Scrolling/SelectionReveal.swift
-run redaction-test         Tinycast/DesignSystem/RedactedPlaceholder.swift
-run keyboard-focus-test    Tinycast/DesignSystem/Interaction/KeyboardFocus.swift
-run ai-instructions-test   Tinycast/Features/AI/Model/AIInstructions.swift \
-                           Tinycast/Features/AI/Model/AIPreamble.swift
-run hover-arming-test      Tinycast/Palette/HoverArming.swift \
-                           Tinycast/Palette/PaletteState.swift \
-                           Tinycast/Palette/PaletteMode.swift \
-                           Tinycast/Features/Emoji/Model/EmojiCatalog.swift \
-                           Tinycast/Features/Clipboard/Model/ClipboardStore.swift \
-                           Tinycast/Features/Clipboard/Model/ClipboardFilter.swift \
-                           Tinycast/Features/FileSearch/Model/FileSearchFilter.swift \
-                           Tinycast/Features/Clipboard/Model/ColorValue.swift \
-                           Tinycast/Features/Clipboard/Model/ColorFormat.swift \
-                           Tinycast/Features/Clipboard/Model/ColorSpaces.swift \
-                           Tinycast/Features/Quicklinks/Model/Quicklink.swift \
-                           Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
-                           Tinycast/Features/CustomCommands/Model/CustomCommand.swift
-run palette-escape-test    Tinycast/Palette/PaletteMode.swift \
-                           Tinycast/Palette/PaletteEscapeAction.swift \
-                           Tinycast/Palette/CommandEscapeTap.swift \
-                           Tinycast/Features/Settings/EscapeKeyBehavior.swift \
-                           Tinycast/Features/Quicklinks/Model/Quicklink.swift \
-                           Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
-                           Tinycast/Features/CustomCommands/Model/CustomCommand.swift
-run palette-navigation-test Tinycast/Palette/PaletteState.swift \
-                           Tinycast/Palette/PaletteMode.swift \
-                           Tinycast/Palette/HoverArming.swift \
-                           Tinycast/Features/Emoji/Model/EmojiCatalog.swift \
-                           Tinycast/Features/Clipboard/Model/ClipboardStore.swift \
-                           Tinycast/Features/Clipboard/Model/ClipboardFilter.swift \
-                           Tinycast/Features/FileSearch/Model/FileSearchFilter.swift \
-                           Tinycast/Features/Clipboard/Model/ColorValue.swift \
-                           Tinycast/Features/Clipboard/Model/ColorFormat.swift \
-                           Tinycast/Features/Clipboard/Model/ColorSpaces.swift \
-                           Tinycast/Features/Quicklinks/Model/Quicklink.swift \
-                           Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
-                           Tinycast/Features/CustomCommands/Model/CustomCommand.swift
-run palette-filter-test    Tinycast/Palette/PaletteMode.swift \
-                           Tinycast/Palette/PaletteFilterAction.swift \
-                           Tinycast/Features/Quicklinks/Model/Quicklink.swift \
-                           Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
-                           Tinycast/Features/CustomCommands/Model/CustomCommand.swift
-run action-menu-search-test Tinycast/Palette/ActionMenuSearchQuery.swift \
-                            Tinycast/Features/Launcher/Model/SearchRelevance.swift
-run palette-shortcut-test  Tinycast/Palette/PaletteShortcut.swift
-run palette-tab-test       Tinycast/Palette/PaletteMode.swift \
-                           Tinycast/Palette/PaletteTabAction.swift \
-                           Tinycast/Features/Quicklinks/Model/Quicklink.swift \
-                           Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
-                           Tinycast/Features/CustomCommands/Model/CustomCommand.swift
-run fallback-test          Tinycast/Features/Launcher/Model/Fallback.swift \
-                           Tinycast/Features/Launcher/Model/CommandID.swift \
-                           Tinycast/Features/HotKeys/Model/HotKeyAction.swift \
-                           Tinycast/Features/QuickActions/Model/QuickAction.swift \
-                           Tinycast/Features/QuickActions/Model/BuiltInQuickAction.swift \
-                           Tinycast/Features/QuickActions/Model/CustomQuickAction.swift \
-                           Tinycast/Features/Quicklinks/Model/Quicklink.swift \
-                           Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
-                           Tinycast/Features/SystemActions/Model/SystemAction.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowCommand.swift
-run dictionary-test        Tinycast/Features/Dictionary/Model/DictionaryEntry.swift \
-                           Tinycast/Features/Dictionary/Model/DictionaryMarkup.swift
-run hotkey-test            Tinycast/Features/HotKeys/Model/DoubleTapModifier.swift \
-                           Tinycast/Features/HotKeys/Model/DoubleTapDetector.swift \
-                           Tinycast/Features/HotKeys/Model/HyperKey.swift \
-                           Tinycast/Platform/ASCIIKeyboardLayout.swift \
-                           Tinycast/Features/HotKeys/Service/KeyShortcut.swift \
-                           Tinycast/Features/HotKeys/Model/HotKeyAction.swift \
-                           Tinycast/Features/QuickActions/Model/QuickAction.swift \
-                           Tinycast/Features/QuickActions/Model/BuiltInQuickAction.swift \
-                           Tinycast/Features/QuickActions/Model/CustomQuickAction.swift \
-                           Tinycast/Features/Launcher/Model/CommandID.swift \
-                           Tinycast/Features/Quicklinks/Model/Quicklink.swift \
-                           Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
-                           Tinycast/Features/SystemActions/Model/SystemAction.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowCommand.swift
-run callout-test           Tinycast/Platform/Appearance.swift \
-                           Tinycast/DesignSystem/Theme.swift \
-                           Tinycast/DesignSystem/InterfaceMetrics.swift \
-                           Tinycast/Features/HotKeys/UI/CalloutPlacement.swift
-run icon-cache-test        Tinycast/Platform/Appearance.swift \
-                           Tinycast/Platform/Images/IconCache.swift
-run entry-icon-test        Tinycast/Platform/Appearance.swift \
-                           Tinycast/Platform/Images/IconCache.swift \
-                           Tinycast/Platform/Images/FileIconStamp.swift
-run ext-icon-test          Tinycast/Platform/Appearance.swift \
-                           Tinycast/Platform/AppDisplayName.swift \
-                           Tinycast/Platform/Images/IconCache.swift \
-                           Tinycast/Platform/Compression/Zlib.swift \
-                           Tinycast/DesignSystem/Theme.swift \
-                           Tinycast/DesignSystem/InterfaceMetrics.swift \
-                           Tinycast/Features/Extensions/Model/ExtensionBootConfig.swift \
-                           Tinycast/Features/Extensions/Model/ExtensionLaunchType.swift \
-                           Tinycast/Features/Extensions/Model/ExtensionManifest.swift \
-                           Tinycast/Features/Extensions/Model/ExtensionRefreshPolicy.swift \
-                           Tinycast/Features/Extensions/Model/ExtensionRefreshState.swift \
-                           Tinycast/Features/Extensions/Model/RenderNode.swift \
-                           Tinycast/Features/Extensions/Service/ExtensionCatalog.swift \
-                           Tinycast/Features/Extensions/Service/ExtensionFetcher.swift \
-                           Tinycast/Features/Extensions/Service/ExtensionNodeShims.swift \
-                           Tinycast/Features/Extensions/Service/ExtensionOAuthKeychain.swift \
-                           Tinycast/Features/Extensions/Service/ExtensionOAuthSession.swift \
-                           Tinycast/Features/Extensions/Service/ExtensionRuntime.swift \
-                           Tinycast/Features/Extensions/Service/ExtensionIconCache.swift \
-                           Tinycast/Features/Extensions/UI/ExtensionAnimatedImage.swift \
-                           Tinycast/Features/Extensions/UI/ExtensionImage.swift \
-                           Tinycast/Features/Clipboard/Model/ColorValue.swift \
-                           Tinycast/Features/Clipboard/Model/ColorSpaces.swift
-run system-action-test     Tinycast/Features/SystemActions/Model/SystemAction.swift
-run volume-test            Tinycast/Features/SystemActions/Model/VolumeLevel.swift
-run window-command-test    Tinycast/Features/WindowManagement/Model/WindowCommand.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowCycle.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowPlacementEngine.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowActionMemory.swift
-run space-gesture-test     Tinycast/Features/WindowManagement/Model/WindowCommand.swift \
-                           Tinycast/Features/WindowManagement/Model/SpaceGesture.swift
-run window-layout-test     Tinycast/Features/WindowManagement/Model/WindowCommand.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowCycle.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowPlacementEngine.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowLayoutAnchor.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowLayoutDisplay.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowLayout.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowLayoutGeometry.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowLayoutPlan.swift \
-                           Tinycast/Features/WindowManagement/Model/WindowLayoutStore.swift \
-                           Tinycast/Features/WindowManagement/Model/CustomWindowSize.swift \
-                           Tinycast/Features/WindowManagement/Model/CustomWindowSizeStore.swift
-run custom-command-test    Tinycast/Platform/PseudoTerminal.swift \
-                           Tinycast/Features/CustomCommands/Model/CustomCommand.swift \
-                           Tinycast/Features/CustomCommands/Model/RaycastScriptImport.swift \
-                           Tinycast/Features/CustomCommands/Service/ShellCommandRunner.swift
-run uninstall-test         Tinycast/Features/Uninstall/Model/UninstallTarget.swift \
-                           Tinycast/Features/Uninstall/Model/UninstallSearchRoot.swift \
-                           Tinycast/Features/Uninstall/Model/UninstallRules.swift \
-                           Tinycast/Features/Uninstall/Model/UninstallProtection.swift \
-                           Tinycast/Features/Uninstall/Model/UninstallPlan.swift
-run quicklink-test         Tinycast/Features/Quicklinks/Model/Quicklink.swift \
-                           Tinycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
-                           Tinycast/Features/Quicklinks/Model/QuicklinkStore.swift \
-                           Tinycast/Features/Quicklinks/Model/QuicklinkArchive.swift \
-                           Tinycast/Features/Quicklinks/Model/RaycastQuicklinkImport.swift
-run slow snippets-test     Tinycast/Platform/NotificationToken.swift \
-                           Tinycast/Platform/HealthTicker.swift \
-                           Tinycast/Platform/AccessibilityText.swift \
-                           Tinycast/Features/Snippets/Model/*.swift \
-                           Tinycast/Features/Snippets/Service/*.swift \
-                           Tinycast/Features/TextInjection/Service/*.swift
-run notes-test             Tinycast/Platform/Signposts.swift \
+                           Tonycast/Features/Emoji/Model/EmojiCatalog.swift \
+                           Tonycast/Features/Emoji/Model/EmojiData.generated.swift \
+                           Tonycast/Features/Emoji/Service/EmojiIndex.swift \
+                           Tonycast/Features/Emoji/Service/FrequentEmojiStore.swift \
+                           Tonycast/Features/Launcher/Model/SearchRelevance.swift \
+                           Tonycast/Platform/AppPaths.swift Tonycast/Platform/Memo.swift
+run palette-selection-test Tonycast/Features/PaletteRowIndex.swift \
+                           Tonycast/Features/Emoji/Model/EmojiGridGeometry.swift
+run appearance-test        Tonycast/Platform/Appearance.swift \
+                           Tonycast/DesignSystem/Theme.swift \
+                           Tonycast/DesignSystem/InterfaceMetrics.swift \
+                           Tonycast/Features/Settings/AppAppearance.swift
+run interface-size-test    Tonycast/Platform/Appearance.swift \
+                           Tonycast/DesignSystem/Theme.swift \
+                           Tonycast/DesignSystem/InterfaceMetrics.swift \
+                           Tonycast/Features/Settings/InterfaceSize.swift \
+                           Tonycast/Features/Extensions/Model/ExtensionFormMetrics.swift
+run palette-placement-test Tonycast/Platform/Appearance.swift \
+                           Tonycast/DesignSystem/Theme.swift \
+                           Tonycast/DesignSystem/InterfaceMetrics.swift \
+                           Tonycast/Features/Settings/InterfaceSize.swift \
+                           Tonycast/Palette/PalettePlacement.swift
+run scroll-reveal-test     Tonycast/DesignSystem/Scrolling/SelectionReveal.swift
+run redaction-test         Tonycast/DesignSystem/RedactedPlaceholder.swift
+run keyboard-focus-test    Tonycast/DesignSystem/Interaction/KeyboardFocus.swift
+run ai-instructions-test   Tonycast/Features/AI/Model/AIInstructions.swift \
+                           Tonycast/Features/AI/Model/AIPreamble.swift
+run hover-arming-test      Tonycast/Palette/HoverArming.swift \
+                           Tonycast/Palette/PaletteState.swift \
+                           Tonycast/Palette/PaletteMode.swift \
+                           Tonycast/Features/Emoji/Model/EmojiCatalog.swift \
+                           Tonycast/Features/Clipboard/Model/ClipboardStore.swift \
+                           Tonycast/Features/Clipboard/Model/ClipboardFilter.swift \
+                           Tonycast/Features/FileSearch/Model/FileSearchFilter.swift \
+                           Tonycast/Features/Clipboard/Model/ColorValue.swift \
+                           Tonycast/Features/Clipboard/Model/ColorFormat.swift \
+                           Tonycast/Features/Clipboard/Model/ColorSpaces.swift \
+                           Tonycast/Features/Quicklinks/Model/Quicklink.swift \
+                           Tonycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
+                           Tonycast/Features/CustomCommands/Model/CustomCommand.swift
+run palette-escape-test    Tonycast/Palette/PaletteMode.swift \
+                           Tonycast/Palette/PaletteEscapeAction.swift \
+                           Tonycast/Palette/CommandEscapeTap.swift \
+                           Tonycast/Features/Settings/EscapeKeyBehavior.swift \
+                           Tonycast/Features/Quicklinks/Model/Quicklink.swift \
+                           Tonycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
+                           Tonycast/Features/CustomCommands/Model/CustomCommand.swift
+run palette-navigation-test Tonycast/Palette/PaletteState.swift \
+                           Tonycast/Palette/PaletteMode.swift \
+                           Tonycast/Palette/HoverArming.swift \
+                           Tonycast/Features/Emoji/Model/EmojiCatalog.swift \
+                           Tonycast/Features/Clipboard/Model/ClipboardStore.swift \
+                           Tonycast/Features/Clipboard/Model/ClipboardFilter.swift \
+                           Tonycast/Features/FileSearch/Model/FileSearchFilter.swift \
+                           Tonycast/Features/Clipboard/Model/ColorValue.swift \
+                           Tonycast/Features/Clipboard/Model/ColorFormat.swift \
+                           Tonycast/Features/Clipboard/Model/ColorSpaces.swift \
+                           Tonycast/Features/Quicklinks/Model/Quicklink.swift \
+                           Tonycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
+                           Tonycast/Features/CustomCommands/Model/CustomCommand.swift
+run palette-filter-test    Tonycast/Palette/PaletteMode.swift \
+                           Tonycast/Palette/PaletteFilterAction.swift \
+                           Tonycast/Features/Quicklinks/Model/Quicklink.swift \
+                           Tonycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
+                           Tonycast/Features/CustomCommands/Model/CustomCommand.swift
+run action-menu-search-test Tonycast/Palette/ActionMenuSearchQuery.swift \
+                            Tonycast/Features/Launcher/Model/SearchRelevance.swift
+run palette-shortcut-test  Tonycast/Palette/PaletteShortcut.swift
+run palette-tab-test       Tonycast/Palette/PaletteMode.swift \
+                           Tonycast/Palette/PaletteTabAction.swift \
+                           Tonycast/Features/Quicklinks/Model/Quicklink.swift \
+                           Tonycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
+                           Tonycast/Features/CustomCommands/Model/CustomCommand.swift
+run fallback-test          Tonycast/Features/Launcher/Model/Fallback.swift \
+                           Tonycast/Features/Launcher/Model/CommandID.swift \
+                           Tonycast/Features/HotKeys/Model/HotKeyAction.swift \
+                           Tonycast/Features/QuickActions/Model/QuickAction.swift \
+                           Tonycast/Features/QuickActions/Model/BuiltInQuickAction.swift \
+                           Tonycast/Features/QuickActions/Model/CustomQuickAction.swift \
+                           Tonycast/Features/Quicklinks/Model/Quicklink.swift \
+                           Tonycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
+                           Tonycast/Features/SystemActions/Model/SystemAction.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowCommand.swift
+run dictionary-test        Tonycast/Features/Dictionary/Model/DictionaryEntry.swift \
+                           Tonycast/Features/Dictionary/Model/DictionaryMarkup.swift
+run hotkey-test            Tonycast/Features/HotKeys/Model/DoubleTapModifier.swift \
+                           Tonycast/Features/HotKeys/Model/DoubleTapDetector.swift \
+                           Tonycast/Features/HotKeys/Model/HyperKey.swift \
+                           Tonycast/Platform/ASCIIKeyboardLayout.swift \
+                           Tonycast/Features/HotKeys/Service/KeyShortcut.swift \
+                           Tonycast/Features/HotKeys/Model/HotKeyAction.swift \
+                           Tonycast/Features/QuickActions/Model/QuickAction.swift \
+                           Tonycast/Features/QuickActions/Model/BuiltInQuickAction.swift \
+                           Tonycast/Features/QuickActions/Model/CustomQuickAction.swift \
+                           Tonycast/Features/Launcher/Model/CommandID.swift \
+                           Tonycast/Features/Quicklinks/Model/Quicklink.swift \
+                           Tonycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
+                           Tonycast/Features/SystemActions/Model/SystemAction.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowCommand.swift
+run callout-test           Tonycast/Platform/Appearance.swift \
+                           Tonycast/DesignSystem/Theme.swift \
+                           Tonycast/DesignSystem/InterfaceMetrics.swift \
+                           Tonycast/Features/HotKeys/UI/CalloutPlacement.swift
+run icon-cache-test        Tonycast/Platform/Appearance.swift \
+                           Tonycast/Platform/Images/IconCache.swift
+run entry-icon-test        Tonycast/Platform/Appearance.swift \
+                           Tonycast/Platform/Images/IconCache.swift \
+                           Tonycast/Platform/Images/FileIconStamp.swift
+run ext-icon-test          Tonycast/Platform/Appearance.swift \
+                           Tonycast/Platform/AppDisplayName.swift \
+                           Tonycast/Platform/Images/IconCache.swift \
+                           Tonycast/Platform/Compression/Zlib.swift \
+                           Tonycast/DesignSystem/Theme.swift \
+                           Tonycast/DesignSystem/InterfaceMetrics.swift \
+                           Tonycast/Features/Extensions/Model/ExtensionBootConfig.swift \
+                           Tonycast/Features/Extensions/Model/ExtensionLaunchType.swift \
+                           Tonycast/Features/Extensions/Model/ExtensionManifest.swift \
+                           Tonycast/Features/Extensions/Model/ExtensionRefreshPolicy.swift \
+                           Tonycast/Features/Extensions/Model/ExtensionRefreshState.swift \
+                           Tonycast/Features/Extensions/Model/RenderNode.swift \
+                           Tonycast/Features/Extensions/Service/ExtensionCatalog.swift \
+                           Tonycast/Features/Extensions/Service/ExtensionFetcher.swift \
+                           Tonycast/Features/Extensions/Service/ExtensionNodeShims.swift \
+                           Tonycast/Features/Extensions/Service/ExtensionOAuthKeychain.swift \
+                           Tonycast/Features/Extensions/Service/ExtensionOAuthSession.swift \
+                           Tonycast/Features/Extensions/Service/ExtensionRuntime.swift \
+                           Tonycast/Features/Extensions/Service/ExtensionIconCache.swift \
+                           Tonycast/Features/Extensions/UI/ExtensionAnimatedImage.swift \
+                           Tonycast/Features/Extensions/UI/ExtensionImage.swift \
+                           Tonycast/Features/Clipboard/Model/ColorValue.swift \
+                           Tonycast/Features/Clipboard/Model/ColorSpaces.swift
+run system-action-test     Tonycast/Features/SystemActions/Model/SystemAction.swift
+run volume-test            Tonycast/Features/SystemActions/Model/VolumeLevel.swift
+run window-command-test    Tonycast/Features/WindowManagement/Model/WindowCommand.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowCycle.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowPlacementEngine.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowActionMemory.swift
+run space-gesture-test     Tonycast/Features/WindowManagement/Model/WindowCommand.swift \
+                           Tonycast/Features/WindowManagement/Model/SpaceGesture.swift
+run window-layout-test     Tonycast/Features/WindowManagement/Model/WindowCommand.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowCycle.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowPlacementEngine.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowLayoutAnchor.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowLayoutDisplay.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowLayout.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowLayoutGeometry.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowLayoutPlan.swift \
+                           Tonycast/Features/WindowManagement/Model/WindowLayoutStore.swift \
+                           Tonycast/Features/WindowManagement/Model/CustomWindowSize.swift \
+                           Tonycast/Features/WindowManagement/Model/CustomWindowSizeStore.swift
+run custom-command-test    Tonycast/Platform/PseudoTerminal.swift \
+                           Tonycast/Features/CustomCommands/Model/CustomCommand.swift \
+                           Tonycast/Features/CustomCommands/Model/RaycastScriptImport.swift \
+                           Tonycast/Features/CustomCommands/Service/ShellCommandRunner.swift
+run uninstall-test         Tonycast/Features/Uninstall/Model/UninstallTarget.swift \
+                           Tonycast/Features/Uninstall/Model/UninstallSearchRoot.swift \
+                           Tonycast/Features/Uninstall/Model/UninstallRules.swift \
+                           Tonycast/Features/Uninstall/Model/UninstallProtection.swift \
+                           Tonycast/Features/Uninstall/Model/UninstallPlan.swift
+run quicklink-test         Tonycast/Features/Quicklinks/Model/Quicklink.swift \
+                           Tonycast/Features/Quicklinks/Model/QuicklinkDestination.swift \
+                           Tonycast/Features/Quicklinks/Model/QuicklinkStore.swift \
+                           Tonycast/Features/Quicklinks/Model/QuicklinkArchive.swift \
+                           Tonycast/Features/Quicklinks/Model/RaycastQuicklinkImport.swift
+run slow snippets-test     Tonycast/Platform/NotificationToken.swift \
+                           Tonycast/Platform/HealthTicker.swift \
+                           Tonycast/Platform/AccessibilityText.swift \
+                           Tonycast/Features/Snippets/Model/*.swift \
+                           Tonycast/Features/Snippets/Service/*.swift \
+                           Tonycast/Features/TextInjection/Service/*.swift
+run notes-test             Tonycast/Platform/Signposts.swift \
                            $L/SearchRelevance.swift \
-                           Tinycast/Features/Notes/Model/*.swift \
-                           Tinycast/Features/Notes/Service/*.swift
-run notes-editor-test      Tinycast/Platform/Signposts.swift \
-                           Tinycast/Platform/Appearance.swift \
-                           Tinycast/DesignSystem/Theme.swift \
-                           Tinycast/DesignSystem/InterfaceMetrics.swift \
-                           Tinycast/Platform/NotificationToken.swift \
-                           Tinycast/Features/TextInjection/Service/InjectableTextView.swift \
-                           Tinycast/Features/Notes/Model/NoteDocument.swift \
-                           Tinycast/Features/Notes/Model/NoteMarkdown.swift \
-                           Tinycast/Features/Notes/Model/NoteMarkdownParser.swift \
-                           Tinycast/Features/Notes/Model/NoteInlineScanner.swift \
-                           Tinycast/Features/Notes/Model/NoteEditPlan.swift \
-                           Tinycast/Features/Notes/Model/NoteEditAction.swift \
-                           Tinycast/Features/Notes/Model/NoteFormatting.swift \
-                           Tinycast/Features/Notes/Model/NoteMarkdownEditing.swift \
-                           Tinycast/Features/Notes/Model/NoteRevealPolicy.swift \
-                           Tinycast/Features/Notes/UI/NoteMarkdownTypography.swift \
-                           Tinycast/Features/Notes/UI/NoteBlockDecoration.swift \
-                           Tinycast/Features/Notes/UI/NoteMarkdownStyler.swift \
-                           Tinycast/Features/Notes/UI/NoteMarkdownRenderer.swift \
-                           Tinycast/Features/Notes/UI/NoteCheckboxGeometry.swift \
-                           Tinycast/Features/Notes/UI/NoteBlockLayoutFragment.swift \
-                           Tinycast/Features/Notes/UI/NoteLayoutFragmentProvider.swift \
-                           Tinycast/Features/Notes/UI/NoteTextViewEditing.swift \
-                           Tinycast/Features/Notes/UI/NoteTextView.swift \
-                           Tinycast/Features/Notes/UI/NoteEditorView.swift
+                           Tonycast/Features/Notes/Model/*.swift \
+                           Tonycast/Features/Notes/Service/*.swift
+run notes-editor-test      Tonycast/Platform/Signposts.swift \
+                           Tonycast/Platform/Appearance.swift \
+                           Tonycast/DesignSystem/Theme.swift \
+                           Tonycast/DesignSystem/InterfaceMetrics.swift \
+                           Tonycast/Platform/NotificationToken.swift \
+                           Tonycast/Features/TextInjection/Service/InjectableTextView.swift \
+                           Tonycast/Features/Notes/Model/NoteDocument.swift \
+                           Tonycast/Features/Notes/Model/NoteMarkdown.swift \
+                           Tonycast/Features/Notes/Model/NoteMarkdownParser.swift \
+                           Tonycast/Features/Notes/Model/NoteInlineScanner.swift \
+                           Tonycast/Features/Notes/Model/NoteEditPlan.swift \
+                           Tonycast/Features/Notes/Model/NoteEditAction.swift \
+                           Tonycast/Features/Notes/Model/NoteFormatting.swift \
+                           Tonycast/Features/Notes/Model/NoteMarkdownEditing.swift \
+                           Tonycast/Features/Notes/Model/NoteRevealPolicy.swift \
+                           Tonycast/Features/Notes/UI/NoteMarkdownTypography.swift \
+                           Tonycast/Features/Notes/UI/NoteBlockDecoration.swift \
+                           Tonycast/Features/Notes/UI/NoteMarkdownStyler.swift \
+                           Tonycast/Features/Notes/UI/NoteMarkdownRenderer.swift \
+                           Tonycast/Features/Notes/UI/NoteCheckboxGeometry.swift \
+                           Tonycast/Features/Notes/UI/NoteBlockLayoutFragment.swift \
+                           Tonycast/Features/Notes/UI/NoteLayoutFragmentProvider.swift \
+                           Tonycast/Features/Notes/UI/NoteTextViewEditing.swift \
+                           Tonycast/Features/Notes/UI/NoteTextView.swift \
+                           Tonycast/Features/Notes/UI/NoteEditorView.swift
 run -O index notes-editor-performance \
-                           Tinycast/Platform/Signposts.swift \
-                           Tinycast/Platform/Appearance.swift \
-                           Tinycast/DesignSystem/Theme.swift \
-                           Tinycast/DesignSystem/InterfaceMetrics.swift \
-                           Tinycast/Platform/NotificationToken.swift \
-                           Tinycast/Features/TextInjection/Service/InjectableTextView.swift \
-                           Tinycast/Features/Notes/Model/NoteDocument.swift \
-                           Tinycast/Features/Notes/Model/NoteMarkdown.swift \
-                           Tinycast/Features/Notes/Model/NoteMarkdownParser.swift \
-                           Tinycast/Features/Notes/Model/NoteInlineScanner.swift \
-                           Tinycast/Features/Notes/Model/NoteEditPlan.swift \
-                           Tinycast/Features/Notes/Model/NoteEditAction.swift \
-                           Tinycast/Features/Notes/Model/NoteFormatting.swift \
-                           Tinycast/Features/Notes/Model/NoteMarkdownEditing.swift \
-                           Tinycast/Features/Notes/Model/NoteRevealPolicy.swift \
-                           Tinycast/Features/Notes/UI/NoteMarkdownTypography.swift \
-                           Tinycast/Features/Notes/UI/NoteBlockDecoration.swift \
-                           Tinycast/Features/Notes/UI/NoteMarkdownStyler.swift \
-                           Tinycast/Features/Notes/UI/NoteMarkdownRenderer.swift \
-                           Tinycast/Features/Notes/UI/NoteCheckboxGeometry.swift \
-                           Tinycast/Features/Notes/UI/NoteBlockLayoutFragment.swift \
-                           Tinycast/Features/Notes/UI/NoteLayoutFragmentProvider.swift \
-                           Tinycast/Features/Notes/UI/NoteTextViewEditing.swift \
-                           Tinycast/Features/Notes/UI/NoteTextView.swift \
-                           Tinycast/Features/Notes/UI/NoteEditorView.swift
-run slow -O raycast-test   Tinycast/Features/Backup/Model/RaycastImportError.swift \
-                           Tinycast/Features/Backup/Service/RaycastDecoder.swift \
-                           Tinycast/Features/Backup/Service/Scrypt.swift \
-                           Tinycast/Platform/Compression/Zlib.swift
-run settings-backup-test   Tinycast/Features/Settings/AppSettingsKey.swift \
-                           Tinycast/Features/Backup/Model/SettingsBackupCoverage.swift
-run backup-archive-test    Tinycast/Platform/AppPaths.swift \
-                           Tinycast/Features/Backup/Model/BackupArchive.swift \
-                           Tinycast/Features/Backup/Model/BackupBundle.swift \
-                           Tinycast/Features/Backup/Model/BackupCategory.swift \
-                           Tinycast/Features/Backup/Model/BackupClipboardItem.swift \
-                           Tinycast/Features/Backup/Model/BackupManifest.swift \
-                           Tinycast/Features/Backup/Service/BackupStaging.swift
-E=Tinycast/Features/Extensions
+                           Tonycast/Platform/Signposts.swift \
+                           Tonycast/Platform/Appearance.swift \
+                           Tonycast/DesignSystem/Theme.swift \
+                           Tonycast/DesignSystem/InterfaceMetrics.swift \
+                           Tonycast/Platform/NotificationToken.swift \
+                           Tonycast/Features/TextInjection/Service/InjectableTextView.swift \
+                           Tonycast/Features/Notes/Model/NoteDocument.swift \
+                           Tonycast/Features/Notes/Model/NoteMarkdown.swift \
+                           Tonycast/Features/Notes/Model/NoteMarkdownParser.swift \
+                           Tonycast/Features/Notes/Model/NoteInlineScanner.swift \
+                           Tonycast/Features/Notes/Model/NoteEditPlan.swift \
+                           Tonycast/Features/Notes/Model/NoteEditAction.swift \
+                           Tonycast/Features/Notes/Model/NoteFormatting.swift \
+                           Tonycast/Features/Notes/Model/NoteMarkdownEditing.swift \
+                           Tonycast/Features/Notes/Model/NoteRevealPolicy.swift \
+                           Tonycast/Features/Notes/UI/NoteMarkdownTypography.swift \
+                           Tonycast/Features/Notes/UI/NoteBlockDecoration.swift \
+                           Tonycast/Features/Notes/UI/NoteMarkdownStyler.swift \
+                           Tonycast/Features/Notes/UI/NoteMarkdownRenderer.swift \
+                           Tonycast/Features/Notes/UI/NoteCheckboxGeometry.swift \
+                           Tonycast/Features/Notes/UI/NoteBlockLayoutFragment.swift \
+                           Tonycast/Features/Notes/UI/NoteLayoutFragmentProvider.swift \
+                           Tonycast/Features/Notes/UI/NoteTextViewEditing.swift \
+                           Tonycast/Features/Notes/UI/NoteTextView.swift \
+                           Tonycast/Features/Notes/UI/NoteEditorView.swift
+run slow -O raycast-test   Tonycast/Features/Backup/Model/RaycastImportError.swift \
+                           Tonycast/Features/Backup/Service/RaycastDecoder.swift \
+                           Tonycast/Features/Backup/Service/Scrypt.swift \
+                           Tonycast/Platform/Compression/Zlib.swift
+run settings-backup-test   Tonycast/Features/Settings/AppSettingsKey.swift \
+                           Tonycast/Features/Backup/Model/SettingsBackupCoverage.swift
+run backup-archive-test    Tonycast/Platform/AppPaths.swift \
+                           Tonycast/Features/Backup/Model/BackupArchive.swift \
+                           Tonycast/Features/Backup/Model/BackupBundle.swift \
+                           Tonycast/Features/Backup/Model/BackupCategory.swift \
+                           Tonycast/Features/Backup/Model/BackupClipboardItem.swift \
+                           Tonycast/Features/Backup/Model/BackupManifest.swift \
+                           Tonycast/Features/Backup/Service/BackupStaging.swift
+E=Tonycast/Features/Extensions
 run symbols-test           $E/Service/SymbolCatalog.swift
 run ext-cleanup-test       $E/Service/ExtensionCleanup.swift \
                            $E/Service/ExtensionCatalog.swift \
-                           Tinycast/Platform/AppDisplayName.swift \
+                           Tonycast/Platform/AppDisplayName.swift \
                            $E/Model/ExtensionManifest.swift \
                            $E/Model/ExtensionLaunchType.swift \
                            $E/Model/ExtensionRefreshPolicy.swift \
                            $E/Model/ExtensionRefreshState.swift
 run ext-refresh-test       $E/Model/ExtensionManifest.swift \
-                           Tinycast/Platform/AppDisplayName.swift \
+                           Tonycast/Platform/AppDisplayName.swift \
                            $E/Model/ExtensionLaunchType.swift \
                            $E/Model/ExtensionRefreshPolicy.swift \
                            $E/Model/ExtensionRefreshState.swift
@@ -453,11 +453,11 @@ run ext-accessory-test     $E/Model/RenderNode.swift \
                            $E/Model/ExtensionSearchAccessory.swift \
                            $E/Service/ExtensionStorage.swift
 run slow ext-test          -parse-as-library \
-                           Tinycast/Platform/Appearance.swift \
-                           Tinycast/Platform/AppDisplayName.swift \
-                           Tinycast/Platform/Images/IconCache.swift \
-                           Tinycast/DesignSystem/Theme.swift \
-                           Tinycast/DesignSystem/InterfaceMetrics.swift \
+                           Tonycast/Platform/Appearance.swift \
+                           Tonycast/Platform/AppDisplayName.swift \
+                           Tonycast/Platform/Images/IconCache.swift \
+                           Tonycast/DesignSystem/Theme.swift \
+                           Tonycast/DesignSystem/InterfaceMetrics.swift \
                            $E/Model/ExtensionBootConfig.swift \
                            $E/Model/ExtensionDeepLink.swift \
                            $E/Model/ExtensionLaunchType.swift \
@@ -482,77 +482,76 @@ run slow ext-test          -parse-as-library \
                            $E/UI/ExtensionImage.swift \
                            $E/UI/ExtensionScreen.swift \
                            $L/SearchRelevance.swift \
-                           Tinycast/Platform/Compression/Zlib.swift \
-                           Tinycast/Features/Clipboard/Model/ColorValue.swift \
-                           Tinycast/Features/Clipboard/Model/ColorSpaces.swift
-run settings-history-test  Tinycast/Features/Settings/SettingsTab.swift \
-                           Tinycast/Features/Settings/SettingsHistory.swift \
-                           Tinycast/Features/Settings/SettingsAnchor.swift \
-                           Tinycast/Features/Settings/SettingsNavigationState.swift \
-                           Tinycast/Features/Settings/SettingsSearchCatalog.swift \
+                           Tonycast/Platform/Compression/Zlib.swift \
+                           Tonycast/Features/Clipboard/Model/ColorValue.swift \
+                           Tonycast/Features/Clipboard/Model/ColorSpaces.swift
+run settings-history-test  Tonycast/Features/Settings/SettingsTab.swift \
+                           Tonycast/Features/Settings/SettingsHistory.swift \
+                           Tonycast/Features/Settings/SettingsAnchor.swift \
+                           Tonycast/Features/Settings/SettingsNavigationState.swift \
+                           Tonycast/Features/Settings/SettingsSearchCatalog.swift \
                            $L/SearchRelevance.swift
-run updates-test           Tinycast/Features/Updates/Model/*.swift \
-                           Tinycast/Features/Updates/Service/BundleSignature.swift
-run support-test           Tinycast/Features/Support/Model/*.swift
-run ai-provider-test       Tinycast/Features/Settings/AppSettingsKey.swift \
-                           Tinycast/Features/AI/Model/*.swift \
-                           Tinycast/Features/AI/Settings/AISettingsStore.swift
-run ai-chat-test           Tinycast/Features/AI/Model/AIRequest.swift \
-                           Tinycast/Features/AI/Model/AIAttachmentPolicy.swift \
-                           Tinycast/Features/AI/Model/AIRetention.swift \
-                           Tinycast/Features/AI/Model/AITool.swift \
-                           Tinycast/Features/AI/Model/JSONValue.swift \
-                           Tinycast/Features/AI/Model/ChatMessage.swift \
-                           Tinycast/Features/AI/Model/ChatSession.swift \
-                           Tinycast/Features/AI/Model/MarkdownBlock.swift \
-                           Tinycast/Features/AI/Service/AIProvider.swift \
-                           Tinycast/Features/AI/Service/ChatHistoryStore.swift \
-                           Tinycast/Features/AI/Service/AIToolLoopProvider.swift \
-                           Tinycast/Features/AI/UI/AIChatState.swift
-run mcp-test               Tinycast/Features/Settings/AppSettingsKey.swift \
-                           Tinycast/Features/AI/Model/AIConnection.swift \
-                           Tinycast/Features/AI/Model/AppleIntelligence.swift \
-                           Tinycast/Features/AI/Model/AITool.swift \
-                           Tinycast/Features/AI/Model/JSONValue.swift \
-                           Tinycast/Features/MCP/Model/*.swift \
-                           Tinycast/Features/MCP/Settings/MCPSettingsStore.swift
-run -O text-diff-test      Tinycast/Features/QuickActions/Model/TextDiffEngine.swift
-run index text-diff-performance Tinycast/Features/QuickActions/Model/TextDiffEngine.swift
-run quick-action-test      Tinycast/Features/Settings/AppSettingsKey.swift \
-                           Tinycast/Features/AI/Model/AIConnection.swift \
-                           Tinycast/Features/AI/Model/AppleIntelligence.swift \
-                           Tinycast/Features/AI/Model/ChatGPTSubscription.swift \
-                           Tinycast/Features/AI/Model/InstalledAI.swift \
-                           Tinycast/Features/QuickActions/Model/*.swift \
-                           Tinycast/Features/QuickActions/Settings/QuickActionSettingsStore.swift
-run apple-intelligence-test Tinycast/Features/Settings/AppSettingsKey.swift \
-                           Tinycast/Features/AI/Model/*.swift \
-                           Tinycast/Features/AI/Service/AIProvider.swift \
-                           Tinycast/Features/AI/Service/AppleIntelligenceProvider.swift
-run slow mcp-stdio-test    Tinycast/Platform/ExecutableLocator.swift \
-                           Tinycast/Platform/KeychainSecretStore.swift \
-                           Tinycast/Features/Settings/AppSettingsKey.swift \
-                           Tinycast/Features/AI/Model/AIConnection.swift \
-                           Tinycast/Features/AI/Model/AppleIntelligence.swift \
-                           Tinycast/Features/AI/Model/AITool.swift \
-                           Tinycast/Features/AI/Model/AIStreamDecoder.swift \
-                           Tinycast/Features/AI/Model/AIRequest.swift \
-                           Tinycast/Features/AI/Model/JSONValue.swift \
-                           Tinycast/Features/MCP/Model/*.swift \
-                           Tinycast/Features/MCP/Service/*.swift
-run slow codex-turn-test   Tinycast/Platform/AppPaths.swift \
-                           Tinycast/Features/AI/Model/*.swift \
-                           Tinycast/Features/AI/Service/AIProvider.swift \
-                           Tinycast/Features/AI/Service/ChatGPTSubscriptionManager.swift \
-                           Tinycast/Features/AI/Service/CodexAppServerClient.swift \
-                           Tinycast/Platform/ExecutableLocator.swift \
-                           Tinycast/Features/AI/Service/CodexTurnRunner.swift
-run installed-ai-test     Tinycast/Features/AI/Model/*.swift \
-                          Tinycast/Features/AI/Service/AIProvider.swift \
-                          Tinycast/Platform/AppPaths.swift \
-                          Tinycast/Platform/ExecutableLocator.swift \
-                          Tinycast/Features/AI/Service/InstalledCLIProvider.swift \
-                          Tinycast/Features/AI/Service/InstalledAIManager.swift
+run updates-test           Tonycast/Features/Updates/Model/*.swift \
+                           Tonycast/Features/Updates/Service/BundleSignature.swift
+run ai-provider-test       Tonycast/Features/Settings/AppSettingsKey.swift \
+                           Tonycast/Features/AI/Model/*.swift \
+                           Tonycast/Features/AI/Settings/AISettingsStore.swift
+run ai-chat-test           Tonycast/Features/AI/Model/AIRequest.swift \
+                           Tonycast/Features/AI/Model/AIAttachmentPolicy.swift \
+                           Tonycast/Features/AI/Model/AIRetention.swift \
+                           Tonycast/Features/AI/Model/AITool.swift \
+                           Tonycast/Features/AI/Model/JSONValue.swift \
+                           Tonycast/Features/AI/Model/ChatMessage.swift \
+                           Tonycast/Features/AI/Model/ChatSession.swift \
+                           Tonycast/Features/AI/Model/MarkdownBlock.swift \
+                           Tonycast/Features/AI/Service/AIProvider.swift \
+                           Tonycast/Features/AI/Service/ChatHistoryStore.swift \
+                           Tonycast/Features/AI/Service/AIToolLoopProvider.swift \
+                           Tonycast/Features/AI/UI/AIChatState.swift
+run mcp-test               Tonycast/Features/Settings/AppSettingsKey.swift \
+                           Tonycast/Features/AI/Model/AIConnection.swift \
+                           Tonycast/Features/AI/Model/AppleIntelligence.swift \
+                           Tonycast/Features/AI/Model/AITool.swift \
+                           Tonycast/Features/AI/Model/JSONValue.swift \
+                           Tonycast/Features/MCP/Model/*.swift \
+                           Tonycast/Features/MCP/Settings/MCPSettingsStore.swift
+run -O text-diff-test      Tonycast/Features/QuickActions/Model/TextDiffEngine.swift
+run index text-diff-performance Tonycast/Features/QuickActions/Model/TextDiffEngine.swift
+run quick-action-test      Tonycast/Features/Settings/AppSettingsKey.swift \
+                           Tonycast/Features/AI/Model/AIConnection.swift \
+                           Tonycast/Features/AI/Model/AppleIntelligence.swift \
+                           Tonycast/Features/AI/Model/ChatGPTSubscription.swift \
+                           Tonycast/Features/AI/Model/InstalledAI.swift \
+                           Tonycast/Features/QuickActions/Model/*.swift \
+                           Tonycast/Features/QuickActions/Settings/QuickActionSettingsStore.swift
+run apple-intelligence-test Tonycast/Features/Settings/AppSettingsKey.swift \
+                           Tonycast/Features/AI/Model/*.swift \
+                           Tonycast/Features/AI/Service/AIProvider.swift \
+                           Tonycast/Features/AI/Service/AppleIntelligenceProvider.swift
+run slow mcp-stdio-test    Tonycast/Platform/ExecutableLocator.swift \
+                           Tonycast/Platform/KeychainSecretStore.swift \
+                           Tonycast/Features/Settings/AppSettingsKey.swift \
+                           Tonycast/Features/AI/Model/AIConnection.swift \
+                           Tonycast/Features/AI/Model/AppleIntelligence.swift \
+                           Tonycast/Features/AI/Model/AITool.swift \
+                           Tonycast/Features/AI/Model/AIStreamDecoder.swift \
+                           Tonycast/Features/AI/Model/AIRequest.swift \
+                           Tonycast/Features/AI/Model/JSONValue.swift \
+                           Tonycast/Features/MCP/Model/*.swift \
+                           Tonycast/Features/MCP/Service/*.swift
+run slow codex-turn-test   Tonycast/Platform/AppPaths.swift \
+                           Tonycast/Features/AI/Model/*.swift \
+                           Tonycast/Features/AI/Service/AIProvider.swift \
+                           Tonycast/Features/AI/Service/ChatGPTSubscriptionManager.swift \
+                           Tonycast/Features/AI/Service/CodexAppServerClient.swift \
+                           Tonycast/Platform/ExecutableLocator.swift \
+                           Tonycast/Features/AI/Service/CodexTurnRunner.swift
+run installed-ai-test     Tonycast/Features/AI/Model/*.swift \
+                          Tonycast/Features/AI/Service/AIProvider.swift \
+                          Tonycast/Platform/AppPaths.swift \
+                          Tonycast/Platform/ExecutableLocator.swift \
+                          Tonycast/Features/AI/Service/InstalledCLIProvider.swift \
+                          Tonycast/Features/AI/Service/InstalledAIManager.swift
 
 if [ "$emit_db" -eq 1 ]; then
     printf ']\n' >> "$DB"
@@ -575,8 +574,8 @@ if [ "$ran" -eq 0 ]; then
 fi
 
 # `sort -s` is stable, so the slow harnesses lead and everything else keeps its declaration order.
-JOBS="${TINYCAST_TEST_JOBS:-$(sysctl -n hw.ncpu)}"
-export TINYCAST_TEST_TIMEOUT="${TINYCAST_TEST_TIMEOUT:-300}"
+JOBS="${TONYCAST_TEST_JOBS:-$(sysctl -n hw.ncpu)}"
+export TONYCAST_TEST_TIMEOUT="${TONYCAST_TEST_TIMEOUT:-300}"
 started=$SECONDS
 
 # Numbers each result, and names what is still running whenever the output goes quiet.

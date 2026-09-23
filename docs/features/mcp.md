@@ -1,8 +1,8 @@
 # MCP servers
 
-Tinycast connects [Model Context Protocol](https://modelcontextprotocol.io) servers and offers their
-tools to the model during a chat. A server is either a remote HTTP endpoint or a command Tinycast
-runs on this Mac; either way it advertises tools, Tinycast namespaces them by the server's handle,
+Tonycast connects [Model Context Protocol](https://modelcontextprotocol.io) servers and offers their
+tools to the model during a chat. A server is either a remote HTTP endpoint or a command Tonycast
+runs on this Mac; either way it advertises tools, Tonycast namespaces them by the server's handle,
 and the model calls what it wants. `Features/MCP/` owns servers and knows nothing about chat;
 [AI](ai.md) owns tool calling and knows nothing about MCP. `AIChatCoordinator.send` is the one place
 the two meet.
@@ -29,7 +29,7 @@ the two meet.
   so the shape that could produce one is never written down. It also means a later turn sees the
   model's own answer rather than the raw tool output it was billed for once already.
 - **A dialog can grant a server, and only Settings can withhold one.** `MCPTrust` is `.ask` by
-  default; the first call of a conversation goes through Tinycast's own three-way dialog. **Always
+  default; the first call of a conversation goes through Tonycast's own three-way dialog. **Always
   Allow** persists `.always`, **Allow This Chat** grants for that `ChatSession.id` alone, and **Don't
   Allow** — which is what Escape does — refuses that one call and lets the next ask again. Escape is
   never allowed to persist a decision, and `.never` is set on the server's row in Settings.
@@ -50,7 +50,7 @@ the two meet.
 - **Only the two HTTP shapes are offered tools.** `AIModelCapabilities.tools` is true for `.api` and
   false for `.appleIntelligence` and `.chatGPT`; the Codex route already has an invariant saying its
   tools are unavailable, and a sandbox boundary on a local CLI is not something MCP may lift.
-- **Tinycast exposes nothing back.** A server request — sampling, elicitation, roots — is declined
+- **Tonycast exposes nothing back.** A server request — sampling, elicitation, roots — is declined
   with a JSON-RPC error. The client advertises no capabilities in `initialize`.
 - **`Model/` stays Foundation-only.** `mcp-test` compiles the shipped models and pins the framing,
   handles, tool names, output flattening, trust and addressing; `mcp-stdio-test` drives a real

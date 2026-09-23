@@ -22,10 +22,10 @@ export function Support() {
         <GlowingMark />
       </div>
       <h2 className="mx-auto mt-14 max-w-2xl text-closing">
-        Enjoying Tinycast?
+        Enjoying Tonycast?
       </h2>
       <p className="mx-auto mt-4 max-w-lg text-pretty text-body-lg text-fg-muted">
-        Tinycast is free and open source, and it stays that way. If you would
+        Tonycast is free and open source, and it stays that way. If you would
         like to support its development, you can chip in. Entirely optional.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">

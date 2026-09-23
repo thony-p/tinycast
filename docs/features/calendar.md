@@ -39,7 +39,7 @@ events as searchable launcher entries.
   event that starts today, plus an event within 30 minutes after midnight; only then does the title
   mode read `No upcoming events`.
 - **`calendarEnabled` doubles as consent**, so it is in `SettingsBackupCoverage.deliberatelyExcluded`
-  and only `CalendarCoordinator.setCalendarEnabled` may write it. Tinycast's own dialog comes first,
+  and only `CalendarCoordinator.setCalendarEnabled` may write it. Tonycast's own dialog comes first,
   the macOS prompt second, and only from the gesture that asked. **It is written only after macOS
   grants**, so a prompt that fails or is dismissed can never leave the feature reading as on with no
   access. Enabling is re-offered whenever access is anything but granted — by the Calendar pane and by
@@ -183,9 +183,9 @@ which is `[start - lead, start)` for **Automatically** and `[start - lead, min(s
 for the timed options. Because the earliest qualifying event wins, one hiding hands the space to the
 next with no extra logic.
 
-**The calendar's item and Tinycast's own item are two independent `MenuBarExtra` scenes**, each
+**The calendar's item and Tonycast's own item are two independent `MenuBarExtra` scenes**, each
 inserted by one preference and reading nothing off the other: `showInMenuBar` on General for
-Tinycast's, `calendarMenuBarDisplay` here for the calendar's. Either may be the only one in the menu
+Tonycast's, `calendarMenuBarDisplay` here for the calendar's. Either may be the only one in the menu
 bar, both may be, or neither. Dragging the calendar item out writes `.disabled`, which is what the
 picker already said — it never touches `showInMenuBar`.
 
@@ -265,6 +265,6 @@ the feature was off is not reported as still missing.
 The Permissions pane shows calendar access alongside Accessibility, and when TCC has no record it
 offers the same consent path rather than only opening System Settings — the Calendars pane there
 lists no app that has never asked, so a `notDetermined` state that could only be sent to Settings was
-a dead end. Both entry points funnel through `CalendarCoordinator.setCalendarEnabled`, so Tinycast's
+a dead end. Both entry points funnel through `CalendarCoordinator.setCalendarEnabled`, so Tonycast's
 dialog still comes first. A denial is the one state that Settings alone can undo, and both panes send
 it there.

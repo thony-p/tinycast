@@ -23,7 +23,7 @@ commands and global shortcuts can show, search, or extend the collection.
   and a button is lit exactly when its toggle would remove that formatting.
 - **Only the active note can be dirty.** Switching, creating, renaming, and deleting first flush it, so
   collection navigation cannot abandon an in-memory draft.
-- **Tinycast is the only writer.** There is no watcher and no revision check: a save replaces the file
+- **Tonycast is the only writer.** There is no watcher and no revision check: a save replaces the file
   with what is in the editor. Every show re-lists the folder, so a note added outside appears, but the
   active draft is never re-read from disk.
 - **Search is on demand and unindexed.** An empty switcher query reads metadata plus the head of every
@@ -37,7 +37,7 @@ commands and global shortcuts can show, search, or extend the collection.
   clamps it to the floor below which the title bar's own parts collide.
 - **The editor is the one surface snippets expand into.** `NoteTextView` adopts `InjectableTextView`,
   so a typed keyword — and the Snippets browser's ↵ — is written straight into the text storage
-  rather than posted as events at whichever app happens to be frontmost. Nothing else in Tinycast
+  rather than posted as events at whichever app happens to be frontmost. Nothing else in Tonycast
   adopts it: see [snippets.md](snippets.md#text-delivery-and-pasteboard-safety).
 
 ## Storage and identity
@@ -102,10 +102,10 @@ failed flush retains the draft for retry.
 
 Command-N creates, Command-P opens or refocuses the switcher, Command-O opens the Notes folder, Escape
 closes the switcher before hiding, and Command-W and the red traffic light both hide directly. Hiding
-restores the prior external application or Tinycast window and flushes without delaying the order-out —
+restores the prior external application or Tonycast window and flushes without delaying the order-out —
 but only while that app is still the frontmost one, so closing a window the user has already left behind
 leaves them in whatever app they moved to.
-Command-Q is bound to nothing app-wide, so no chord over Notes can quit Tinycast.
+Command-Q is bound to nothing app-wide, so no chord over Notes can quit Tonycast.
 
 Both windows are one `NotesPanel`, a non-activating floating panel that owns the Escape rule and reads
 ⌘⌫. They differ only in style mask and in the `commandChords` their controller installs: the note window
@@ -283,7 +283,7 @@ flush before loading another source. Termination awaits that flush before the ap
 vetoes the quit.
 
 **A save overwrites whatever is on disk.** There is no watcher, no revision comparison and no conflict
-state: editing the *active* note in another app while Tinycast has it open loses that edit the next time
+state: editing the *active* note in another app while Tonycast has it open loses that edit the next time
 the debounce fires. Open Notes Folder (⌘O) invites exactly that, and this is the accepted trade for a
 feature whose whole job is one local editor. Every other external change is picked up, because showing
 the window re-lists the folder before it presents anything.

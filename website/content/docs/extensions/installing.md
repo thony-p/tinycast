@@ -16,9 +16,9 @@ Copies extensions you already have out of Raycast on this Mac.
 **Nothing is built. No Node, no package manager and no network are needed**, because the extensions
 are already built.
 
-Tinycast looks in both `~/.config/raycast` and `~/.config/raycast-x`, and an extension found in both
+Tonycast looks in both `~/.config/raycast` and `~/.config/raycast-x`, and an extension found in both
 is offered once. There is an **Import All** button. The pane checks again whenever you open it, and
-tells you when Raycast has something Tinycast does not.
+tells you when Raycast has something Tonycast does not.
 
 ## Add from folder
 
@@ -53,7 +53,7 @@ that does not build fails at the build step, instead of installing half-broken.
 **Automatic** (default) uses the first of **pnpm → Bun → Yarn → npm** that you have. The fastest and
 most disk-friendly come first, and npm, which is nearly always there, comes last.
 
-An app opened from the Dock does not see your terminal's `PATH`, so Tinycast looks in the usual places
+An app opened from the Dock does not see your terminal's `PATH`, so Tonycast looks in the usual places
 itself: Homebrew, Volta, asdf, mise, fnm, nvm and Yarn. The pane shows what it found, like
 "Found pnpm at /opt/homebrew/bin/pnpm", or tells you nothing is installed.
 
@@ -83,7 +83,7 @@ _this Mac_:
 
 ## Storage
 
-Everything lives in Tinycast's Application Support folder, and **uninstalling an extension removes
+Everything lives in Tonycast's Application Support folder, and **uninstalling an extension removes
 all of it**: the extension, its storage and cache, its preferences, its support folder, its sign-ins
 in the Keychain, its icon choice, its command shortcuts, favorites, aliases and learned ranking.
 

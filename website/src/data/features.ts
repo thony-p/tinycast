@@ -23,7 +23,7 @@ export type Feature = {
 
 export type MinorFeature = Pick<Feature, "icon" | "title" | "href">;
 
-// Everything Tinycast does, in plain language. Kept true to what the app
+// Everything Tonycast does, in plain language. Kept true to what the app
 // actually ships — each maps to a real feature in the source, and each links
 // to the docs page that covers it. Order sets the bento: every row adds up to
 // four columns, with wide cards counting as two.

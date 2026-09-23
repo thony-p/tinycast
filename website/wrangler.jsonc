@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "tinycast-website",
+  "name": "tonycast-website",
   "compatibility_date": "2026-09-17",
   // Code runs for the Polar routes only; every other path is served from `out/` without it.
   "main": "./worker/index.ts",
@@ -28,5 +28,5 @@
   // The apex only. www is a redirect rule in the Cloudflare dashboard, not a second origin.
   "workers_dev": false,
   "preview_urls": false,
-  "routes": [{ "pattern": "tinycast.dev", "custom_domain": true }],
+  "routes": [{ "pattern": "tonycast.dev", "custom_domain": true }],
 }

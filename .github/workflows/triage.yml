@@ -27,7 +27,7 @@ jobs:
               "",
               "A few things worth knowing up front:",
               "",
-              "**Tinycast aims to stay small and focused**, so it is extremely selective about new",
+              "**Tonycast aims to stay small and focused**, so it is extremely selective about new",
               "features. Every request is read, and the ideas that truly matter are the ones taken on.",
               "Smaller conveniences are usually closed.",
               "",
@@ -87,7 +87,7 @@ jobs:
             const body = [
               "Closing this automatically — it doesn't link an approved issue.",
               "",
-              "Tinycast requires the bug or feature to be agreed before code is written, so effort isn't",
+              "Tonycast requires the bug or feature to be agreed before code is written, so effort isn't",
               "wasted on something that won't be merged. See",
               "[CONTRIBUTING.md](https://github.com/" + context.repo.owner + "/" + context.repo.repo +
                 "/blob/main/CONTRIBUTING.md).",

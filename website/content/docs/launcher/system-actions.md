@@ -50,7 +50,7 @@ All Disks, Dismiss Notifications and Unhide All Hidden Apps.
 
 ## A few details
 
-**Volume.** Up and Down move along a **5% grid**: from 37%, up goes to 40% and down to 35%. Tinycast
+**Volume.** Up and Down move along a **5% grid**: from 37%, up goes to 40% and down to 35%. Tonycast
 shows its own volume display, because macOS only shows one for the real media keys. It shows the
 level as a number, says `Muted` instead of `0%`, and fades after 1.6 seconds.
 
@@ -58,10 +58,10 @@ level as a number, says `Muted` instead of `0%`, and fades after 1.6 seconds.
 touches internal or network volumes.
 
 **Hide All Apps Except Frontmost** and **Quit All Applications**, run from a shortcut with the
-palette closed, work on the app that is actually in front. Quit All leaves Finder and Tinycast
+palette closed, work on the app that is actually in front. Quit All leaves Finder and Tonycast
 running, and quits politely, so apps with unsaved work still ask you to save.
 
-**Toggle System Appearance** changes **macOS itself**, not just Tinycast. Tinycast follows along only
+**Toggle System Appearance** changes **macOS itself**, not just Tonycast. Tonycast follows along only
 while its own [theme](/docs/palette#appearance) is set to System.
 
 ## Permissions

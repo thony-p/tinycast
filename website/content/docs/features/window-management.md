@@ -81,7 +81,7 @@ command, move to a different display, or wait a while.
 **Restore Window goes back one step, not through a history.** Left Half → Maximize → Top Right
 Quarter → Restore Window puts the window back where it **started**, not where it was last.
 
-Restore Window also works on windows Tinycast has never moved, because it notes the frame before the first
+Restore Window also works on windows Tonycast has never moved, because it notes the frame before the first
 change. It remembers up to 64 windows, forgets an app's windows when it quits, and never saves this
 to disk.
 
@@ -113,4 +113,4 @@ Minimized windows, sheets and popovers, windows already in native fullscreen, an
 report a position or size are skipped before anything happens.
 
 A window that cannot be resized, like System Information, is left alone rather than half-moved. If an
-app refuses to shrink, Tinycast lines the window up against its side **once**, never in a loop.
+app refuses to shrink, Tonycast lines the window up against its side **once**, never in a loop.

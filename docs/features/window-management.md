@@ -171,7 +171,7 @@ Two details carry their weight:
   original frame, because rule 1 captures once and the intermediate actions never overwrite it. A stack
   has no defensible answer for what a _second_ Restore press should do.
 
-Rule 1 also delivers the "works for windows Tinycast never moved" requirement: the capture happens in
+Rule 1 also delivers the "works for windows Tonycast never moved" requirement: the capture happens in
 `WindowMover.perform` before a single write.
 
 **Cycling covers the four halves only**, and `WindowCycle` picks one of three modes, `.off` by default
@@ -200,7 +200,7 @@ when a read fails. Nothing is persisted.
 
 ## Choosing a target
 
-Our panels are `.nonactivatingPanel`, so opening one never makes Tinycast frontmost and
+Our panels are `.nonactivatingPanel`, so opening one never makes Tonycast frontmost and
 `NSWorkspace.frontmostApplication` keeps naming the app *behind* it rather than the window the user
 is looking at. `WindowTarget` is the answer to "what does this command act on": it prefers a key
 window of ours, falling back to the frontmost app only when there is none.
@@ -308,7 +308,7 @@ Three details are load-bearing and each was expensive to learn:
 - **Velocity is momentum, not latency.** 2000 overshoots by two Spaces; 1000 lands exactly one, and
   lowering it does not make the switch slower.
 - **The Dock ignores a gesture from a short-lived process.** The calls all report success and nothing
-  happens. Tinycast is a resident menu-bar app, so this is free — but it is why a one-shot CLI cannot
+  happens. Tonycast is a resident menu-bar app, so this is free — but it is why a one-shot CLI cannot
   be used to reproduce a bug here.
 
 Boundaries are left to macOS. The private `CGSGetActiveSpace` lags behind the Dock after a synthetic
@@ -382,7 +382,7 @@ verification, particularly:
 4. Cycling, in both modes: under `.sizes`, three presses of Left Half, then drag the window and confirm
    the next press restarts at ½. Under `.displays` on two monitors, four presses of Left Half must
    visit every half-slot once and return to the first.
-5. Restore on a window Tinycast has never moved, and after a custom size.
+5. Restore on a window Tonycast has never moved, and after a custom size.
 6. **Space switching, on the real desktop with three or more Spaces.** Next and Previous each move
    exactly one Space with no visible slide, in and out of a fullscreen Space, and a held shortcut does
    not wedge the Dock or land two Spaces at once. A Space switch is not observable until it settles —

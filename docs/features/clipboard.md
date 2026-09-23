@@ -11,7 +11,7 @@
   (the default) or copy — and ⌘↵ always does the other. ⌘1…⌘0 on a pin and a double-click go
   through the same call, so no surface can drift from the setting; ⌥↵ pastes regardless, since
   keeping the window open is a paste-only idea. The ⌘K menu puts the default first with the ↵ chip.
-- **Clipboard writes stamp a private `internalType` marker** so the poller skips Tinycast's own writes.
+- **Clipboard writes stamp a private `internalType` marker** so the poller skips Tonycast's own writes.
   If the writer and the poller ever disagree, the app re-captures its own pastes in a loop.
 - **`Model/ClipboardStore.swift` keeps to Foundation plus SQLite3 and no other app source**, so
   `clipboard-test` can compile it standalone. It uses `isolated deinit` for its SQLite teardown.
@@ -27,7 +27,7 @@
 - **A `.file` entry references the file where it lies and never copies it.** Its absolute path is
   the `text` column, so the trigram index finds it by name or by folder for free, and `imagePath`
   stays nil — which is what keeps `prune`, `deleteBlob` and `owns` from ever reaching a file
-  Tinycast did not write. `kind` is a plain `TEXT` column, so the case cost no migration; an older
+  Tonycast did not write. `kind` is a plain `TEXT` column, so the case cost no migration; an older
   build simply fails to decode the row.
 - **A colour is parsed from the text on demand, never stored.** `ColorValue` is the single parser
   behind the clipboard's swatches and the launcher's colour card, so the two can never disagree
@@ -37,7 +37,7 @@
   or classify an entry by it. What an entry *is* still comes from the content that was captured.
 - **No recognition ever runs in the app process.** `ClipboardTextWorker` spawns one bundled
   `ClipboardTextHelper` per item and reaps it, which is the whole reason Vision's and PDFKit's
-  allocations do not accumulate in Tinycast. The helper is handed a path and answers with text.
+  allocations do not accumulate in Tonycast. The helper is handed a path and answers with text.
 
 ## Poll-based capture
 
@@ -50,7 +50,7 @@ branch untouched.
 
 `ClipboardManager.fileURLs(on:volatileRoots:)` takes both the pasteboard and the roots as
 parameters, so `pasteboard-test` can drive an `NSPasteboard.withUniqueName()` and its own scratch
-tree: a harness that touched `NSPasteboard.general` would land in the reader's own running Tinycast
+tree: a harness that touched `NSPasteboard.general` would land in the reader's own running Tonycast
 as a genuine copy. `PasteboardFiles` reads each item's own `public.file-url`, so a copied `http` URL stays a link;
 returns nil rather than an empty array, so the text branch runs; caps a batch at
 `maxCapturedFiles`, so a Finder select-all cannot insert ten thousand rows on one tick; and
@@ -63,11 +63,11 @@ the cap, and even a rejected modern file URL suppresses the legacy filenames fal
 `PasteboardFiles.urls(on:)` that attachments use is the same reader with no limit and no test.
 
 `ClipboardManager` runs a 0.5s `Timer` watching `NSPasteboard.general.changeCount`. To avoid
-re-capturing Tinycast's own writes, every write stamps a private `internalType` marker on the
+re-capturing Tonycast's own writes, every write stamps a private `internalType` marker on the
 pasteboard and the poller skips anything carrying it.
 
 `stop()` is the off switch: it drops the timer and the fast-user-switching observers, and clears the
-`isCapturing` flag that `prepareForTinycastPasteboardMutation` reads — so a paste Tinycast performs
+`isCapturing` flag that `prepareForTonycastPasteboardMutation` reads — so a paste Tonycast performs
 itself no longer drains the pasteboard into history either.
 
 Existing clips survive being switched off, since a history is captured rather than authored and
@@ -321,7 +321,7 @@ at launch.
 
 ## Referenced files
 
-A file copied in Finder is recorded as a reference, never as a copy: Tinycast writes nothing to
+A file copied in Finder is recorded as a reference, never as a copy: Tonycast writes nothing to
 disk for it, and the row's path points at the original wherever it lies. That is the whole reason
 `imagePath` stays nil for a `.file` row — `owns()` is the one ownership rule, and a path it never
 sees can never be deleted by `deleteBlob` or a retention cut. `clipboard-test`'s
@@ -381,7 +381,7 @@ Support, on the boot volume, which is the same volume as almost every drop targe
 there defaults to a move, and a move carries the blob out of the history and strands its row. Only
 an `NSDraggingSource` can answer `sourceOperationMaskFor`, and `ClipDragView` answers `.copy` for
 every context. SwiftUI's `onDrag` takes an `NSItemProvider` and nothing else. A `.file` row is
-copy-only for the reverse reason: the path is the user's own file, and Tinycast must not move it.
+copy-only for the reverse reason: the path is the user's own file, and Tonycast must not move it.
 
 **It claims mouse-down, like `WindowDragHandle` does, because the hosting view eats the click
 first.** The overlay owns the whole press: select on the way down, activate on a double click, and

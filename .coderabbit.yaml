@@ -28,7 +28,7 @@ reviews:
 
   labeling_instructions:
     - label: extension
-      instructions: Apply when the PR changes Tinycast/Features/Extensions/ or Scripts/raycast-runtime/.
+      instructions: Apply when the PR changes Tonycast/Features/Extensions/ or Scripts/raycast-runtime/.
     - label: bug
       instructions: Apply when the PR fixes incorrect existing behaviour.
     - label: enhancement
@@ -52,10 +52,10 @@ reviews:
 
   path_filters:
     - "!**/*.generated.swift"
-    - "!Tinycast/Resources/RaycastRuntime.generated.js"
-    - "!Tinycast.xcodeproj/**"
-    - "!Tinycast/Assets.xcassets/**"
-    - "!Tinycast/tinycast.icon/**"
+    - "!Tonycast/Resources/RaycastRuntime.generated.js"
+    - "!Tonycast.xcodeproj/**"
+    - "!Tonycast/Assets.xcassets/**"
+    - "!Tonycast/tonycast.icon/**"
     - "!Tests/launcher-corpus/**"
     - "!Tests/ai-fixtures/*.txt"
     - "!**/node_modules/**"
@@ -71,7 +71,7 @@ reviews:
   path_instructions:
     - path: "**/*.swift"
       instructions: |
-        Tinycast targets only macOS 26+, Xcode 26 and Swift 6 language mode.
+        Tonycast targets only macOS 26+, Xcode 26 and Swift 6 language mode.
 
         Repository authority:
         - Review against AGENTS.md and docs/standards.md; use docs/architecture.md, docs/ui.md
@@ -88,7 +88,7 @@ reviews:
         - Do not turn subjective style preferences into findings.
         - Do not repeat what SwiftLint already enforces unless there is an extra correctness concern.
         - Prefer a few high-confidence findings over speculative comments.
-        - Respect intentional Tinycast conventions even when they differ from generic Swift advice.
+        - Respect intentional Tonycast conventions even when they differ from generic Swift advice.
 
         Concurrency (Swift 6 strict; concurrency violations are defects):
         - @MainActor is the default. Flag any new custom actor or global actor; the app has one actor.
@@ -160,7 +160,7 @@ reviews:
         - Flag two consecutive comment lines, comment blocks, comments that restate code, and
           comments narrating the change itself.
 
-    - path: "Tinycast/Features/*/Model/**"
+    - path: "Tonycast/Features/*/Model/**"
       instructions: |
         Pure model layer, compiled directly by the test harnesses.
         - Must not import AppKit, SwiftUI or Cocoa. This is a hard error.
@@ -170,7 +170,7 @@ reviews:
           Locale.current or UserDefaults that a harness cannot override.
         - Types crossing actors are Sendable value types. Prefer nonisolated pure functions.
 
-    - path: "Tinycast/App/**"
+    - path: "Tonycast/App/**"
       instructions: |
         Composition root.
         - New long-lived state goes on AppCore and is wired in start().
@@ -178,7 +178,7 @@ reviews:
           could be deferred into a Task or done on first use.
         - Check every started task and observer is torn down.
 
-    - path: "Tinycast/Palette/**"
+    - path: "Tonycast/Palette/**"
       instructions: |
         The summon path must feel instant.
         - Anything resolved per show must not be recomputed per render or keystroke.
@@ -186,7 +186,7 @@ reviews:
         - Flag observation of whole stores where one property is read.
         - Flag synchronous IO on show.
 
-    - path: "Tinycast/Features/Extensions/**"
+    - path: "Tonycast/Features/Extensions/**"
       instructions: |
         Runs untrusted Raycast extensions in JavaScriptCore.
         - Containment: every view, row, menu, geometry and sizing constant lives here. Flag
@@ -199,7 +199,7 @@ reviews:
         - JSContext/JSValue stay on their owning actor. Flag retain cycles between JS callbacks
           and Swift owners.
 
-    - path: "Tinycast/DesignSystem/**"
+    - path: "Tonycast/DesignSystem/**"
       instructions: |
         Theme.swift is the only design-token source.
         - Flag hard-coded colours, spacing, radii or fonts elsewhere.
@@ -207,12 +207,12 @@ reviews:
           it always was. Flag any change to a dark value unless the PR explicitly changes Dark.
         - DesignSystem must not depend on any feature.
 
-    - path: "Tinycast/DesignSystem/Scrolling/{EdgeDissolve,ThinScrollbar}.swift"
+    - path: "Tonycast/DesignSystem/Scrolling/{EdgeDissolve,ThinScrollbar}.swift"
       instructions: |
         Off-limits. Any edit here is a visual regression. Ask the author to fix the underlying
         scroll issue elsewhere unless the PR explicitly exists to change this file.
 
-    - path: "Tinycast/**/*View*.swift"
+    - path: "Tonycast/**/*View*.swift"
       instructions: |
         SwiftUI:
         - Keep bodies declarative and small; prefer extracted subviews to large bodies and
@@ -224,14 +224,14 @@ reviews:
         - Every custom control needs an accessibility label and traits.
         - Follow docs/ui.md.
 
-    - path: "Tinycast/Platform/**"
+    - path: "Tonycast/Platform/**"
       instructions: |
         System shims shared by all features.
         - Must not depend on any feature.
         - Keep them thin and Sendable-correct.
         - Decode C/CF values to Swift values at the boundary.
 
-    - path: "Tinycast/{Info.plist,Tinycast.entitlements}"
+    - path: "Tonycast/{Info.plist,Tonycast.entitlements}"
       instructions: |
         Flag any new entitlement, usage-description key or privilege, and ask why it is required.
 
@@ -263,7 +263,7 @@ reviews:
     - path: "project.yml"
       instructions: |
         XcodeGen source of truth.
-        - Check Tinycast.xcodeproj was regenerated in the same PR.
+        - Check Tonycast.xcodeproj was regenerated in the same PR.
         - Keep Swift 6 language mode, strict concurrency, the macOS 26 deployment target and
           zero third-party dependencies.
         - Flag SwiftPM packages and Bundle.module.
@@ -313,7 +313,7 @@ reviews:
       - name: Model purity
         mode: error
         instructions: >-
-          Fail if any added or modified file under Tinycast/Features/*/Model/
+          Fail if any added or modified file under Tonycast/Features/*/Model/
           contains import AppKit, import SwiftUI or import Cocoa. Otherwise pass.
 
       - name: Generated files untouched
@@ -327,8 +327,8 @@ reviews:
       - name: Protected scroll files
         mode: error
         instructions: >-
-          Fail if Tinycast/DesignSystem/Scrolling/EdgeDissolve.swift or
-          Tinycast/DesignSystem/Scrolling/ThinScrollbar.swift changed and the
+          Fail if Tonycast/DesignSystem/Scrolling/EdgeDissolve.swift or
+          Tonycast/DesignSystem/Scrolling/ThinScrollbar.swift changed and the
           PR title or description does not explicitly state the change is
           intended for that file. Otherwise pass.
 
@@ -344,7 +344,7 @@ reviews:
       - name: XcodeGen project in sync
         mode: error
         instructions: >-
-          Fail only if project.yml changed and Tinycast.xcodeproj/project.pbxproj
+          Fail only if project.yml changed and Tonycast.xcodeproj/project.pbxproj
           did not. A project.pbxproj change without a project.yml change is
           expected: XcodeGen globs source folders, so adding, moving or removing
           a file regenerates the project alone. Otherwise pass.
@@ -352,7 +352,7 @@ reviews:
       - name: Memory footprint reported
         mode: warning
         instructions: >-
-          Pass if the PR changes no Swift file under Tinycast/. Otherwise pass
+          Pass if the PR changes no Swift file under Tonycast/. Otherwise pass
           only if the description's "Memory footprint" section has values filled
           in, or states plainly why measurement does not apply or was not done.
           Fail if the section is missing or left as the empty template.

@@ -1,8 +1,8 @@
 #!/bin/bash
-# Mirror website/media/ into the R2 bucket behind cdn.tinycast.dev. Usage: upload-website-media.sh
+# Mirror website/media/ into the R2 bucket behind cdn.tonycast.dev. Usage: upload-website-media.sh
 set -euo pipefail
 
-BUCKET="tinycast-cdn"
+BUCKET="tonycast-cdn"
 WEBSITE="$(cd "$(dirname "$0")/../website" && pwd)"
 
 shopt -s nullglob
@@ -28,4 +28,4 @@ for FILE in "${FILES[@]}"; do
     npx wrangler r2 object put "${BUCKET}/${NAME}" --file "$FILE" --content-type "$TYPE" --remote
 done
 
-echo "✓ ${#FILES[@]} file(s) on https://cdn.tinycast.dev/"
+echo "✓ ${#FILES[@]} file(s) on https://cdn.tonycast.dev/"

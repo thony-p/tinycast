@@ -16,7 +16,7 @@ jobs:
       - uses: actions/github-script@v8
         with:
           script: |
-            const marker = "<!-- tinycast:ai-coauthors -->";
+            const marker = "<!-- tonycast:ai-coauthors -->";
             const tools = /claude|anthropic|codex|openai|chatgpt|copilot|cursor|gemini|devin|aider|windsurf|codeium/i;
             const pr = context.payload.pull_request;
             const repo = { owner: context.repo.owner, repo: context.repo.repo };

@@ -1,14 +1,14 @@
 # Updates
 
-Tinycast checks GitHub Releases once a day, offers the newest release for its own channel in a native
+Tonycast checks GitHub Releases once a day, offers the newest release for its own channel in a native
 window with its release notes, installs it and relaunches. There is no Sparkle and no appcast: the
 release feed the website already reads is the feed the app reads.
 
 ## Invariants
 
-- **Tinycast installs its own updates, and Homebrew stays out of the way.** Both casks declare
+- **Tonycast installs its own updates, and Homebrew stays out of the way.** Both casks declare
   `auto_updates true`, which is Homebrew's own flag for an app that manages its own version. `brew
-  update && brew upgrade` therefore skips Tinycast entirely — it is never reported outdated, never
+  update && brew upgrade` therefore skips Tonycast entirely — it is never reported outdated, never
   re-downloaded, and a self-updated copy is never trashed or rolled back. `brew install`, `brew
   uninstall` and `brew list` keep working unchanged.
 - **The archive is a zip, never the DMG.** A zip expands with `ditto`; a DMG would have to be mounted,
@@ -18,9 +18,9 @@ release feed the website already reads is the feed the app reads.
   `-Universal-` one. Intel takes the universal zip and is offered *nothing* if it is missing, since a
   thin build would install and then refuse to launch; Apple silicon prefers the thin zip and falls
   back to universal.
-- **Nobody ever runs `xattr`.** An archive Tinycast fetched itself is not quarantined — macOS sets
+- **Nobody ever runs `xattr`.** An archive Tonycast fetched itself is not quarantined — macOS sets
   that flag for sandboxed downloaders and for apps that opt in with `LSFileQuarantineEnabled`, and
-  Tinycast is neither. `Quarantine` checks anyway through `getxattr`/`removexattr` rather than the
+  Tonycast is neither. `Quarantine` checks anyway through `getxattr`/`removexattr` rather than the
   `xattr` tool, and an app that still carries the flag is refused rather than installed.
 - **The signature is the only integrity guarantee.** A downloaded bundle is trusted when its seal
   validates, nested helper included, *and* it either satisfies the Developer ID requirement pinned in
@@ -30,7 +30,7 @@ release feed the website already reads is the feed the app reads.
   is deliberately not in the requirement — it resolves the ticket through `syspolicyd` or the
   network, so an offline Mac would refuse a bundle the chain already proves is ours.
 - **A build only ever updates within its own channel.** The channels are separate bundle ids installed
-  side by side; crossing would mean installing a different app. `com.tinycast.app.dev` never updates
+  side by side; crossing would mean installing a different app. `com.tonycast.app.dev` never updates
   at all, and does not advertise the command.
 - **Nothing is installed unless every check passes.** Bundle id, version and signature are all checked
   on the expanded copy before `replaceItemAt` runs, and the running app survives any failure untouched.
@@ -49,7 +49,7 @@ release feed the website already reads is the feed the app reads.
 - **Nothing about updates is persisted in `AppSettings`.** The feature owns one cache file, so no
   `AppSettingsKey` and no `SettingsBackupCoverage` entry exist for it.
 - **The window shows the changelog and nothing else.** CI writes install instructions below
-  `<!-- tinycast:install -->`, and `ReleaseNotes.summary` — the single reader of that marker, called
+  `<!-- tonycast:install -->`, and `ReleaseNotes.summary` — the single reader of that marker, called
   where the feed is parsed so the cache holds the cut text too — drops them. An app that installs its
   own updates has no use for a Homebrew command, and a body published before the marker existed has
   none, so it comes back whole.
@@ -68,8 +68,8 @@ release feed the website already reads is the feed the app reads.
 
 | Bundle id | Channel | Takes |
 | --- | --- | --- |
-| `com.tinycast.app` | `.stable` | releases |
-| `com.tinycast.app.beta` | `.beta` | prereleases |
+| `com.tonycast.app` | `.stable` | releases |
+| `com.tonycast.app.beta` | `.beta` | prereleases |
 | anything else | `.development` | nothing |
 
 `AppVersion` parses `MAJOR.MINOR.PATCH` and `MAJOR.MINOR.PATCH-beta.N` with semver precedence: a
@@ -105,7 +105,7 @@ One route, whatever the install came from:
 1. Stream the zip into `~/Library/Caches/<bundle-id>/Updates/`, with real byte progress and a Cancel
    that actually aborts the transfer.
 2. `ditto -x -k` it into a staging folder, and take whatever `.app` lands there — the bundle is named
-   for its channel, so it is `Tinycast Beta.app` on beta.
+   for its channel, so it is `Tonycast Beta.app` on beta.
 3. Check quarantine natively; clear it if somehow present, and refuse the update if it survives.
 4. Verify the bundle id, the version, and that the code signature is valid and proves the bundle is
    ours — by the pinned Developer ID requirement, or by the running app's own leaf certificate.
@@ -121,8 +121,8 @@ setting, clipboard entry, note or snippet is affected by an update, by `brew upg
 ## Releasing into it
 
 `.github/workflows/release.yml` publishes two assets from one build: the DMG people download by hand
-and the cask installs, and `Tinycast-<version>.zip` for the updater. A stable run adds a
-`Tinycast-Universal-<version>` pair from its `universal` job, uploaded second so the thin zip stays
+and the cask installs, and `Tonycast-<version>.zip` for the updater. A stable run adds a
+`Tonycast-Universal-<version>` pair from its `universal` job, uploaded second so the thin zip stays
 first in the asset list — builds predating architecture-aware selection take whichever comes first.
 The zip is made with
 
@@ -134,9 +134,9 @@ which is the only zip that leaves the code signature verifiable — plain `zip` 
 breaks the seal, and the signature check above would then reject every update.
 
 The body it publishes is composed by `Scripts/release-notes.sh`: GitHub's generated changelog first,
-then `<!-- tinycast:install -->`, then the install text. Anything a release wants the update window to
+then `<!-- tonycast:install -->`, then the install text. Anything a release wants the update window to
 show has to go above that marker — see [release.md](../release.md#release-notes).
 
-**The casks must declare `auto_updates true`** in `abue-ammar/homebrew-tinycast`. Without it Homebrew
+**The casks must declare `auto_updates true`** in `abue-ammar/homebrew-tonycast`. Without it Homebrew
 compares its Caskroom receipt against the cask version, sees a self-updated app as outdated forever,
 and re-installs over it on the next `brew upgrade`.

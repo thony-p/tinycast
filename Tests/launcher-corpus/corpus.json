@@ -1913,17 +1913,7 @@
     {
       "key": "command:about",
       "kind": "command",
-      "name": "About Tinycast",
-      "strongNames": [],
-      "translations": [],
-      "ownerName": null,
-      "bundleID": null,
-      "executableName": null
-    },
-    {
-      "key": "command:support",
-      "kind": "command",
-      "name": "Support Tinycast",
+      "name": "About Tonycast",
       "strongNames": [],
       "translations": [],
       "ownerName": null,
@@ -1933,7 +1923,7 @@
     {
       "key": "command:quit",
       "kind": "command",
-      "name": "Quit Tinycast",
+      "name": "Quit Tonycast",
       "strongNames": [],
       "translations": [],
       "ownerName": null,
@@ -3123,7 +3113,7 @@
     {
       "query": "qui",
       "expect": "system-action:quit-all-apps",
-      "criterion": "a system action against 'Quit Tinycast'"
+      "criterion": "a system action against 'Quit Tonycast'"
     },
     {
       "query": "almo",

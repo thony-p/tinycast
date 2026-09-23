@@ -1,6 +1,6 @@
-# Tinycast website
+# Tonycast website
 
-The marketing page and documentation for Tinycast, at <https://tinycast.dev>.
+The marketing page and documentation for Tonycast, at <https://tonycast.dev>.
 
 Next.js (App Router) with a static export, Tailwind v4 for styling, and
 [Fumadocs](https://fumadocs.dev) for the documentation section. A small Worker in `worker/` serves

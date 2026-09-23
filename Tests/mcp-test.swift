@@ -75,7 +75,7 @@ struct MCPTests {
             case .request(let id, let method) = MCPProtocol.parse(
                 Data(#"{"jsonrpc":"2.0","id":"a1","method":"sampling/createMessage"}"#.utf8))
         else {
-            expect(false, "a method with an id is a request Tinycast must answer")
+            expect(false, "a method with an id is a request Tonycast must answer")
             return
         }
         expect(

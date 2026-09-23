@@ -3,7 +3,7 @@ title: Fallbacks
 description: When search does not have the answer, send what you typed to AI Chat, file search, the shell or a quicklink.
 ---
 
-Below every search, Tinycast offers a few rows under **Use "…" with**. Each one takes what you typed
+Below every search, Tonycast offers a few rows under **Use "…" with**. Each one takes what you typed
 and hands it to something else. They sit at the bottom on purpose: the real results always come
 first.
 

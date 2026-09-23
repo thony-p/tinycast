@@ -4,9 +4,9 @@ export type Plan = "monthly" | "one-time";
 
 export const supportHero = {
   eyebrow: "Support",
-  title: "Enjoying Tinycast?",
+  title: "Enjoying Tonycast?",
   intro:
-    "Tinycast is free and open source, and it stays that way. If it saves you time and you would like to support its development, you can chip in here. Entirely optional, and thank you either way.",
+    "Tonycast is free and open source, and it stays that way. If it saves you time and you would like to support its development, you can chip in here. Entirely optional, and thank you either way.",
 } as const;
 
 export const plans: { id: Plan; label: string }[] = [
@@ -31,11 +31,11 @@ export const supportReasons = [
 ] as const;
 
 export const runningCosts =
-  "It also covers the running costs: the yearly Apple Developer Program membership, so releases can be properly signed and notarised, the tinycast.dev domain, and the tools and services behind it.";
+  "It also covers the running costs: the yearly Apple Developer Program membership, so releases can be properly signed and notarised, the tonycast.dev domain, and the tools and services behind it.";
 
 export const thanks = {
   title: "Thank you.",
-  body: "That genuinely means a lot. It goes straight into making Tinycast better.",
+  body: "That genuinely means a lot. It goes straight into making Tonycast better.",
   next: {
     monthly: [
       "Polar has emailed your receipt.",
@@ -50,8 +50,8 @@ export const thanks = {
     title: "Claim your perks",
     body: "A thank-you download and a supporter role on Discord. Sign in with the email you paid with, then connect Discord to get the role.",
     action: "Open your Polar portal",
-    // Polar's customer portal for the tinycast organization; perks are claimed there.
-    href: "https://polar.sh/tinycast/portal",
+    // Polar's customer portal for the tonycast organization; perks are claimed there.
+    href: "https://polar.sh/tonycast/portal",
   },
   share: "Want to help a little more? Tell a friend who lives in Spotlight.",
 } as const satisfies {

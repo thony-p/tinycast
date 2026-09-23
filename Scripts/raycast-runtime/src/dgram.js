@@ -32,7 +32,7 @@ class NameLookupSocket extends EventEmitter {
 
   send(buffer, offset = 0, length, port, address, callback) {
     if (port !== MDNS_PORT) {
-      throw new Error("dgram only answers mDNS name lookups in Tinycast extensions. See docs/extensions.md.");
+      throw new Error("dgram only answers mDNS name lookups in Tonycast extensions. See docs/extensions.md.");
     }
     const packet = Buffer.from(buffer);
     this.answer(packet.subarray(offset, offset + (length ?? packet.length)));

@@ -1,9 +1,9 @@
 ---
 title: The palette
-description: The one window Tinycast has, how to move around it, and how to make it yours.
+description: The one window Tonycast has, how to move around it, and how to make it yours.
 ---
 
-Almost everything Tinycast does happens in one floating panel. Each feature is either the launcher,
+Almost everything Tonycast does happens in one floating panel. Each feature is either the launcher,
 which is the root screen, or a screen you open from it. <kbd>esc</kbd> walks back the way you came.
 
 ## Moving around
@@ -29,7 +29,7 @@ Every screen except the launcher shows a back arrow in the top-left corner. Hove
 a click goes back a step or closes the window.
 
 <kbd>⌘</kbd><kbd>esc</kbd> needs the [Accessibility permission](/docs/permissions), because macOS
-keeps that chord for itself unless Tinycast catches it first.
+keeps that chord for itself unless Tonycast catches it first.
 
 ### Emacs chords
 
@@ -97,7 +97,7 @@ is on. Turn it off to always use the display with the menu bar.
 field, the empty space in the header, or the search field itself while it is empty.
 
 While you drag, dotted guides show the default position and light up when you are close enough to
-snap. Let go there and it snaps home. Let go anywhere else and Tinycast remembers that spot, even
+snap. Let go there and it snaps home. Let go anywhere else and Tonycast remembers that spot, even
 after a restart.
 
 A remembered spot is only dropped when no screen can show the palette any more, say after you unplug
@@ -128,7 +128,7 @@ it back to the original look.
 <kbd>↓</kbd> expands it and selects the first row. With **Show favorites in compact mode** on, your
 favorite apps sit at the right of the bar; see [Favorites](/docs/launcher/favorites).
 
-The [Toggle System Appearance](/docs/launcher/system-actions) action changes _macOS itself_. Tinycast
+The [Toggle System Appearance](/docs/launcher/system-actions) action changes _macOS itself_. Tonycast
 follows it only while its own theme is set to System.
 
 ## Input source
@@ -137,12 +137,12 @@ follows it only while its own theme is set to System.
 is open.
 
 If you type Japanese or Chinese most of the day but your app names are in Latin letters, this saves
-a switch every time you open the launcher. Tinycast switches when the palette opens and switches back
+a switch every time you open the launcher. Tonycast switches when the palette opens and switches back
 when it closes. If you changed the layout yourself while it was open, your choice stays.
 
 ## Pop to root
 
-**Settings → General → Pop to Root Search** decides how long after the window closes Tinycast goes
+**Settings → General → Pop to Root Search** decides how long after the window closes Tonycast goes
 back to the launcher: **Immediately** (default), or after 5, 15, 30, 60 or 90 seconds.
 
 Raise it if you often close the palette and come straight back to the same screen.
@@ -151,7 +151,7 @@ AI Chat has its own rule for whether a conversation reopens; see [AI Chat](/docs
 
 ## The menu bar
 
-The Tinycast menu bar icon has **Open Tinycast**, **Clipboard History**, **Settings…**,
-**Check for Updates…**, **Support Tinycast…** and **Quit Tinycast**.
+The Tonycast menu bar icon has **Open Tonycast**, **Clipboard History**, **Settings…**,
+**Check for Updates…**, **Support Tonycast…** and **Quit Tonycast**.
 
 **Settings → General → Show in menu bar** hides the icon. Your shortcuts keep working without it.

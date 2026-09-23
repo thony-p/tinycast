@@ -73,8 +73,8 @@ chat works exactly as it does without MCP.
 - A reply can go through at most **10 rounds** of tool calls. A model that only keeps calling tools
   has stopped answering, so the reply ends and says so.
 - Each tool result, and all results in one reply together, are capped in size.
-- Servers start when you use chat and stop after **10 idle minutes**, or when Tinycast quits.
-- Tinycast offers nothing back to a server. Requests from a server, like sampling, are declined.
+- Servers start when you use chat and stop after **10 idle minutes**, or when Tonycast quits.
+- Tonycast offers nothing back to a server. Requests from a server, like sampling, are declined.
 
 ## Backups
 

@@ -5,7 +5,7 @@ struct RankingTest {
     @MainActor
     static func main() async {
         let fileURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("tinycast-ranking-\(UUID().uuidString).json")
+            .appendingPathComponent("tonycast-ranking-\(UUID().uuidString).json")
 
         var clock = Date(timeIntervalSince1970: 2_000_000_000)
         let store = LauncherRankingStore(fileURL: fileURL) { clock }
@@ -163,7 +163,7 @@ struct RankingTest {
 
         // One row per prefix, read as one row per submitted query, would inflate every count.
         let legacyURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("tinycast-ranking-legacy-\(UUID().uuidString).json")
+            .appendingPathComponent("tonycast-ranking-legacy-\(UUID().uuidString).json")
         let legacy = """
             [{"itemKey":"dev.zed.Zed","query":"zed","count":5,\
             "lastUsed":695000000}]

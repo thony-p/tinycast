@@ -141,13 +141,13 @@ invariant true for every frame in the pass.
 that is `AXStandardWindow`, not minimized, not natively fullscreen, reports geometry, and is
 positionable — a stricter filter than the mover's, because a Save panel must never become an entry.
 Candidates come from `AppLauncher.quitAllTargets()`'s rule, excluded **by pid** rather than by
-activation policy, since opening About flips Tinycast itself to `.regular`.
+activation policy, since opening About flips Tonycast itself to `.regular`.
 
 Only Accessibility is needed: `AXPosition` and `AXSize` are AX attributes. Screen Recording gates
 window *titles*, which nothing here reads.
 
 The frontmost app's focused window, when it is one of the captured windows, is marked **Bring to
-front**. Capturing from Settings marks nothing, because Tinycast itself is frontmost then.
+front**. Capturing from Settings marks nothing, because Tonycast itself is frontmost then.
 
 Capture never saves silently — the draft opens in the editor so it can be seen, trimmed and named.
 

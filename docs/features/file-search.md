@@ -14,10 +14,10 @@ feature is enabled in Settings.
 - **Everything under `Model/` stays Foundation-only and pure**, `FileSearchIgnoreList`'s `import Darwin`
   and `FileSearchFilter`'s `UniformTypeIdentifiers` included — value types with no environment of their
   own. `file-search-test` compiles the shipped files together with the existing pure fuzzy scorer.
-- **Search is filename-only, and every list comes from Spotlight.** Tinycast creates no content index,
+- **Search is filename-only, and every list comes from Spotlight.** Tonycast creates no content index,
   history, query cache, watcher or search data — the blank screen's Recently Used rows are one more
   Spotlight query over the configured scopes, read from the system's own `kMDItemLastUsedDate` and
-  `kMDItemFSContentChangeDate`, never from anything Tinycast recorded. The type filter narrows *which*
+  `kMDItemFSContentChangeDate`, never from anything Tonycast recorded. The type filter narrows *which*
   files Spotlight is asked for; it never adds a second pass over the ones it returned.
 - **The filter belongs to the query, not to the rows.** `FileSearchSession` keys its de-dup and its
   supersession check on the query and the filter together, so narrowing re-runs the same words rather
@@ -25,7 +25,7 @@ feature is enabled in Settings.
 - **Hidden paths and application-bundle contents are structural, not patterns.** They are what keeps
   the feature permission-free, so no user setting can re-admit them. Everything else that is dropped
   comes from the ignore list.
-- **`~/Library` is never a scope Tinycast picks by itself.** A configured home root expands into its
+- **`~/Library` is never a scope Tonycast picks by itself.** A configured home root expands into its
   visible children plus the two cloud-storage roots instead. A user who adds a folder under `~/Library`
   by hand gets what they asked for.
 - **The shipped ignore rules are compiled in and never persisted.** `fileSearchIgnorePatterns` stores
@@ -34,7 +34,7 @@ feature is enabled in Settings.
 - **File Search is off by default, and off means no entry point or Spotlight work.** A nonempty query
   on that screen is the first operation that searches, and the global shortcut no-ops while the
   feature switch is off.
-- **Tinycast asks for no file permission.** Hidden metadata items and application bundles are filtered,
+- **Tonycast asks for no file permission.** Hidden metadata items and application bundles are filtered,
   and Spotlight or TCC omissions produce a thinner result set rather than a prompt for Full Disk Access.
 - **A superseded query never publishes.** The session cancels its pending task and checks cancellation
   after the synchronous Spotlight call, so a late result cannot replace the newer query's rows. Editing
@@ -133,7 +133,7 @@ revision check, then the same worker runs only the newest pending query. Leaving
 cancels and clears the session as well.
 
 `FileSearchService.search` emits a `FileSearchService.search` interval on the shared
-`com.tinycast.perf` signpost subsystem. `Tests/file-search-performance.swift` exercises the same service
+`com.tonycast.perf` signpost subsystem. `Tests/file-search-performance.swift` exercises the same service
 against the current user's Spotlight index and reports first-run and repeated-query latency; it stays
 outside `run-tests.sh` because filesystem contents and Spotlight state are machine-dependent.
 
@@ -154,7 +154,7 @@ magnitude, not budgets; rerun the benchmark after query-policy work.
 draws. The list uses the shared Results header, row metrics, edge dissolve, thin scrollbar and scroll
 intent; its header reads **Recently Used** on the blank screen and **Results** under a query. A row shows
 a fitted native file icon and the full filename — a folder prefixed by its parent's name, dimmed, since
-half the folder hits on a developer machine are some `src` or `Tinycast`. The path itself is the preview's
+half the folder hits on a developer machine are some `src` or `Tonycast`. The path itself is the preview's
 `Where` row rather than a second column the narrow list has no width for. A click selects and a double
 click opens, both through `onRowClick`, which answers on the press: `.onTapGesture(count: 2)` makes the
 single tap wait out the system's double-click interval first, and that wait *is* the second a click used
@@ -224,7 +224,7 @@ says "File search is unavailable" inline.
 
 Settings ▸ File Search owns the `fileSearchEnabled` switch, which is off when its preference is absent,
 along with the scope list, the ignore patterns and the Search Files command row. All of them are
-ordinary settings carried by Tinycast settings backups; importing them grants no permission or
+ordinary settings carried by Tonycast settings backups; importing them grants no permission or
 background access.
 
 `AppCore` observes the switch and asks `FileSearchCoordinator` to project `CommandID.searchFiles` into

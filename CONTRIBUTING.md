@@ -1,7 +1,7 @@
 # Contributing to Tonycast
 
-Check existing [issues](https://github.com/abue-ammar/tonycast/issues) and
-[pull requests](https://github.com/abue-ammar/tonycast/pulls) first.
+Check existing [issues](https://github.com/abue-ammar/tinycast/issues) and
+[pull requests](https://github.com/abue-ammar/tinycast/pulls) first.
 
 > **Don't hurry your code. Make sure it works well and is well designed. Don't worry about timing.**
 

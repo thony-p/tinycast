@@ -11,8 +11,8 @@ This is the easiest route. Homebrew clears the macOS quarantine flag for you, so
 without a warning.
 
 ```bash
-brew trust --tap abue-ammar/tonycast
-brew install --cask abue-ammar/tonycast/tonycast
+brew trust --tap abue-ammar/tinycast
+brew install --cask abue-ammar/tinycast/tinycast
 ```
 
 You run `brew trust` once. Homebrew will not install from a third-party tap until you trust it.
@@ -24,7 +24,7 @@ command above installs a smaller build for Apple silicon only. On an Intel Mac, 
 cask instead:
 
 ```bash
-brew install --cask abue-ammar/tonycast/tonycast-universal
+brew install --cask abue-ammar/tinycast/tinycast-universal
 ```
 
 You do not need to work out which one you need. `tonycast` refuses to install on Intel, and both
@@ -43,7 +43,7 @@ by side, so you can keep stable and try a beta at the same time.
 | Beta    | `tonycast@beta`      | `Tonycast Beta.app` |
 
 ```bash
-brew install --cask abue-ammar/tonycast/tonycast@beta
+brew install --cask abue-ammar/tinycast/tinycast@beta
 ```
 
 The beta does not share settings with stable. To move your setup across, use
@@ -52,7 +52,7 @@ of them installed.
 
 ## Downloading directly
 
-Builds are also on the [Releases page](https://github.com/abue-ammar/tonycast/releases).
+Builds are also on the [Releases page](https://github.com/abue-ammar/tinycast/releases).
 
 Tonycast is **self-signed**. There is no paid Apple Developer ID behind it yet, so macOS quarantines
 a copy you download by hand and will not open it. After you drag the app to Applications, clear the
@@ -79,7 +79,7 @@ working across updates.
 ## Uninstalling
 
 ```bash
-brew uninstall --cask abue-ammar/tonycast/tonycast
+brew uninstall --cask abue-ammar/tinycast/tinycast
 ```
 
 To remove the files Tonycast made, delete its Application Support and Caches folders:

@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   upload:
-    if: github.repository == 'abue-ammar/tonycast'
+    if: github.repository == 'abue-ammar/tinycast'
     runs-on: ubuntu-latest
     environment: cloudflare
     steps:

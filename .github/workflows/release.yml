@@ -49,7 +49,7 @@ jobs:
           CHANNEL="${{ github.event.inputs.channel }}"
           BASE_VERSION="${{ github.event.inputs.version }}"
           # Each channel is a distinct, side-by-side app: its own display name + bundle id,
-          # and its own Homebrew cask in the abue-ammar/homebrew-tonycast tap.
+          # and its own Homebrew cask in the abue-ammar/homebrew-tinycast tap.
           case "$CHANNEL" in
             beta)   SUFFIX="-beta.${GITHUB_RUN_NUMBER}";  DISPLAY="Tonycast Beta";  BUNDLE="com.tonycast.app.beta";  CASK="tonycast@beta";  PRERELEASE=true ;;
             stable) SUFFIX="";                            DISPLAY="Tonycast";       BUNDLE="com.tonycast.app";       CASK="tonycast";       PRERELEASE=false ;;
@@ -196,7 +196,7 @@ jobs:
             exit 0
           fi
           SHA="$(shasum -a 256 "dist/${DMG_FILE}" | awk '{print $1}')"
-          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/abue-ammar/homebrew-tonycast.git" tap
+          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/abue-ammar/homebrew-tinycast.git" tap
           CASK_FILE="tap/Casks/${CASK}.rb"
           if [ ! -f "$CASK_FILE" ]; then
             echo "::error::$CASK_FILE not found in tap."
@@ -234,7 +234,7 @@ jobs:
           fi
           if [ "${CHANNEL}" = "stable" ]; then COLOR=3066993; else COLOR=15844367; fi
           RELEASE_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${TAG}"
-          INSTALL="brew install --cask abue-ammar/tonycast/${CASK}"
+          INSTALL="brew install --cask abue-ammar/tinycast/${CASK}"
           # Build with jq so backticks stay literal (printf in single quotes escaped them,
           # which Discord rendered as verbatim backticks instead of a code block).
           # Components V2 forbids a top-level `content`, so @everyone is a text component, and
@@ -393,7 +393,7 @@ jobs:
             exit 0
           fi
           SHA="$(shasum -a 256 "dist/Tonycast-Universal-${VERSION}.dmg" | awk '{print $1}')"
-          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/abue-ammar/homebrew-tonycast.git" tap
+          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/abue-ammar/homebrew-tinycast.git" tap
           CASK_FILE="tap/Casks/${CASK}.rb"
           if [ ! -f "$CASK_FILE" ]; then
             echo "::error::$CASK_FILE not found in tap."

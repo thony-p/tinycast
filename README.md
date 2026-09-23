@@ -4,9 +4,9 @@
 RAM.**
 
 <p align="center">
-  <a href="https://github.com/abue-ammar/tonycast/releases/latest">
+  <a href="https://github.com/abue-ammar/tinycast/releases/latest">
     <img alt="Latest release"
-         src="https://img.shields.io/github/v/release/abue-ammar/tonycast?sort=semver&style=flat&label=release&color=1F6FEB"></a>
+         src="https://img.shields.io/github/v/release/abue-ammar/tinycast?sort=semver&style=flat&label=release&color=1F6FEB"></a>
   <img alt="Swift 6.0"
        src="https://img.shields.io/badge/Swift-6.0-F05138?style=flat&logo=swift&logoColor=white">
   <img alt="macOS 26 or later"
@@ -80,8 +80,8 @@ keep it actively maintained. GitHub Sponsors isn't available in my country, so p
 First, add the tap:
 
 ```sh
-brew trust --tap abue-ammar/tonycast   # required for third-party taps
-brew tap abue-ammar/tonycast
+brew trust --tap abue-ammar/tinycast   # required for third-party taps
+brew tap abue-ammar/tinycast
 ```
 
 Then run the one line that matches your Mac:
@@ -98,7 +98,7 @@ Want early builds? `brew install --cask tonycast@beta` puts `Tonycast Beta.app` 
 app, with its own settings and permissions. Apple silicon, macOS 26+.
 
 Homebrew clears the macOS quarantine flag on every install and update, so there is nothing else to
-run. Downloading a DMG from [Releases](https://github.com/abue-ammar/tonycast/releases) instead?
+run. Downloading a DMG from [Releases](https://github.com/abue-ammar/tinycast/releases) instead?
 Tonycast is self-signed, so clear the flag once:
 `xattr -dr com.apple.quarantine "/Applications/Tonycast.app"`.
 
@@ -145,9 +145,9 @@ Questions, ideas, or just want to follow along? **[Join the Discord](https://dis
 
 <a href="https://www.star-history.com/?repos=abue-ammar%2Ftonycast&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=abue-ammar/tonycast&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=abue-ammar/tonycast&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=abue-ammar/tonycast&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=abue-ammar/tinycast&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=abue-ammar/tinycast&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=abue-ammar/tinycast&type=date&legend=top-left" />
  </picture>
 </a>
 

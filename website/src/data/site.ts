@@ -11,7 +11,7 @@ export const summary =
 export const site = {
   name: "Tonycast",
   tagline: "The essentials, without the bloat.",
-  repo: "https://github.com/abue-ammar/tonycast",
+  repo: "https://github.com/abue-ammar/tinycast",
   url: "https://tonycast.dev",
   // The R2 bucket behind cdn.tonycast.dev. Anything over Workers' 25 MiB
   // per-asset cap lives here instead of `public/` — see website/README.md.
@@ -20,7 +20,7 @@ export const site = {
   fallbackVersion: "v0.9.7",
   platform: "macOS 26+",
   license: "AGPL-3.0",
-  licenseUrl: "https://github.com/abue-ammar/tonycast/blob/main/LICENSE",
+  licenseUrl: "https://github.com/abue-ammar/tinycast/blob/main/LICENSE",
   community: {
     discord: "https://discord.gg/v2Eeb4QQy3",
   },
@@ -45,9 +45,9 @@ export const nav = [
 
 // The hero's two lines. Every other channel lives in docs/install.md, which is
 // where both install CTAs point.
-export const brewTrustCommand = "brew trust --tap abue-ammar/tonycast";
+export const brewTrustCommand = "brew trust --tap abue-ammar/tinycast";
 export const brewInstallCommand =
-  "brew install --cask abue-ammar/tonycast/tonycast";
+  "brew install --cask abue-ammar/tinycast/tinycast";
 
 // The logo wall under the hero, in render order. The track starts at the first
 // entry with the left edge under the mask, so the two least-known names lead

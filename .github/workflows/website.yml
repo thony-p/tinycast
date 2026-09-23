@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   cloudflare:
-    if: github.repository == 'abue-ammar/tonycast'
+    if: github.repository == 'abue-ammar/tinycast'
     runs-on: ubuntu-latest
     environment:
       name: cloudflare
@@ -53,11 +53,11 @@ jobs:
           jq -n '{POLAR_ACCESS_TOKEN: env.POLAR_ACCESS_TOKEN}' > "$secrets"
           npm run deploy -- --secrets-file "$secrets"
 
-  # Publishes nothing but a CNAME, which is what makes GitHub 301 abue-ammar.github.io/tonycast/*
+  # Publishes nothing but a CNAME, which is what makes GitHub 301 abue-ammar.github.io/tinycast/*
   # to tonycast.dev/* at its own edge — no HTML, no meta refresh. Independent of the Cloudflare
   # job on purpose: a failed deploy there must not take the forwarder down with it.
   redirect:
-    if: github.repository == 'abue-ammar/tonycast'
+    if: github.repository == 'abue-ammar/tinycast'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

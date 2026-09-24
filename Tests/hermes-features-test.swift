@@ -179,6 +179,49 @@ struct HermesFeaturesTest {
         check("the screenshot's percentage is rounded the same way",
               abs((reading.fraction ?? 0).rounded() - 20) < 0.001)
 
+        // The gauge rides inline in the composer row, so its widest reading must be no wider than
+        // the slot reserved for it. Sweeping the whole space proves the reservation, where a spot
+        // check at one value would not. The windows deliberately straddle every formatter rung: the
+        // raw count, the k rung, and the unbounded M rung above a billion, which is where a `999.9k`
+        // literal under-reserved (`~1500.5M/2000M` overflowed it by one character).
+        var widestUncovered: String?
+        var checkedReadings = 0
+        let windows = [0, 1_000, 131_072, 999_949, 1_048_576, 2_000_000,
+                       1_000_000_000, 2_000_000_000]
+        for window in windows {
+            let reserved = HermesUsageFormat.widestContextLabel(size: window).count
+            // A step that divides 1e6 would sample only whole-megabyte values, which all compact to
+            // the short `NNNNM` form and would leave the decimal forms unprobed. A prime step is what
+            // makes this sweep able to fail.
+            for used in stride(from: 0, through: max(window, 1), by: 7_919) {
+                let label = HermesUsageFormat.contextLabel(
+                    used: used, size: window, isEstimated: true)
+                checkedReadings += 1
+                if label.count > reserved {
+                    widestUncovered = "\(label) (\(label.count)) overflows a \(reserved) slot "
+                        + "for window \(window)"
+                    break
+                }
+            }
+            if widestUncovered != nil { break }
+        }
+        check("the sweep actually exercised readings", checkedReadings > 5_000)
+        check("no realisable reading is wider than the reserved slot", widestUncovered == nil)
+        check("the reserved label covers the widest k value",
+              HermesUsageFormat.widestContextLabel(size: 1_048_576) == "~999.9k/1M")
+        check("the reservation grows for an unbounded M rung",
+              HermesUsageFormat.widestContextLabel(size: 2_000_000_000) == "~2000.0M/2000M")
+        check("the reserved label covers the unestimated case",
+              HermesUsageFormat.contextLabel(used: 999_900, size: 1_048_576, isEstimated: true)
+                .count <= HermesUsageFormat.widestContextLabel(size: 1_048_576).count)
+        check("a window-less gauge reserves nothing",
+              HermesUsageFormat.widestContextLabel(size: 0).isEmpty)
+        check("the reserved bar covers a full meter",
+              HermesUsageFormat.widestBarLabel() == "[██████████] ~100%")
+        check("the reserved bar is wider than a mid reading",
+              HermesUsageFormat.widestBarLabel().count
+                >= HermesUsageFormat.barLabel(percent: 94.9, isEstimated: true).count)
+
         // MARK: - Feature 4: attachments
 
         let fixture = "/Users/tony/git/Temp/acp-attach-fixture.txt"

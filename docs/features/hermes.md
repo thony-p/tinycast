@@ -54,6 +54,15 @@ memory, running on a machine you choose.
 - **The measured count wins over the estimate.** A mid-turn `usage_update` carries only a rough
   estimate of request pressure; the prompt response's `usage` block carries the provider's measured
   input tokens. The gauge shows the estimate with a `~` and drops it once the measurement arrives.
+- **The gauge rides inline in the composer row, and reserves its widest reading.** It sits between the
+  text field and Send, right-aligned, rather than on a row of its own below the composer — that
+  orphaned line was the thing to remove. Because the row is now shared, the gauge cannot resize as it
+  ticks: `used` climbs from `9.9k` to `10.0k` mid-turn, and a self-sizing label would change the
+  row's width and drag the text field's caret while the user is typing.
+  `HermesUsageFormat.widestContextLabel(size:)` derives the reserved width from the live context
+  window, so the slot tracks a 1M window or a 128k one. Do not replace it with a literal —
+  `Tests/hermes-features-test.swift` sweeps every reading across a range of windows to prove the
+  reservation holds, which a hardcoded string would silently fail once the window changed.
 - **Tonycast presents its own dialogs here too.** A permission prompt is
   `HermesPermissionSheet` inside the window, not `NSAlert`. See the non-negotiables in
   [../standards.md](../standards.md).

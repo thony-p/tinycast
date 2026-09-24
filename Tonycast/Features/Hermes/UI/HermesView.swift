@@ -56,6 +56,10 @@ struct HermesView: View {
                     .disabled(!session.status.isReady)
                     .onSubmit(submit)
 
+                if let usage = session.usage {
+                    HermesUsageGauge(usage: usage)
+                }
+
                 if session.isTurnActive {
                     Button("Stop") { Task { await session.cancelTurn() } }
                         .buttonStyle(.plain)
@@ -69,9 +73,6 @@ struct HermesView: View {
                             canSend ? Theme.Colors.textPrimary : Theme.Colors.textTertiary)
                         .disabled(!canSend)
                 }
-            }
-            if let usage = session.usage {
-                HermesUsageGauge(usage: usage)
             }
         }
         .padding(Theme.Spacing.dialogInset)
@@ -105,18 +106,29 @@ struct HermesUsageGauge: View {
     let usage: ACPTranscriptItem.Usage
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.sm) {
-            Text(usage.label)
-                .font(Font.caption)
-                .foregroundStyle(Theme.Colors.textTertiary)
-                .monospacedDigit()
-            Text(usage.barLabel)
-                .font(Font.caption)
-                .foregroundStyle(Theme.Colors.textTertiary)
-                .monospaced()
-            Spacer(minLength: 0)
+        ZStack(alignment: .trailing) {
+            reading(
+                label: HermesUsageFormat.widestContextLabel(size: usage.size),
+                bar: HermesUsageFormat.widestBarLabel())
+                .hidden()
+            reading(label: usage.label, bar: usage.barLabel)
         }
+        .font(Font.caption)
+        .foregroundStyle(Theme.Colors.textTertiary)
+        .lineLimit(1)
+        .fixedSize()
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Context window usage \(usage.label)")
         .help("Context window usage for this session")
+    }
+
+    private func reading(label: String, bar: String) -> some View {
+        HStack(spacing: Theme.Spacing.xs) {
+            Text(label)
+                .monospacedDigit()
+            Text(bar)
+                .monospaced()
+        }
     }
 }
 

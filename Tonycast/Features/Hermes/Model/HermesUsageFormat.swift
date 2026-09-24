@@ -55,4 +55,29 @@ enum HermesUsageFormat {
         let bounded = Int(max(0, min(100, percent.rounded())))
         return "[\(bar(percent: percent))] \(isEstimated ? "~" : "")\(bounded)%"
     }
+
+    /// The widest label `contextLabel` can return for a window, so an inline gauge can reserve a
+    /// fixed slot instead of resizing as it ticks.
+    ///
+    /// `used` climbs from `9.9k` to `10.0k` mid-turn, and a self-sizing label would change the row's
+    /// width and drag the caret. Within the realisable domain (`used <= size`, neither negative) this
+    /// reservation is exact: `Tests/hermes-features-test.swift` sweeps every reading the formatter can
+    /// produce and fails if one overflows it.
+    ///
+    /// The numerator cannot simply be `999.9k`. The `M` rung is unbounded, so a window past a billion
+    /// tokens reports a form like `2000M` and a numerator of `1500.5M`, which is wider. The bound is
+    /// therefore the wider of the `k` cap and the window's own `M` form, written at one decimal rather
+    /// than compacted: the digit is what makes it an upper bound, since `compact` drops a trailing
+    /// `.0` that this form keeps.
+    static func widestContextLabel(size: Int?) -> String {
+        guard let size, size > 0 else { return "" }
+        let megabyteForm = String(format: "%.1f", Double(size) / 1_000_000) + "M"
+        let numerator = megabyteForm.count > 6 ? megabyteForm : "999.9k"
+        return "~\(numerator)/\(compact(size))"
+    }
+
+    /// The widest label `barLabel` can return: a full meter, a three-digit percent, and the tilde.
+    static func widestBarLabel() -> String {
+        "[\(bar(percent: 100))] ~100%"
+    }
 }

@@ -12,6 +12,8 @@ struct CurrencyRates: Codable, Equatable, Sendable {
     let rates: [String: Double]
     /// When this was downloaded: drives staleness, and doubles as the memo key in `CalcMemo`.
     let fetchedAt: Date
+    /// The feed's own publish date, so a CDN-served day-old copy is visible rather than silent.
+    let feedDate: String?
 
     func rate(for code: String) -> Double? {
         if let rate = rates[code], rate > 0, rate.isFinite { return rate }

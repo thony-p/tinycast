@@ -21,7 +21,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const RATES = "https://backend.raycast.com/api/v1/currencies";
+const RATES = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json";
 const CLDR = "https://raw.githubusercontent.com/unicode-org/cldr-json/main/cldr-json";
 const CLDR_NAMES = `${CLDR}/cldr-numbers-full/main/en/currencies.json`;
 const CLDR_CURRENCY_DATA = `${CLDR}/cldr-core/supplemental/currencyData.json`;
@@ -30,8 +30,17 @@ const CLDR_CURRENCY_DATA = `${CLDR}/cldr-core/supplemental/currencyData.json`;
 const MIN_EXPECTED = 150;
 // The crypto table in CalcCurrency.swift owns this one, and prices it from the dedicated feed.
 const CRYPTO_OWNED = new Set(["BTC"]);
+// Codes CLDR carries no name for are dropped: this feed mixes crypto tickers (ETH, SOL, XRP and
+// ~75 more) into the same flat table as fiat, and CLDR knowing an ISO code is the only reliable
+// way to tell money from a token. These are the real currencies CLDR never tracked.
+const NON_ISO_MONEY = new Set(["CNH", "XAU", "XAG", "XPT", "XPD", "XDR", "GGP", "IMP", "JEP", "TVD"]);
 // CLDR carries no name for the Crown Dependencies' pounds, and the feed supplies no names at all.
-const UNNAMED = { GGP: "Guernsey Pound", IMP: "Isle of Man Pound", JEP: "Jersey Pound" };
+const UNNAMED = {
+  GGP: "Guernsey Pound",
+  IMP: "Isle of Man Pound",
+  JEP: "Jersey Pound",
+  TVD: "Tuvaluan Dollar",
+};
 
 async function load(url, argPath) {
   if (argPath) return JSON.parse(fs.readFileSync(argPath, "utf8"));
@@ -78,9 +87,8 @@ function swiftString(value) {
   return `"${value}"`;
 }
 
-/// Codes CLDR knows at all, and codes it still shows some region using. A code CLDR has never heard
-/// of stays in: absence of evidence isn't retirement, and it is what keeps CNH, XAU, XDR and the
-/// Crown Dependencies' pounds, none of which are any region's tender.
+/// Codes CLDR still shows some region using, plus the set of codes it knows at all. The known set
+/// is what separates money from the crypto tickers the rate feed also carries.
 function inUse(currencyData) {
   const known = new Set();
   const live = new Set();
@@ -92,36 +100,41 @@ function inUse(currencyData) {
       }
     }
   }
-  return (code) => live.has(code) || !known.has(code);
+  return { known, live };
 }
 
 async function main() {
   const feed = await load(RATES, process.argv[2]);
   const cldr = await load(CLDR_NAMES, process.argv[3]);
   const supplemental = await load(CLDR_CURRENCY_DATA, process.argv[4]);
-  const base = feed?.source;
-  const quotes = feed?.quotes;
-  // An error body arrives with HTTP 200, so the flag is the only thing that says the table is real.
-  if (feed?.success !== true) throw new Error("the rate feed reported failure");
-  if (!base || !quotes || typeof quotes !== "object")
-    throw new Error("unexpected feed shape: source/quotes missing");
+  // A dated, flat, lowercase-keyed table: 1 USD buys this many of each code.
+  const base = "USD";
+  const quotes = feed?.usd;
+  if (!quotes || typeof quotes !== "object")
+    throw new Error("unexpected feed shape: usd missing");
   const names = cldr?.main?.en?.numbers?.currencies;
   if (!names) throw new Error("unexpected CLDR shape: main.en.numbers.currencies missing");
   if (!supplemental?.supplemental?.currencyData?.region)
     throw new Error("unexpected CLDR shape: supplemental.currencyData.region missing");
 
-  // Quotes are keyed "<base><code>" and omit the base's own row, so it has to be added back.
+  // The feed keys lowercase and carries non-ISO entries (metals, obsolete codes); only ISO stay.
   const quoted = new Set([base]);
-  for (const pair of Object.keys(quotes)) {
-    if (pair.length === 6 && pair.startsWith(base)) quoted.add(pair.slice(3));
+  for (const key of Object.keys(quotes)) {
+    const code = key.toUpperCase();
+    if (/^[A-Z]{3}$/.test(code) && quotes[key] > 0) quoted.add(code);
   }
 
-  const stillInUse = inUse(supplemental.supplemental.currencyData);
+  const { known: knownCodes, live } = inUse(supplemental.supplemental.currencyData);
+  // A code must be CLDR-known money, or an allowlisted non-ISO one. A code CLDR has never heard of
+  // is judged by the allowlist alone — absence of evidence isn't retirement, but it isn't money
+  // either, and this feed quotes ~80 crypto tickers that would otherwise become "currencies".
+  const wasRetired = (code) => knownCodes.has(code) && !live.has(code);
+  const isMoney = (code) => (NON_ISO_MONEY.has(code) || knownCodes.has(code)) && !wasRetired(code);
   const codes = [...quoted]
-    .filter((code) => /^[A-Z]{3}$/.test(code) && !CRYPTO_OWNED.has(code) && stillInUse(code))
+    .filter((code) => /^[A-Z]{3}$/.test(code) && !CRYPTO_OWNED.has(code) && isMoney(code))
     .sort();
   const retired = quoted.size - CRYPTO_OWNED.size - codes.length;
-  const asOf = new Date((feed.timestamp || Date.now() / 1000) * 1000).toISOString().slice(0, 10);
+  const asOf = feed.date || new Date().toISOString().slice(0, 10);
   if (codes.length < MIN_EXPECTED) throw new Error(`suspiciously few currencies: ${codes.length}`);
 
   const signClaims = new Map();

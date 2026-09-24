@@ -515,6 +515,12 @@ run mcp-test               Tonycast/Features/Settings/AppSettingsKey.swift \
                            Tonycast/Features/AI/Model/JSONValue.swift \
                            Tonycast/Features/MCP/Model/*.swift \
                            Tonycast/Features/MCP/Settings/MCPSettingsStore.swift
+run hermes-permission-test Tonycast/Features/AI/Model/JSONValue.swift \
+                           Tonycast/Platform/ExecutableLocator.swift \
+                           Tonycast/Features/Hermes/Service/ACPMessage.swift \
+                           Tonycast/Features/Hermes/Service/ACPProtocol.swift \
+                           Tonycast/Features/Hermes/Service/ACPClient.swift \
+                           Tonycast/Features/Hermes/Service/ACPPermissionBroker.swift
 run -O text-diff-test      Tonycast/Features/QuickActions/Model/TextDiffEngine.swift
 run index text-diff-performance Tonycast/Features/QuickActions/Model/TextDiffEngine.swift
 run quick-action-test      Tonycast/Features/Settings/AppSettingsKey.swift \

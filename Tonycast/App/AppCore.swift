@@ -189,6 +189,12 @@ final class AppCore {
         chat: aiChat, settings: settings, appIndex: appIndex, palette: palette,
         paletteCoordinator: paletteCoordinator, settingsCoordinator: settingsCoordinator,
         core: self)
+    /// Hermes runs as its own ACP session rather than through the AI provider stack, so it gets its
+    /// own settings object and session manager instead of reusing `aiChat`.
+    let hermesSettings = HermesSettings()
+    @ObservationIgnored private(set) lazy var hermesSession = ACPSessionManager(settings: hermesSettings)
+    @ObservationIgnored private(set) lazy var hermesCoordinator = HermesCoordinator(
+        settings: hermesSettings, session: hermesSession)
 
     @ObservationIgnored private lazy var windowController = PaletteWindowController(core: self)
     @ObservationIgnored private lazy var messageHUD = MessageHUDController(settings: settings)

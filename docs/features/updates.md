@@ -77,6 +77,13 @@ prerelease sorts below the release it leads to, and `beta.10` above `beta.9`. Ev
 to nil, so an off-shape tag can never be offered as an update. A release whose tag disagrees with
 its `prerelease` flag is treated as mis-published and skipped.
 
+It also parses the fork's own `MAJOR.MINOR.PATCH-tN.M` marker, which is what `0.11.3-t0.1` in
+`project.yml` is. The marker exists to be **displayed**: this fork publishes no release stream
+(`com.tonycast.app` resolves to `.development`), and the marker is deliberately not a prerelease, so
+a fork build is still a stock release as far as the feed is concerned. Ordering exists only so the
+comparison stays sane — a marked build sorts above the unmarked triple it was cut from and below the
+next one.
+
 The Intel build is *not* a channel. It shares the stable tag, version, bundle id and signature, so it
 resolves to `.stable` like any other; `ReleaseArchitecture` picks its asset, and nothing about
 identity changes.

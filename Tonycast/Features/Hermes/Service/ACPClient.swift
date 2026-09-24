@@ -54,6 +54,10 @@ actor ACPClient {
     private var stderrBuffer = Data()
     private var nextID = 1
     private var pending: [Int: Pending] = [:]
+    /// Set when the user asked to stop, so a late exit is not reported as a crash.
+    private var intentionalStop = false
+    /// Serial, off-actor writer. Writes never touch the actor's thread.
+    private let writer = ACPFrameWriter()
 
     /// Fan-out for notifications the session layer consumes.
     private var eventHandler: (@Sendable (Event) -> Void)?
@@ -124,18 +128,33 @@ actor ACPClient {
         }
         self.process = process
         input = stdin.fileHandleForWriting
+        // A frame is written off the actor: a pipe write blocks once the buffer fills (~64 KB), and
+        // writing on the actor would freeze the reader and every timeout watchdog with it.
+        writer.start(handle: stdin.fileHandleForWriting)
 
         // Handshake: nothing is usable until the agent answers `initialize`.
-        let response = try await request(ACPMessage.initialize)
-        let agentVersion =
-            response.objectValue?["agentInfo"]?.objectValue?["version"]?.stringValue ?? "unknown"
-        emit(.connected(agentVersion: agentVersion))
+        do {
+            let response = try await request(ACPMessage.initialize)
+            let agentVersion =
+                response.objectValue?["agentInfo"]?.objectValue?["version"]?.stringValue ?? "unknown"
+            emit(.connected(agentVersion: agentVersion))
+        } catch {
+            // Without this the child stays alive with `isRunning == true` but never initialized, so a
+            // retry would skip the handshake and leave the client permanently broken.
+            let reason = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            stop()
+            throw ACPError.launchFailed(reason)
+        }
     }
 
     func stop() {
         guard let process else { return }
+        writer.stop()
+        // The user asked for this stop, so a late exit must not report a crash reason.
+        intentionalStop = true
         process.terminationHandler = nil
-        // Closing stdin is the clean exit; SIGTERM is the backstop.
+        (process.standardOutput as? Pipe)?.fileHandleForReading.readabilityHandler = nil
+        (process.standardError as? Pipe)?.fileHandleForReading.readabilityHandler = nil
         try? input?.close()
         input = nil
         Task.detached {
@@ -144,6 +163,9 @@ actor ACPClient {
         }
         finishAll(with: ACPError.notRunning)
         self.process = nil
+        // Buffers must not survive into the next session: stale bytes would corrupt its first frame.
+        outputBuffer.removeAll(keepingCapacity: false)
+        stderrBuffer.removeAll(keepingCapacity: false)
     }
 
     // MARK: - Requests
@@ -164,14 +186,9 @@ actor ACPClient {
                     await self?.expire(id)
                 }
                 pending[id] = Pending(continuation: continuation, timeout: watchdog)
-                do {
-                    try input.write(contentsOf: frame)
-                } catch {
-                    // No await between the map write above and here, so the entry is still ours.
-                    pending[id]?.timeout.cancel()
-                    pending[id] = nil
-                    continuation.resume(throwing: ACPError.requestFailed(error.localizedDescription))
-                }
+                // Queued, never written inline: a blocking pipe write on the actor would stall the
+                // reader and stop this request's own watchdog from ever firing.
+                writer.enqueue(frame)
             }
         } onCancel: {
             Task { await self.expire(id) }
@@ -229,8 +246,8 @@ actor ACPClient {
     // MARK: - Private
 
     private func send(_ data: Data?) {
-        guard let data, let input else { return }
-        try? input.write(contentsOf: data)
+        guard let data else { return }
+        writer.enqueue(data)
     }
 
     private func emit(_ event: Event) {
@@ -356,7 +373,11 @@ actor ACPClient {
             detail.isEmpty ? "Hermes exited with status \(status)." : Self.lastLines(of: detail)
         // Pending calls fail before the owner is told, or a late `stop()` would overwrite the reason.
         finishAll(with: ACPError.requestFailed(reason))
+        let wasIntentional = intentionalStop
+        intentionalStop = false
         cleanup()
+        // A user-initiated stop already told the UI; reporting it again reads as a crash.
+        guard !wasIntentional else { return }
         emit(.disconnected(reason: reason))
     }
 

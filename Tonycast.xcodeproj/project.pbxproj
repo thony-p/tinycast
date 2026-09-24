@@ -389,6 +389,7 @@
 		9219C476859CFBC49D43800D /* CalcTimeZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = E242A150935355F51AE99084 /* CalcTimeZone.swift */; };
 		9247479B306A10C2818B5001 /* WindowLayoutDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFDD646FBAE19EFDAD818BA /* WindowLayoutDraft.swift */; };
 		925530BB8865C428B5945898 /* Memo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11C460903EDB93682324C40 /* Memo.swift */; };
+		92FC34DA716DA12945F34366 /* ACPFrameWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4438885AE2C1875221C751FA /* ACPFrameWriter.swift */; };
 		932F0E5CA689D2325EC662BD /* ExtensionFormKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B12D06192997478EB20AED /* ExtensionFormKey.swift */; };
 		934A91EE8E23205189D6ED99 /* QuickActionPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E64DEA23F8664C8790E5802 /* QuickActionPrompt.swift */; };
 		93F4BC4FE5F56670D7F906CF /* ExecutableLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FCBD92EA0152897593095A /* ExecutableLocator.swift */; };
@@ -871,6 +872,7 @@
 		428D651AA616EC8AC9FE025D /* ClipboardFilterButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardFilterButton.swift; sourceTree = "<group>"; };
 		42F1E384A4F994602D5DB1EA /* ExtensionSearchAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionSearchAccessory.swift; sourceTree = "<group>"; };
 		431C5F901599987280841317 /* UpdateCheckStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckStore.swift; sourceTree = "<group>"; };
+		4438885AE2C1875221C751FA /* ACPFrameWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ACPFrameWriter.swift; sourceTree = "<group>"; };
 		451391518187ACF3F4B3A104 /* NoteInlineScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteInlineScanner.swift; sourceTree = "<group>"; };
 		45C2F9EB19FE144D602625D2 /* NoteSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSearch.swift; sourceTree = "<group>"; };
 		48579E488E178058DD2D5A75 /* CalendarCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCoordinator.swift; sourceTree = "<group>"; };
@@ -2143,6 +2145,7 @@
 			isa = PBXGroup;
 			children = (
 				398AC661FA9D26F5F004D170 /* ACPClient.swift */,
+				4438885AE2C1875221C751FA /* ACPFrameWriter.swift */,
 				90F87224980D4831E0AA9BD0 /* ACPMessage.swift */,
 				03F6CE06A294FC2AF723C98E /* ACPPermissionBroker.swift */,
 				6F8E6656F771E2F18CF75AB9 /* ACPProtocol.swift */,
@@ -3244,6 +3247,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A3F9943B1850814E461B1059 /* ACPClient.swift in Sources */,
+				92FC34DA716DA12945F34366 /* ACPFrameWriter.swift in Sources */,
 				3AABFD617B8E0E5334915B4F /* ACPMessage.swift in Sources */,
 				C722BC2CAAC602B503DC81E3 /* ACPPermissionBroker.swift in Sources */,
 				2ABA6A0D8AC2F1DF1A8A7465 /* ACPProtocol.swift in Sources */,

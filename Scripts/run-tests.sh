@@ -519,6 +519,7 @@ run hermes-permission-test Tonycast/Features/AI/Model/JSONValue.swift \
                            Tonycast/Platform/ExecutableLocator.swift \
                            Tonycast/Features/Hermes/Service/ACPMessage.swift \
                            Tonycast/Features/Hermes/Service/ACPProtocol.swift \
+                           Tonycast/Features/Hermes/Service/ACPFrameWriter.swift \
                            Tonycast/Features/Hermes/Service/ACPClient.swift \
                            Tonycast/Features/Hermes/Service/ACPPermissionBroker.swift
 run -O text-diff-test      Tonycast/Features/QuickActions/Model/TextDiffEngine.swift

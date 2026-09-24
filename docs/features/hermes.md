@@ -46,6 +46,12 @@ memory, running on a machine you choose.
   block; the agent resolves the URI and reads the file itself. That keeps a large file out of
   Tonycast's memory and off the pipe, and it is why attachments survive a re-render for free. The URI
   is built by `URL`, not by hand — a `#` in a filename must not truncate it or invent a query.
+- **An image attachment only works when the agent's model can see.** Verified from the request dump:
+  Tonycast builds the correct `data:image/png;base64,…` block and Hermes turns the link into it, so
+  the client side is sound. What fails is downstream — a text-only model answers HTTP 500 (Ollama
+  Cloud: `deepseek-v4.1-flash` 500s on any image while `glm-5.3-flash` accepts and correctly
+  describes the same bytes). A dead-end here is a provider/model fact, not a Tonycast bug: check the
+  agent's configured model before suspecting the attachment path, and give the agent a fallback.
 - **The token gauge mirrors Hermes' own formatter, deliberately.** `HermesUsageFormat` ports
   `@hermes/shared`'s `compactNumber` and the statusbar's label format, thresholds included, so
   `1048576` reads `1M` and never `1.0M`. Where the desktop and a local improvement would disagree —

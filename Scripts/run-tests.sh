@@ -517,6 +517,8 @@ run mcp-test               Tonycast/Features/Settings/AppSettingsKey.swift \
                            Tonycast/Features/MCP/Settings/MCPSettingsStore.swift
 run hermes-permission-test Tonycast/Features/AI/Model/JSONValue.swift \
                            Tonycast/Platform/ExecutableLocator.swift \
+                           Tonycast/Features/Hermes/Model/ACPAttachment.swift \
+                           Tonycast/Features/Hermes/Model/HermesConnection.swift \
                            Tonycast/Features/Hermes/Service/ACPMessage.swift \
                            Tonycast/Features/Hermes/Service/ACPProtocol.swift \
                            Tonycast/Features/Hermes/Service/ACPFrameWriter.swift \
@@ -525,6 +527,9 @@ run hermes-permission-test Tonycast/Features/AI/Model/JSONValue.swift \
 run hermes-placement-test Tonycast/Features/AI/Model/JSONValue.swift \
                            Tonycast/Platform/ExecutableLocator.swift \
                            Tonycast/Features/Hermes/Model/ACPTranscriptItem.swift \
+                           Tonycast/Features/Hermes/Model/ACPAttachment.swift \
+                           Tonycast/Features/Hermes/Model/HermesConnection.swift \
+                           Tonycast/Features/Hermes/Model/HermesUsageFormat.swift \
                            Tonycast/Features/Hermes/Settings/HermesSettings.swift \
                            Tonycast/Features/Hermes/Service/ACPProtocol.swift \
                            Tonycast/Features/Hermes/Service/ACPMessage.swift \
@@ -532,6 +537,14 @@ run hermes-placement-test Tonycast/Features/AI/Model/JSONValue.swift \
                            Tonycast/Features/Hermes/Service/ACPClient.swift \
                            Tonycast/Features/Hermes/Service/ACPPermissionBroker.swift \
                            Tonycast/Features/Hermes/Service/ACPSessionManager.swift
+run hermes-features-test  Tonycast/Features/Updates/Model/AppVersion.swift \
+                           Tonycast/Features/AI/Model/JSONValue.swift \
+                           Tonycast/Features/Hermes/Model/ACPTranscriptItem.swift \
+                           Tonycast/Features/Hermes/Model/ACPAttachment.swift \
+                           Tonycast/Features/Hermes/Model/HermesConnection.swift \
+                           Tonycast/Features/Hermes/Model/HermesUsageFormat.swift \
+                           Tonycast/Features/Hermes/Service/ACPProtocol.swift \
+                           Tonycast/Features/Hermes/Service/ACPMessage.swift
 run -O text-diff-test      Tonycast/Features/QuickActions/Model/TextDiffEngine.swift
 run index text-diff-performance Tonycast/Features/QuickActions/Model/TextDiffEngine.swift
 run quick-action-test      Tonycast/Features/Settings/AppSettingsKey.swift \

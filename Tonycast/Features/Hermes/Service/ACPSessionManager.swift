@@ -40,6 +40,14 @@ final class ACPSessionManager {
     /// Options actually shown, which may be narrower than what the agent proposed.
     private(set) var pendingPermissionOptions: [ACPClient.PermissionOption] = []
 
+    /// Files to carry with the next prompt. Cleared once the prompt is sent.
+    private(set) var attachments: [ACPAttachment] = []
+    /// An attachment the user removed before sending, kept so `undo` can put it back.
+    private var removedAttachments: [ACPAttachment] = []
+
+    /// The newest usage reading, shown beside the composer rather than as a transcript row.
+    private(set) var usage: ACPTranscriptItem.Usage?
+
     private let client: ACPClient
     private let settings: HermesSettings
     private let broker: ACPPermissionBroker
@@ -49,10 +57,14 @@ final class ACPSessionManager {
     init(settings: HermesSettings, broker: ACPPermissionBroker = ACPPermissionBroker()) {
         self.settings = settings
         self.broker = broker
-        self.client = ACPClient(workingDirectory: settings.launchDirectory)
+        self.client = ACPClient(
+            connection: settings.connection, workingDirectory: settings.launchDirectory)
     }
 
     // MARK: - Lifecycle
+
+    /// Which Hermes this window talks to, for the header and the New Session dialog.
+    var connection: HermesConnection { settings.connection }
 
     /// Starts the process and attaches a session. Safe to call repeatedly.
     func connect() async {
@@ -76,11 +88,42 @@ final class ACPSessionManager {
         agentVersion = nil
         sessionID = nil
         isTurnActive = false
+        usage = nil
+    }
+
+    /// Switches to another Hermes instance and starts a fresh session there.
+    ///
+    /// The process is torn down rather than re-pointed: a session and its id belong to the instance
+    /// that minted them, so the transcript is cleared too. Doing it in this order means the window
+    /// never shows the old host's conversation under the new host's name.
+    ///
+    /// The switch is claimed synchronously, before the first suspension. Two menu clicks in one
+    /// turn would otherwise both tear the process down and both start one, racing the same client.
+    func switchConnection(to connection: HermesConnection) async {
+        guard connection != settings.connection else { return }
+        // A switch kills the running agent, so it is refused mid-turn rather than cancelling one.
+        guard status != .launching, !isTurnActive else { return }
+        status = .launching
+        agentVersion = nil
+        sessionID = nil
+        pendingPermission = nil
+        pendingPermissionOptions = []
+        usage = nil
+        transcript.removeAll()
+        clearAttachments()
+        await client.stop()
+        settings.connection = connection
+        await client.use(connection)
+        status = .idle
+        await connect()
     }
 
     /// New session in the configured working directory, discarding the current conversation.
     func startNewSession() async {
+        guard !isTurnActive else { return }
         transcript.removeAll()
+        usage = nil
+        clearAttachments()
         do {
             try await attachSession(forceNew: true)
         } catch {
@@ -119,27 +162,69 @@ final class ACPSessionManager {
         return (cwd as NSString).lastPathComponent
     }
 
+    // MARK: - Attachments
+
+    /// Adds picked files to the next prompt. A path already attached is not added twice, and a path
+    /// Tonycast cannot turn into a valid link is dropped rather than sent as a dead one.
+    func attach(_ paths: [String]) {
+        let existing = Set(attachments.map(\.path))
+        let additions = paths.filter { !existing.contains($0) }.compactMap(ACPAttachment.at(path:))
+        guard !additions.isEmpty else { return }
+        attachments.append(contentsOf: additions)
+        removedAttachments.removeAll()
+    }
+
+    func removeAttachment(_ attachment: ACPAttachment) {
+        guard let index = attachments.firstIndex(where: { $0.id == attachment.id }) else { return }
+        removedAttachments = [attachments.remove(at: index)]
+    }
+
+    /// Puts back the last removed attachment, so a mis-click is not a re-pick.
+    func undoRemoveAttachment() {
+        guard let restored = removedAttachments.popLast() else { return }
+        guard !attachments.contains(where: { $0.path == restored.path }) else { return }
+        attachments.append(restored)
+    }
+
+    func clearAttachments() {
+        attachments.removeAll()
+        removedAttachments.removeAll()
+    }
+
     // MARK: - Turns
 
-    func send(_ text: String) async {
+    /// Sends a prompt and reports whether a turn actually began, so the composer only discards the
+    /// draft once it has been handed over. Clearing first would lose the text when the send fails.
+    @discardableResult
+    func send(_ text: String) async -> Bool {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
+        // Attachments alone are a valid prompt: a screenshot with no words is a real request.
+        guard !trimmed.isEmpty || !attachments.isEmpty else { return false }
         if !status.isReady { await connect() }
-        guard status.isReady, let sessionID else { return }
+        guard status.isReady, let sessionID else { return false }
 
-        transcript.append(.user(trimmed))
+        let sent = attachments
+        transcript.append(.user(trimmed.isEmpty ? "Attached \(sent.count) file(s)." : trimmed, attachments: sent))
+        attachments.removeAll()
+        removedAttachments.removeAll()
         isTurnActive = true
         lastError = nil
         // The permission sheet must not outlive the turn that raised it.
         pendingPermission = nil
         pendingPermissionOptions = []
         do {
-            _ = try await client.prompt(sessionID: sessionID, text: trimmed)
+            let measured = try await client.prompt(
+                sessionID: sessionID, text: trimmed, attachments: sent)
+            // The measured count replaces the estimate the streamed notifications left behind.
+            if let measured {
+                recordUsage(used: measured.inputTokens, size: usage?.size, isEstimated: false)
+            }
         } catch {
             lastError = Self.describe(error)
             transcript.append(.system("Turn failed: \(Self.describe(error))"))
         }
         isTurnActive = false
+        return true
     }
 
     func cancelTurn() async {
@@ -220,12 +305,21 @@ final class ACPSessionManager {
                 transcript.append(.plan(entries))
             }
         case "usage_update":
+            // A mid-turn reading, and always a rough estimate: the agent has not measured the
+            // request yet. The prompt response replaces it with the real count when the turn ends.
             if let used = update["used"]?.intValue {
-                transcript.append(.usage(used))
+                recordUsage(used: used, size: update["size"]?.intValue ?? usage?.size, isEstimated: true)
             }
         default:
             break
         }
+    }
+
+    /// Keeps one usage reading for the whole window. A later notification with no `size` must not
+    /// throw away the context window an earlier one reported, or the gauge loses its denominator.
+    private func recordUsage(used: Int, size: Int?, isEstimated: Bool) {
+        let resolved = size ?? usage?.size ?? 0
+        usage = ACPTranscriptItem.Usage(used: used, size: resolved, isEstimated: isEstimated)
     }
 
     /// A chunk continues the previous item when it is the same role, which is what streaming looks

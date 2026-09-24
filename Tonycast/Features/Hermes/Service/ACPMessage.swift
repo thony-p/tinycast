@@ -38,14 +38,19 @@ enum ACPMessage {
             params: ["sessionId": sessionID, "cwd": cwd, "mcpServers": []])
     }
 
-    /// `prompt` is a list of content blocks; text is the only one this client produces.
-    static func prompt(id: Int, sessionID: String, text: String) throws -> Data {
-        try ACPProtocol.request(
+    /// `prompt` is a list of content blocks. Text plus one `resource_link` per attachment: the
+    /// agent resolves each URI and reads the file itself, so no bytes ever cross this pipe.
+    static func prompt(
+        id: Int, sessionID: String, text: String, attachments: [ACPAttachment] = []
+    ) throws -> Data {
+        var blocks: [[String: Any]] = [["type": "text", "text": text]]
+        blocks.append(contentsOf: attachments.map(\.wireBlock))
+        return try ACPProtocol.request(
             id: id,
             method: "session/prompt",
             params: [
                 "sessionId": sessionID,
-                "prompt": [["type": "text", "text": text]],
+                "prompt": blocks,
             ])
     }
 

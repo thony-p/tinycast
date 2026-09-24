@@ -61,12 +61,6 @@ private struct HermesTranscriptRow: View {
             }
         case .plan:
             planRow
-        case .usage:
-            if let tokens = item.tokenCount {
-                Text("\(tokens) tokens used")
-                    .font(Font.caption)
-                    .foregroundStyle(Theme.Colors.textTertiary)
-            }
         }
     }
 
@@ -74,16 +68,38 @@ private struct HermesTranscriptRow: View {
     private func bubble(isUser: Bool) -> some View {
         HStack {
             if isUser { Spacer(minLength: Theme.Spacing.xxl) }
-            Text(item.text)
-                .font(Font.body)
-                .foregroundStyle(isUser ? Theme.Colors.textPrimary : Theme.Colors.noteText)
-                .textSelection(.enabled)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(isUser ? Theme.Spacing.lg : 0)
-                .background(
-                    RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous)
-                        .fill(isUser ? Theme.Colors.controlSurface : Color.clear))
+            VStack(alignment: isUser ? .trailing : .leading, spacing: Theme.Spacing.xs) {
+                Text(item.text)
+                    .font(Font.body)
+                    .foregroundStyle(isUser ? Theme.Colors.textPrimary : Theme.Colors.noteText)
+                    .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
+                if !item.attachments.isEmpty {
+                    attachmentRow
+                }
+            }
+            .padding(isUser ? Theme.Spacing.lg : 0)
+            .background(
+                RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous)
+                    .fill(isUser ? Theme.Colors.controlSurface : Color.clear))
             if !isUser { Spacer(minLength: Theme.Spacing.xxl) }
+        }
+    }
+
+    /// What was carried with the message, so a sent prompt stays legible after Send.
+    private var attachmentRow: some View {
+        HStack(spacing: Theme.Spacing.xs) {
+            ForEach(item.attachments) { attachment in
+                HStack(spacing: Theme.Spacing.xxs) {
+                    Image(systemName: attachment.kind.symbolName)
+                    Text(attachment.name)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+                .font(Font.caption)
+                .foregroundStyle(Theme.Colors.textTertiary)
+                .help(attachment.path)
+            }
         }
     }
 

@@ -34,6 +34,13 @@ actor ACPClient {
         let kind: String
     }
 
+    /// The provider's measured token counts for one completed turn.
+    struct TurnUsage: Sendable, Equatable {
+        let inputTokens: Int
+        let outputTokens: Int
+        let cachedReadTokens: Int
+    }
+
     /// What the client is told about the agent's own liveness.
     enum Event: Sendable {
         case connected(agentVersion: String)
@@ -45,8 +52,7 @@ actor ACPClient {
 
     // MARK: - State
 
-    private let command: String
-    private let arguments: [String]
+    private var connection: HermesConnection
     private let workingDirectory: String
     private var process: Process?
     private var input: FileHandle?
@@ -68,11 +74,20 @@ actor ACPClient {
     /// A turn can legitimately run for minutes; the per-method timeouts below cover control calls.
     private static let defaultTimeout: Duration = .seconds(60)
 
-    init(command: String = "hermes", arguments: [String] = ["acp"], workingDirectory: String) {
-        self.command = command
-        self.arguments = arguments
+    init(connection: HermesConnection = .local, workingDirectory: String) {
+        self.connection = connection
         self.workingDirectory = workingDirectory
     }
+
+    /// Points this client at another Hermes. Only meaningful while stopped: the running process
+    /// belongs to the connection that started it, so the owner must stop before switching.
+    func use(_ connection: HermesConnection) {
+        guard !isRunning else { return }
+        self.connection = connection
+    }
+
+    /// What the client is connected to, for the session layer to report.
+    var currentConnection: HermesConnection { connection }
 
     // MARK: - Lifecycle
 
@@ -84,9 +99,10 @@ actor ACPClient {
 
     func start() async throws {
         if isRunning { return }
-        guard let executable = await ExecutableLocator.locate(command) else {
-            throw ACPError.launchFailed(
-                "`\(command)` was not found on this Mac. Install Hermes, or set its path in settings.")
+        // `ssh` is resolved like `hermes`: both are commands a user may have put somewhere unusual,
+        // and neither is at a path this app can assume.
+        guard let executable = await ExecutableLocator.locate(connection.command) else {
+            throw ACPError.launchFailed(Self.missingCommandMessage(connection))
         }
         // A concurrent start may have won the race during the async lookup.
         if isRunning { return }
@@ -96,7 +112,7 @@ actor ACPClient {
         let stdout = Pipe()
         let stderr = Pipe()
         process.executableURL = executable
-        process.arguments = arguments
+        process.arguments = connection.arguments
         process.currentDirectoryURL = URL(fileURLWithPath: workingDirectory, isDirectory: true)
         process.environment = Self.launchEnvironment(executable: executable)
 
@@ -196,10 +212,28 @@ actor ACPClient {
     }
 
     /// A prompt runs an entire turn, so it gets its own generous timeout rather than the default.
-    func prompt(sessionID: String, text: String) async throws -> JSONValue {
-        try await request(
-            { try ACPMessage.prompt(id: $0, sessionID: sessionID, text: text) },
+    ///
+    /// The response's `usage` block is the provider's **measured** token count for the request that
+    /// just ran, which is the number Hermes' own statusbar shows. The mid-turn `usage_update`
+    /// notification carries only a rough estimate, so this is the reading worth trusting.
+    func prompt(
+        sessionID: String, text: String, attachments: [ACPAttachment] = []
+    ) async throws -> ACPClient.TurnUsage? {
+        let response = try await request(
+            { try ACPMessage.prompt(id: $0, sessionID: sessionID, text: text, attachments: attachments) },
             timeout: .seconds(1_800))
+        return Self.turnUsage(from: response)
+    }
+
+    /// The measured input/output tokens, or nil when the agent reported no usage for the turn.
+    private static func turnUsage(from response: JSONValue) -> TurnUsage? {
+        guard let usage = response.objectValue?["usage"]?.objectValue,
+            let input = usage["inputTokens"]?.intValue
+        else { return nil }
+        return TurnUsage(
+            inputTokens: input,
+            outputTokens: usage["outputTokens"]?.intValue ?? 0,
+            cachedReadTokens: usage["cachedReadTokens"]?.intValue ?? 0)
     }
 
     func newSession(cwd: String) async throws -> String {
@@ -396,6 +430,16 @@ actor ACPClient {
         input = nil
         outputBuffer.removeAll(keepingCapacity: false)
         stderrBuffer.removeAll(keepingCapacity: false)
+    }
+
+    /// What to say when the connection's command is not installed. A remote launch fails as a
+    /// missing `ssh` or a missing key far more often than a local one fails for a missing `hermes`,
+    /// so the wording names the actual gap.
+    private static func missingCommandMessage(_ connection: HermesConnection) -> String {
+        if connection.isRemote {
+            return "`ssh` was not found, so Tonycast cannot reach \(connection.name)."
+        }
+        return "`\(connection.command)` was not found on this Mac. Install Hermes, or set its path in settings."
     }
 
     /// The app inherits Finder's PATH, so the agent's own toolchain has to be put back on it.

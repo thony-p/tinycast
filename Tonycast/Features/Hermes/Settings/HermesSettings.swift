@@ -1,11 +1,18 @@
 import Foundation
 import Observation
 
-/// Hermes-specific settings: which executable to launch, where sessions open, and the remembered
+/// Hermes-specific settings: which host to launch, where sessions open, and the remembered
 /// session id. Persisted under the app's own UserDefaults domain alongside every other setting.
 @MainActor
 @Observable
 final class HermesSettings {
+    /// Which Hermes this window talks to. Persisted by id, so a connection missing from a future
+    /// catalog falls back to this Mac rather than leaving nothing to launch.
+    var connection: HermesConnection {
+        get { HermesConnection.named(defaults.string(forKey: Key.connection.rawValue)) }
+        set { defaults.set(newValue.id, forKey: Key.connection.rawValue) }
+    }
+
     /// Project roots a new session may open in. Defaults to the same tree the desktop app scans.
     var projectRoots: [String] {
         didSet { defaults.set(projectRoots, forKey: Key.projectRoots.rawValue) }
@@ -56,16 +63,18 @@ final class HermesSettings {
         set { defaults.set(newValue, forKey: Key.sessionMode.rawValue) }
     }
 
-    /// Remembered so a relaunch can reattach instead of starting over.
+    /// Remembered so a relaunch can reattach instead of starting over. Scoped to the connection:
+    /// a session id only exists in the Hermes instance that minted it, so handing the Mac's id to
+    /// the VM would fail every time the host was switched.
     var savedSessionID: String? {
-        get { defaults.string(forKey: Key.savedSessionID.rawValue) }
-        set { defaults.set(newValue, forKey: Key.savedSessionID.rawValue) }
+        get { defaults.string(forKey: savedSessionKey("SessionID")) }
+        set { defaults.set(newValue, forKey: savedSessionKey("SessionID")) }
     }
 
     /// A session's cwd is fixed at creation, so the id is only reusable for the same directory.
     var savedSessionCwd: String? {
-        get { defaults.string(forKey: Key.savedSessionCwd.rawValue) }
-        set { defaults.set(newValue, forKey: Key.savedSessionCwd.rawValue) }
+        get { defaults.string(forKey: savedSessionKey("SessionCwd")) }
+        set { defaults.set(newValue, forKey: savedSessionKey("SessionCwd")) }
     }
 
     private let defaults: UserDefaults
@@ -80,6 +89,9 @@ final class HermesSettings {
     var existingProjectRoots: [String] {
         projectRoots.filter { Self.isUsableDirectory($0) }
     }
+
+    /// What the New Session dialog and the header call the current connection.
+    var connectionName: String { connection.name }
 
     /// Whether a session may reattach to the remembered id. A session's cwd is fixed at creation,
     /// so resuming elsewhere would hand the agent a stale working root.
@@ -159,7 +171,14 @@ final class HermesSettings {
             .appending(path: "git", directoryHint: .isDirectory).path
     }
 
+    /// The per-connection storage key for a session field: a session id only exists in the Hermes
+    /// instance that minted it, so the id and its cwd are remembered per connection.
+    private func savedSessionKey(_ field: String) -> String {
+        "hermesSaved\(field).\(connection.id)"
+    }
+
     private enum Key: String {
+        case connection = "hermesConnection"
         case projectRoots = "hermesProjectRoots"
         case sessionDirectory = "hermesSessionDirectory"
         case launchDirectory = "hermesLaunchDirectory"

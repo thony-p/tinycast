@@ -114,8 +114,11 @@ private struct HermesHeader: View {
     private var subtitle: String {
         switch session.status {
         case .ready:
-            if let version = session.agentVersion { return "Connected · Hermes \(version)" }
-            return "Connected"
+            let placement = "filed in \(session.sessionLocationLabel)"
+            if let version = session.agentVersion {
+                return "Connected · Hermes \(version) · \(placement)"
+            }
+            return "Connected · \(placement)"
         default:
             return session.status.label
         }

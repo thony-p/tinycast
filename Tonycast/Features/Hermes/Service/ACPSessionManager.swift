@@ -49,7 +49,7 @@ final class ACPSessionManager {
     init(settings: HermesSettings, broker: ACPPermissionBroker = ACPPermissionBroker()) {
         self.settings = settings
         self.broker = broker
-        self.client = ACPClient(workingDirectory: settings.defaultWorkingDirectory)
+        self.client = ACPClient(workingDirectory: settings.launchDirectory)
     }
 
     // MARK: - Lifecycle
@@ -91,10 +91,10 @@ final class ACPSessionManager {
     }
 
     private func attachSession(forceNew: Bool = false) async throws {
-        let cwd = settings.defaultWorkingDirectory
+        let cwd = settings.sessionDirectory
         // Reattach only when the previous session ran in the same directory; a session's cwd is
         // fixed at creation, so resuming elsewhere would hand the agent a stale working root.
-        if !forceNew, let saved = settings.savedSessionID, settings.savedSessionCwd == cwd {
+        if !forceNew, settings.canReattach(to: cwd), let saved = settings.savedSessionID {
             do {
                 sessionID = try await client.loadSession(sessionID: saved, cwd: cwd)
                 status = .ready
@@ -109,6 +109,14 @@ final class ACPSessionManager {
         settings.savedSessionID = sessionID
         settings.savedSessionCwd = cwd
         status = .ready
+    }
+
+    /// Where this session is filed in Hermes' own sidebar: `Home` when it has no working
+    /// directory, otherwise the directory's name. Shown so placement is visible, not inferred.
+    var sessionLocationLabel: String {
+        let cwd = settings.sessionDirectory
+        guard !cwd.isEmpty else { return "Home" }
+        return (cwd as NSString).lastPathComponent
     }
 
     // MARK: - Turns

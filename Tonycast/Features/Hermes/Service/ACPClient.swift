@@ -173,7 +173,7 @@ actor ACPClient {
     func request(
         _ build: (Int) throws -> Data, timeout: Duration = ACPClient.defaultTimeout
     ) async throws -> JSONValue {
-        guard isRunning, let input else { throw ACPError.notRunning }
+        guard isRunning, input != nil else { throw ACPError.notRunning }
         let id = nextID
         nextID += 1
         let frame = try build(id)

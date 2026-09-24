@@ -458,14 +458,14 @@ A leading sign is swapped back into amount-first order, so `€20 to GBP` and `2
 The table is **generated except for the judgement calls**. `node Scripts/gen-currencies.js` joins three
 sources on the ISO code and emits `CurrencyData.generated.swift`:
 
-- **The fiat rate feed** decides which currencies exist — the same feed the rates come from, so the
+- **The rate feed** decides which currencies exist — the same feed the rates come from, so the
   table can never list something the app can't price.
 - **CLDR's supplemental currency data** decides which of those are still spent. The feed carries no
   retirement metadata and happily quotes codes their countries abandoned years ago, so a code CLDR
   marks live in some region is kept, a code CLDR retired everywhere is dropped, and a code CLDR never
   mentions is also kept — absence of evidence is not retirement, and that distinction is what
   preserves `CNH`, the metals, `XDR` and the Crown Dependencies' pounds, none of which are any
-  region's tender. 159 codes survive.
+  region's tender. 165 codes survive.
 - **CLDR** (`en`) decides what humans call them: display name, currency sign, singular/plural noun.
   Read from the pinned `cldr-json` checkout, not the host's `Intl`, whose output shifts with the
   local ICU version.
@@ -546,10 +546,11 @@ The fetch runs on a private **cacheless** `URLSession` (`.ephemeral`, `urlCache 
 
 One keyless endpoint serves fiat **and** crypto in a single table — `usd.json` from the
 `@fawazahmed0/currency-api` package on jsDelivr. It is already quoted the way the app models rates:
-units of each code per 1 USD, so `CurrencyFeed` uppercases the lowercase keys and drops anything
-that isn't a three-letter ISO code. That replaced two Raycast endpoints (a fiat feed and a separate
-coin feed whose inverse prices had to be flipped and merged); with one table there is no merge order
-to reason about and no partial-snapshot case to handle.
+units of each code per 1 USD, so `CurrencyFeed` uppercases the lowercase keys and keeps codes of three
+or four letters, because the app's own crypto table runs to four (`USDT`, `SHIB`, `DOGE`, `DASH`).
+That replaced two Raycast endpoints (a fiat feed and a separate coin feed whose inverse prices had to
+be flipped and merged); with one table there is no merge order to reason about and no partial-snapshot
+case to handle.
 
 The feed mixes ~80 crypto tickers into the same flat table as fiat, so the snapshot cannot tell
 money from a token by shape. `CurrencyData` is where that is decided: `Scripts/gen-currencies.js`
@@ -557,9 +558,10 @@ keeps a code only when CLDR knows it as a currency, or when it is on a short all
 CLDR never tracked (`CNH`, `XAU`, `XAG`, `XPT`, `XPD`, `XDR`, and the Crown Dependencies' pounds).
 Without that test the crypto the feed carries would surface as currencies in the calculator.
 
-A response under 4 KB is refused before decoding (`CurrencyRateStore.fetch`), because a truncated
-body must never replace a good cache. Any payload that decodes to no usable rate throws rather than
-returning an empty snapshot.
+The snapshot refuses a body that decodes to fewer than 150 usable rates (`CurrencyFeed.minimumRates`),
+because a truncated or stub body must never replace a good cache. Counting decoded rates rather than
+body bytes is deliberate: the feed quotes the base against itself, so a one-key body would clear a byte
+floor and blank the cache.
 
 The table is cached at `~/Library/Caches/<bundle-id>/currency-rates.json` and refreshed every 24h.
 The feed republishes about once a day, so a tighter interval would cost requests without returning

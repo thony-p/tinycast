@@ -864,28 +864,42 @@ struct CalcTests {
         expectNil("usd", region: "INR")
         expectNil("btc", region: "INR")
 
-        // The feed decoding, exercised the way the store hands it over
+        // The feed decoding, exercised the way the store hands it over. One table now: the fiat and
+        // coins arrive in the same payload, and a non-ISO key is dropped rather than becoming a code.
+        // `minimumRates: 0` because a fixture is not a 339-key production body; the floor is its own
+        // test below.
         expectSnapshot(
-            "fiat only", fiat: fiatJSON, crypto: nil,
-            expected: "USD=1 EUR=0.9 BTC=nil complete=false")
-        expectSnapshot(
-            "both feeds", fiat: fiatJSON, crypto: cryptoJSON,
-            expected: "USD=1 EUR=0.9 BTC=5e-05 complete=true")
-        // A coin payload quoted against another base is ignored rather than folded in wrongly
-        expectSnapshot(
-            "mismatched base", fiat: fiatJSON,
-            crypto: Data(#"{"success":true,"target":"EUR","rates":{"BTC":20000}}"#.utf8),
-            expected: "USD=1 EUR=0.9 BTC=nil complete=false")
-        expectSnapshotThrows("no quotes", fiat: Data(#"{"success":true,"source":"USD","quotes":{}}"#.utf8))
-        // A cached snapshot that prices no coin predates them, whatever its `fetchedAt` claims
-        let coinless = CurrencyRates(base: "USD", rates: ["EUR": 0.9], fetchedAt: clock.now)
-        check(
-            "a coin-less snapshot is rejected on load", expected: "false",
-            got: "\(CurrencyFeed.pricesCoins(coinless))")
-        check("the fixture prices coins", expected: "true", got: "\(CurrencyFeed.pricesCoins(fx))")
+            "one feed table", payload: fiatJSON,
+            expected: "USD=1 EUR=0.9 BTC=5e-05")
+        // The feed's own `"usd": 1` row must not count toward the floor, or a one-key body would
+        // satisfy it and blank a good cache. `minimumRates: 1` isolates that from "too few overall":
+        // the base row alone still throws, while one real rate beside it succeeds.
         expectSnapshotThrows(
-            "feed reported failure",
-            fiat: Data(#"{"success":false,"source":"USD","quotes":{"USDEUR":0.9}}"#.utf8))
+            "base row alone", payload: Data(#"{"date":"2026-09-23","usd":{"usd":1}}"#.utf8),
+            minimumRates: 1)
+        expectSnapshot(
+            "base row plus one real rate", payload: Data(#"{"date":"2026-09-23","usd":{"usd":1,"eur":0.9}}"#.utf8),
+            expected: "USD=1 EUR=0.9 BTC=nil", minimumRates: 1)
+        expectSnapshotThrows(
+            "unusable rates do not count", payload: Data(#"{"date":"2026-09-23","usd":{"usd":1,"eur":-1,"gbp":0}}"#.utf8),
+            minimumRates: 1)
+        expectSnapshotThrows(
+            "wrong shape", payload: Data(#"{"success":true,"source":"USD","quotes":{"USDEUR":0.9}}"#.utf8),
+            minimumRates: 1)
+        // The fixture's `btc` is three letters; the hand-written crypto table is mostly four
+        // (USDT, SHIB, DOGE, DASH, LUNA, AVAX), and one of those must not be filtered out. A
+        // three-letter-only filter would strand six of the app's own coins.
+        expectSnapshot(
+            "a four-letter coin survives the filter",
+            payload: Data(#"{"date":"2026-09-23","usd":{"usdt":1.0,"shib":60.0}}"#.utf8),
+            expected: "USD=1 EUR=nil BTC=nil", minimumRates: 0)
+        expectSnapshot(
+            "no letter count, no code",
+            payload: Data(#"{"date":"2026-09-23","usd":{"eur":0.9,"1inch":0.1,"x1234":7}}"#.utf8),
+            expected: "USD=1 EUR=0.9 BTC=nil", minimumRates: 0)
+        // The production floor: a sparse but valid body is refused.
+        expectSnapshotThrows(
+            "below the floor", payload: fiatJSON, minimumRates: CurrencyFeed.minimumRates)
 
         // Slashed rate spellings — the tokenizer keeps a known `unit/unit` whole
         expectDisplay("100 km/h to mph", "62.13711922 mph")
@@ -1745,13 +1759,11 @@ struct CalcTests {
             "KRW": 1330, "IDR": 18053, "CHF": 0.81, "AED": 3.6725, "SGD": 1.35,
             "BTC": 1.0 / 60_000, "ETH": 1.0 / 2_000, "SOL": 1.0 / 100, "DOGE": 10
         ],
-        fetchedAt: Date(timeIntervalSince1970: 1_785_000_000))
+        fetchedAt: Date(timeIntervalSince1970: 1_785_000_000), feedDate: "2026-09-23")
 
-    /// A pair whose base isn't the source and a nonsense rate, both of which must be dropped.
+    /// The single feed table: a real code, a non-ISO key that must be dropped, and a nonsense rate.
     static let fiatJSON = Data(
-        #"{"success":true,"source":"USD","quotes":{"USDEUR":0.9,"EURGBP":0.8,"USDBAD":-1}}"#.utf8)
-    /// Quoted the other way round — 1 BTC costs 20,000 USD, so the table stores 0.00005.
-    static let cryptoJSON = Data(#"{"success":true,"target":"USD","rates":{"BTC":20000}}"#.utf8)
+        #"{"date":"2026-09-23","usd":{"eur":0.9,"btc":0.00005,"bad":-1,"x1234":7}}"#.utf8)
 
     // MARK: - Helpers
 
@@ -1868,23 +1880,30 @@ struct CalcTests {
         check(label(query, region), expected: expected, got: result.expression)
     }
 
-    /// `CurrencyFeed` is handed the two payloads exactly as the store receives them.
-    static func expectSnapshot(_ name: String, fiat: Data, crypto: Data?, expected: String) {
-        guard let result = try? CurrencyFeed.snapshot(fiat: fiat, crypto: crypto, now: clock.now)
+    /// `CurrencyFeed` is handed the payload exactly as the store receives it: one flat table.
+    static func expectSnapshot(
+        _ name: String, payload: Data, expected: String, minimumRates: Int = 0
+    ) {
+        guard
+            let result = try? CurrencyFeed.snapshot(
+                payload: payload, now: clock.now, minimumRates: minimumRates)
         else {
             fail(name, expected: expected, got: "threw")
             return
         }
-        let show = { (code: String) in result.rates.rates[code].map(CalcFormatter.copyText) ?? "nil" }
+        let show = { (code: String) in result.rates[code].map(CalcFormatter.copyText) ?? "nil" }
         check(
             name, expected: expected,
-            got: "USD=\(show("USD")) EUR=\(show("EUR")) BTC=\(show("BTC")) "
-                + "complete=\(result.complete)")
+            got: "USD=\(show("USD")) EUR=\(show("EUR")) BTC=\(show("BTC"))")
     }
 
-    static func expectSnapshotThrows(_ name: String, fiat: Data) {
-        if let result = try? CurrencyFeed.snapshot(fiat: fiat, crypto: nil, now: clock.now) {
-            fail(name, expected: "throws", got: "\(result.rates.rates.count) rates")
+    static func expectSnapshotThrows(
+        _ name: String, payload: Data, minimumRates: Int = 0
+    ) {
+        if let result = try? CurrencyFeed.snapshot(
+            payload: payload, now: clock.now, minimumRates: minimumRates)
+        {
+            fail(name, expected: "throws", got: "\(result.rates.count) rates")
         } else {
             passes += 1
         }

@@ -498,10 +498,9 @@ it implies is carried here instead, with CLDR as its source. The standard code a
 
 `CalcCurrency.crypto` is the third hand-written table, and the only one with no external source at
 all: no standards body names a coin, and the feed silently omits any symbol it can't price, so it
-can't even report which exist. The list is therefore a product choice — and it is also the symbol
-list the fetch asks for, since `CurrencyRateStore` builds its request from `cryptoCodes`. The two
-cannot drift apart. A symbol the feed drops reports `No exchange rate for <CODE>.`, exactly like an
-unquoted fiat code, and starts working again on its own if the feed picks it back up.
+can't even report which exist. The list is therefore a product choice. A symbol the feed drops
+reports `No exchange rate for <CODE>.`, exactly like an unquoted fiat code, and starts working again
+on its own if the feed picks it back up.
 
 Coins join the same `byName` table as `CurrencyDef`s, so every existing path — the sign tokenizer,
 the `BTC1K` prefix split, `parseConversion`, typed arithmetic — works on them unchanged. They are
@@ -543,27 +542,24 @@ erroring about a code the user never typed — an unresolvable region still name
 ### Exchange rates
 
 The fetch runs on a private **cacheless** `URLSession` (`.ephemeral`, `urlCache = nil`) rather than
-`URLSession.shared`, so `currency-rates.json` stays the only copy on disk. The feed serves the table
-`Cache-Control: public, max-age=…`, so the shared session would keep a second copy in the on-disk
-`URLCache` that deleting the snapshot doesn't touch.
+`URLSession.shared`, so `currency-rates.json` stays the only copy on disk.
 
-Rates come from `CurrencyRateStore` (`Calculator/Service/`, owned by `AppCore`), which issues two
-requests concurrently: the fiat table, keyed `<base><code>` with the base's own row omitted, and the
-coin table, which quotes the **inverse** — one coin priced in the base. `CurrencyFeed` folds both
-into the single units-per-base map `CurrencyRates` stores, inverting the coins on the way in and
-merging them last so a symbol both feeds quote takes the coin feed's own price. One flat table means
-`convert(_:from:to:)` cross-rates fiat against crypto with no special case anywhere downstream.
+One keyless endpoint serves fiat **and** crypto in a single table — `usd.json` from the
+`@fawazahmed0/currency-api` package on jsDelivr. It is already quoted the way the app models rates:
+units of each code per 1 USD, so `CurrencyFeed` uppercases the lowercase keys and drops anything
+that isn't a three-letter ISO code. That replaced two Raycast endpoints (a fiat feed and a separate
+coin feed whose inverse prices had to be flipped and merged); with one table there is no merge order
+to reason about and no partial-snapshot case to handle.
 
-The fiat half is required; the coins are best-effort. A run that misses them still answers for the
-session but is **not** written to disk, and retries in **30 minutes** rather than waiting out the day.
-Both halves of that follow from the store scheduling off the newest _whole_ snapshot rather than off
-whatever `rates` currently holds: a partial one answers without resetting the clock, so it can neither
-park the loop for a day nor be reloaded at launch as though it were complete.
+The feed mixes ~80 crypto tickers into the same flat table as fiat, so the snapshot cannot tell
+money from a token by shape. `CurrencyData` is where that is decided: `Scripts/gen-currencies.js`
+keeps a code only when CLDR knows it as a currency, or when it is on a short allowlist of real money
+CLDR never tracked (`CNH`, `XAU`, `XAG`, `XPT`, `XPD`, `XDR`, and the Crown Dependencies' pounds).
+Without that test the crypto the feed carries would surface as currencies in the calculator.
 
-The same rule absorbs a cached snapshot written before crypto existed. It still prices fiat, so it is
-served rather than discarded — but it counts as no age at all, so the store re-fetches immediately
-instead of trusting a `fetchedAt` that says the table is hours fresh. `CurrencyFeed.pricesCoins` is
-that test, and it is sound only because a partial snapshot is never persisted.
+A response under 4 KB is refused before decoding (`CurrencyRateStore.fetch`), because a truncated
+body must never replace a good cache. Any payload that decodes to no usable rate throws rather than
+returning an empty snapshot.
 
 The table is cached at `~/Library/Caches/<bundle-id>/currency-rates.json` and refreshed every 24h.
 The feed republishes about once a day, so a tighter interval would cost requests without returning

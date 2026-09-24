@@ -1,55 +1,60 @@
 import Foundation
 
-/// Decodes the rate feeds into one snapshot. Pure, so the harness covers it; the store does the IO.
+/// Decodes the rate feed into one snapshot. Pure, so the harness covers it; the store does the IO.
 enum CurrencyFeed {
-    /// Fiat quotes are keyed `<base><code>` and omit the base's own row.
-    private struct FiatPayload: Decodable {
-        let success: Bool
-        let source: String
-        let quotes: [String: Double]
-    }
-
-    /// Crypto is quoted the other way round — one unit costs this much of `target`.
-    private struct CryptoPayload: Decodable {
-        let success: Bool
-        let target: String
+    /// One base, one flat map: 1 unit of `base` buys this many of each code.
+    private struct Payload: Decodable {
+        /// The feed's own publish date, `YYYY-MM-DD`; a CDN can serve a copy a day old.
+        let date: String?
         let rates: [String: Double]
+
+        enum CodingKeys: String, CodingKey {
+            case date
+            case rates = "usd"
+        }
     }
 
-    /// One units-per-base table from both feeds; `complete` is false when the coins didn't land.
+    /// The endpoint is `.../currencies/usd.json`, so the base is fixed by the URL, not the payload.
+    static let base = "USD"
+
+    /// The feed serves 339 keys; below this a body is a CDN stub or error object, not a snapshot.
+    static let minimumRates = 150
+
+    /// One units-per-`base` table, or a throw. `minimumRates` lets a fixture skip 150 real rates.
     static func snapshot(
-        fiat: Data, crypto: Data?, now: Date
-    ) throws -> (rates: CurrencyRates, complete: Bool) {
-        let payload = try JSONDecoder().decode(FiatPayload.self, from: fiat)
-        let base = payload.source
-        guard payload.success, base.count == 3 else { throw URLError(.cannotParseResponse) }
+        payload: Data, now: Date, minimumRates: Int = CurrencyFeed.minimumRates
+    ) throws -> CurrencyRates {
+        let decoded = try JSONDecoder().decode(Payload.self, from: payload)
 
         var rates: [String: Double] = [:]
-        rates.reserveCapacity(payload.quotes.count + 1)
-        for (pair, rate) in payload.quotes where usable(rate) {
-            guard pair.count == 6, pair.hasPrefix(base) else { continue }
-            rates[String(pair.dropFirst(3))] = rate
+        rates.reserveCapacity(decoded.rates.count)
+        // Fiat codes are three letters; the hand-written crypto table runs to four (USDT, SHIB).
+        for (code, rate) in decoded.rates {
+            let upper = code.uppercased()
+            // A base quoted against itself would let a one-key body clear the floor below.
+            guard upper != base, (3...4).contains(upper.count), upper.allSatisfy(\.isLetter),
+                usable(rate)
+            else { continue }
+            rates[upper] = rate
         }
-        guard !rates.isEmpty else { throw URLError(.cannotParseResponse) }
+        guard rates.count >= minimumRates else { throw URLError(.cannotParseResponse) }
+        // Set last, so the base is the one the endpoint names rather than anything the feed claims.
         rates[base] = 1
 
-        var coins = 0
-        // Last, so the coin feed's own price wins for a symbol the fiat table also quotes.
-        if let crypto, let payload = try? JSONDecoder().decode(CryptoPayload.self, from: crypto),
-            payload.success, payload.target == base
-        {
-            for (code, price) in payload.rates where usable(price) && usable(1 / price) {
-                rates[code] = 1 / price
-                coins += 1
-            }
-        }
-
-        return (CurrencyRates(base: base, rates: rates, fetchedAt: now), coins > 0)
+        return CurrencyRates(base: base, rates: rates, fetchedAt: now, feedDate: decoded.date)
     }
 
-    /// Only whole snapshots are persisted, so a cached one pricing no coin predates them entirely.
-    static func pricesCoins(_ snapshot: CurrencyRates) -> Bool {
-        CalcCurrency.cryptoCodes.contains { snapshot.rates[$0] != nil }
+    /// Older than this, a served snapshot is not trusted for another full interval.
+    static let staleAfter: TimeInterval = 48 * 3600
+
+    /// The feed's publish date as an instant, or nil when it is absent or unparseable.
+    static func publishedAt(_ feedDate: String?) -> Date? {
+        guard let feedDate else { return nil }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.date(from: feedDate)
     }
 
     private static func usable(_ rate: Double) -> Bool {

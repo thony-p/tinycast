@@ -179,7 +179,7 @@ node Scripts/gen-countries.js        # -> Tonycast/Features/Calculator/Model/Cou
 `gen-countries.js` joins IANA's `zone.tab` with CLDR's `en` territory names on the ISO 3166 code. Re-run
 it when IANA adds or moves a country's zone; see [calculator.md](features/calculator.md#time-zones).
 
-`gen-currencies.js` joins three sources on the ISO code: the **fiat rate feed**'s own quote list — the
+`gen-currencies.js` joins three sources on the ISO code: the **rate feed**'s own quote list — the
 same feed `CurrencyRateStore` fetches rates from, so the table and the rate source cannot drift apart
 — **Unicode CLDR**'s `en` currency data, which supplies display names, signs and the singular/plural
 noun, and **CLDR's supplemental currency data**, which says which codes are still spent anywhere. That

@@ -115,7 +115,7 @@ function ClipboardPreview() {
       <li className="flex items-center gap-2.5 rounded-lg bg-tint/8 px-2 py-1.5">
         <IconTile icon={FileText} tint="rgb(120 120 128 / 0.6)" />
         <span className="truncate font-mono text-caption text-fg">
-          brew install --cask tinycast
+          brew install --cask tonycast
         </span>
       </li>
       <li className="flex items-center gap-2.5 rounded-lg px-2 py-1.5">

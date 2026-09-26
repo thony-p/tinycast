@@ -38,7 +38,7 @@ enum ClipboardSelectionBenchmark {
 
     static func fixtures() throws -> URL {
         let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("tinycast-file-benchmark-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("tonycast-file-benchmark-\(UUID().uuidString)", isDirectory: true)
         let durable = directory.appendingPathComponent("durable", isDirectory: true)
         let volatile = directory.appendingPathComponent("volatile", isDirectory: true)
         try FileManager.default.createDirectory(at: durable, withIntermediateDirectories: true)

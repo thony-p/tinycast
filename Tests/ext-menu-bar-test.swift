@@ -7,7 +7,7 @@ extension ExtensionTests {
         _ = NSApplication.shared
         NSApp.setActivationPolicy(.accessory)
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "tinycast-live-menu-\(UUID())")
+            "tonycast-live-menu-\(UUID())")
         defer { try? FileManager.default.removeItem(at: directory) }
         let storage = ExtensionStorage(directory: directory.appendingPathComponent("storage"))
         for (key, value) in environmentPreferences() {
@@ -81,7 +81,7 @@ extension ExtensionTests {
     @MainActor
     static func menuBarRenderingChecks() async {
         let controller = ExtensionMenuBarController(
-            entryID: "tinycast-fixture-rendering", assetsPath: "/tmp", isVisible: false)
+            entryID: "tonycast-fixture-rendering", assetsPath: "/tmp", isVisible: false)
         defer { controller.remove() }
         controller.menuWillOpen(controller.menu)
         check("opening callback does not change menu structure", controller.menu.items.isEmpty)
@@ -173,7 +173,7 @@ extension ExtensionTests {
     @MainActor
     static func menuBarPendingActionChecks() {
         let controller = ExtensionMenuBarController(
-            entryID: "tinycast-fixture-pending-action", assetsPath: "/tmp",
+            entryID: "tonycast-fixture-pending-action", assetsPath: "/tmp",
             isVisible: false)
         defer { controller.remove() }
         var dispatched: [String] = []
@@ -303,7 +303,7 @@ extension ExtensionTests {
     static func menuBarImageChecks() async {
         var pending: [CheckedContinuation<NSImage?, Never>] = []
         let controller = ExtensionMenuBarController(
-            entryID: "tinycast-fixture-slow-image", assetsPath: "/tmp",
+            entryID: "tonycast-fixture-slow-image", assetsPath: "/tmp",
             isVisible: false,
             loadImage: { _, _, _ in
                 await withCheckedContinuation { pending.append($0) }
@@ -354,7 +354,7 @@ extension ExtensionTests {
 
         var attempts: [CGFloat: Int] = [:]
         let retry = ExtensionMenuBarController(
-            entryID: "tinycast-fixture-retry-image", assetsPath: "/tmp",
+            entryID: "tonycast-fixture-retry-image", assetsPath: "/tmp",
             isVisible: false,
             loadImage: { _, _, size in
                 attempts[size, default: 0] += 1
@@ -478,7 +478,7 @@ extension ExtensionTests {
         await menuBarImageChecks()
         await lateMenuResponseChecks()
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "tinycast-menu-\(UUID())")
+            "tonycast-menu-\(UUID())")
         defer { try? FileManager.default.removeItem(at: directory) }
         let storage = ExtensionStorage(directory: directory.appendingPathComponent("storage"))
         let source = #"""

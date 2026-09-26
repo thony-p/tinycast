@@ -19,7 +19,7 @@ command -v xcode-build-server >/dev/null || { echo "xcode-build-server not insta
 
 # A build that compiled no Swift emits no compile commands, and parsing it would replace .compile with
 # an empty database — every file loses its flags. Keep the previous one in that case.
-backup="${TMPDIR:-/tmp}/tinycast-compile.bak"
+backup="${TMPDIR:-/tmp}/tonycast-compile.bak"
 [ -f .compile ] && cp .compile "$backup"
 
 xcode-build-server parse < "$LOG" >/dev/null 2>&1

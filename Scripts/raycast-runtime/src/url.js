@@ -240,7 +240,7 @@ export class URL {
   }
 }
 
-// Tinycast runs only on macOS, so Node's Windows path override is deliberately out of scope.
+// Tonycast runs only on macOS, so Node's Windows path override is deliberately out of scope.
 export function fileURLToPath(input, options = {}) {
   let parsed;
   if (typeof input === "string") {
@@ -265,7 +265,7 @@ export function fileURLToPath(input, options = {}) {
     throw nodeTypeError("ERR_INVALID_URL", "Invalid URL");
   }
   if (options?.windows) {
-    throw new Error("Windows file paths are not supported in Tinycast extensions.");
+    throw new Error("Windows file paths are not supported in Tonycast extensions.");
   }
   const hostname = decodedFileHostname(parsed.hostname);
   if (hostname !== "" && hostname.toLowerCase() !== "localhost") {

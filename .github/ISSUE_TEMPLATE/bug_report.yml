@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug running Tinycast
+description: Report a bug running Tonycast
 title: "[Bug]: "
 labels: ["bug"]
 body:
@@ -39,7 +39,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Tinycast version + channel
+      label: Tonycast version + channel
       placeholder: 0.1.0 stable
     validations:
       required: true

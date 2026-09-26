@@ -90,8 +90,8 @@ fs.appendFileSync(
 
 /** One MCP call, from the item that names it to the elicitation that gates it. */
 function toolCall(index, read) {
-    // `mcp-foreign` asks on behalf of the reader's own `probe`, which Tinycast must never answer.
-    const server = MODE === "mcp-foreign" ? "probe" : "tinycast-probe";
+    // `mcp-foreign` asks on behalf of the reader's own `probe`, which Tonycast must never answer.
+    const server = MODE === "mcp-foreign" ? "probe" : "tonycast-probe";
     const item = {
         type: "mcpToolCall",
         id: `call-${index}`,
@@ -139,7 +139,7 @@ function toolCall(index, read) {
 function toolPair(read) {
     const tools = ["first_tool", "second_tool"];
     const items = tools.map((tool, index) => ({
-        type: "mcpToolCall", id: `call-${index + 1}`, server: "tinycast-probe", tool,
+        type: "mcpToolCall", id: `call-${index + 1}`, server: "tonycast-probe", tool,
         status: "inProgress", arguments: {},
     }));
     for (const item of items) emit({ method: "item/started", params: { threadId: THREAD, item } });
@@ -147,7 +147,7 @@ function toolPair(read) {
         id: 900 + index,
         method: "mcpServer/elicitation/request",
         params: {
-            serverName: "tinycast-probe", threadId: THREAD, turnId: TURN,
+            serverName: "tonycast-probe", threadId: THREAD, turnId: TURN,
             message: `Allow the probe MCP server to run tool “${tool}”?`,
             _meta: { codex_approval_kind: "mcp_tool_call", tool_name: tool },
         },

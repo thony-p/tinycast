@@ -3,7 +3,7 @@ title: Clipboard history
 description: Text, images, files and colors you copied, searchable and pasted back where you came from.
 ---
 
-Tinycast keeps what you copy, so you can find it again and paste it back into the app you were
+Tonycast keeps what you copy, so you can find it again and paste it back into the app you were
 using.
 
 Clipboard history is the one feature that ships **on**. **Settings → Clipboard → Enable Clipboard
@@ -15,7 +15,7 @@ Clipboard History command and its shortcut go away. What you already saved stays
 
 - <kbd>tab</kbd> from the launcher (after AI Chat, if AI is on).
 - The **Clipboard History** command, or its global shortcut in **Settings → Clipboard**.
-- **Clipboard History** in the Tinycast menu bar menu.
+- **Clipboard History** in the Tonycast menu bar menu.
 
 The footer names where a paste will land, like "Paste to Notes", so you always know the target.
 
@@ -45,7 +45,7 @@ the drop lands, the palette closes, just like a paste.
 
 - **Text**, with a preview.
 - **Images**, like screenshots, stored as PNG files.
-- **Files you copy in Finder.** Tinycast saves a reference to the file where it is, never a copy. Up
+- **Files you copy in Finder.** Tonycast saves a reference to the file where it is, never a copy. Up
   to 32 files per copy are recorded. Pasting gives apps the file itself, and gives text fields its
   path.
 - **Colors.** A copied `#FF5733`, `rgb(…)` or `hsl(…)` shows as a swatch.
@@ -88,11 +88,11 @@ ending, so `Safari.app`, `report.pdf` and `index.html` stay text.
 
 ## Searching text inside images and PDFs
 
-**Search text in images and PDFs** is **off** by default. Turn it on and Tinycast reads the text in
+**Search text in images and PDFs** is **off** by default. Turn it on and Tonycast reads the text in
 your copied images, image files and PDFs, so a search for a word in a screenshot finds it.
 
 - It happens **on your Mac**, while you are not typing or moving the mouse, one item at a time.
-- It runs in a separate helper process, so Tinycast itself stays light.
+- It runs in a separate helper process, so Tonycast itself stays light.
 - It covers files up to 32 MB and the first 64 pages of a PDF.
 - The recognized text is only used for search. Pasting still gives you the original.
 - Turning it off stops the work. Text already recognized is kept and reused if you turn it back on.
@@ -113,16 +113,16 @@ This setting is not included in [backups](/docs/reference/backup).
 | Disabled Applications          | A list of apps                                                    | Keychain Access, Passwords |
 | Clear history                  | Removes every saved clip and image                                | —                          |
 
-**Disabled Applications** starts with Keychain Access and Passwords, so Tinycast never records what
+**Disabled Applications** starts with Keychain Access and Passwords, so Tonycast never records what
 you copy out of a password manager. Add your own. Copies that apps mark as secret are skipped too.
 
 ## Limits worth knowing
 
-History lives in `clipboard.sqlite3`, with images beside it, in Tinycast's Application Support folder.
+History lives in `clipboard.sqlite3`, with images beside it, in Tonycast's Application Support folder.
 It is there, not in Caches, so Time Machine backs it up and macOS never clears it behind your back.
 
-- Tinycast checks the clipboard twice a second. Its own pastes are marked and skipped, so pasting
-  from Tinycast never adds a new entry.
+- Tonycast checks the clipboard twice a second. Its own pastes are marked and skipped, so pasting
+  from Tonycast never adds a new entry.
 - The newest **1,000** entries are kept ready in memory. Search reaches further back.
 - **Search needs at least three characters** to use the full index. Shorter searches look through
   the recent entries in memory.

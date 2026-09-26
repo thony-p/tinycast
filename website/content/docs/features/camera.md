@@ -21,7 +21,7 @@ where you can give it a global shortcut and an alias.
 Clicking anywhere outside the preview closes it too.
 
 **What you see is what you get.** Mirroring flips the photo as well as the preview, so the photo
-always matches what you framed. Tinycast remembers the Mirror choice until you quit.
+always matches what you framed. Tonycast remembers the Mirror choice until you quit.
 
 The photo lands in your [clipboard history](/docs/features/clipboard) like any other image.
 

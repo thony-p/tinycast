@@ -3,10 +3,10 @@ title: Calendar & meetings
 description: Join the next meeting with one key, see your day, and keep the next event in the menu bar.
 ---
 
-Tinycast reads the calendars already on your Mac, finds the join link in each meeting, and puts it
+Tonycast reads the calendars already on your Mac, finds the join link in each meeting, and puts it
 one keystroke away. It works with any calendar macOS knows about, like iCloud, Google or Exchange.
 
-**Settings → Calendar → Join meetings from Tinycast** holds the switch. It ships **off**. Turning it
+**Settings → Calendar → Join meetings from Tonycast** holds the switch. It ships **off**. Turning it
 on explains what it reads, then macOS asks for calendar access. See [Permissions](/docs/permissions#calendars).
 
 Events are read on your Mac. **Nothing leaves it.**
@@ -37,7 +37,7 @@ A meeting with no link opens in Calendar instead.
 
 ## Which links it finds
 
-Tinycast looks in the event's URL, location and notes, in that order. It knows **Zoom**,
+Tonycast looks in the event's URL, location and notes, in that order. It knows **Zoom**,
 **Google Meet**, **Microsoft Teams**, **Webex**, **Jitsi**, **Whereby**, **Amazon Chime**,
 **GoTo Meeting**, **BlueJeans** and **Skype**, and falls back to any other web link in the event.
 
@@ -100,7 +100,7 @@ the preview opens and off as soon as it closes. It uses the same camera screen a
 
 ## The menu bar
 
-The calendar gets its **own** menu bar item, separate from the Tinycast icon. You can show either,
+The calendar gets its **own** menu bar item, separate from the Tonycast icon. You can show either,
 both or neither.
 
 | Setting                        | Options                                                                  | Default                          |

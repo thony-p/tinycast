@@ -1,6 +1,6 @@
 ---
 title: What works
-description: What Tinycast supports from the Raycast API, how well it works in practice, and the known gaps.
+description: What Tonycast supports from the Raycast API, how well it works in practice, and the known gaps.
 ---
 
 ## How well it works
@@ -30,7 +30,7 @@ published extensions work too.
 **Signing in with OAuth.** `OAuth.PKCEClient` works with all three of Raycast's redirect methods.
 Tokens are kept in your login Keychain, one set per extension, and removed when you uninstall it.
 
-To catch the redirect, Tinycast registers the `raycast://` link type. If Raycast is also installed,
+To catch the redirect, Tonycast registers the `raycast://` link type. If Raycast is also installed,
 macOS picks which app gets those links. A sign-in that never comes back gives up after five minutes.
 
 **Node built-ins.** `path`, `fs` and `fs/promises`, `os`, `child_process`, `crypto`, `zlib`,
@@ -48,9 +48,9 @@ the palette closed. A `no-view` command with an `interval` can refresh on a sche
 `menu-bar` commands draw native menu items and refresh on their manifest interval, holding no
 JavaScript between runs; see [Menu bar commands](/docs/extensions#menu-bar-commands).
 
-**`raycast://` links** stay inside Tinycast. A link to an installed extension command runs that
+**`raycast://` links** stay inside Tonycast. A link to an installed extension command runs that
 command — from another app or the browser as well as from inside an extension — with its `arguments`,
-`fallbackText` and `launchType` honored, and `tinycast://` works the same way. Anything else reopens
+`fallbackText` and `launchType` honored, and `tonycast://` works the same way. Anything else reopens
 the palette. Passing them on would launch Raycast itself.
 
 ## Not supported yet

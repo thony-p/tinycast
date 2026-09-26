@@ -58,7 +58,7 @@ before the placeholders are resolved.
 
 ## Placeholders
 
-Quicklinks reuse Tinycast's one template engine — the same
+Quicklinks reuse Tonycast's one template engine — the same
 [`SnippetTemplateEngine`](snippets.md#template-tokens) snippets use, so every token and every modifier
 is available and there is no second parser to keep in sync. `{cursor}` and `{snippet:…}` are text
 concerns with nothing to resolve against in a destination, so they are left literal.
@@ -153,7 +153,7 @@ frontmost tab; that is what "prefer existing tabs" means, so it is the same swit
 second one.
 
 Every failure — unresolvable link, missing file, missing app, refused open — reports through
-Tinycast's own dialog and leaves no partial state.
+Tonycast's own dialog and leaves no partial state.
 
 ## Search and pinning
 
@@ -239,7 +239,7 @@ Unlike `snippetsEnabled`, `quicklinksEnabled` grants no permission class and ena
 excluding it would be cargo-culting.
 
 The encrypted `.rayconfig` flow in **Settings → Backup** can import Raycast's quicklinks as an
-independently selectable category. Tinycast reads `name`, `link`, `createdAt` and the optional
+independently selectable category. Tonycast reads `name`, `link`, `createdAt` and the optional
 `openWith` / `applicationId` from the export's `quicklinks.quicklinks` collection, resolving an app
 path through `openWithPlatforms` when the field is a platform id. Invalid entries are skipped; valid
 entries merge into the existing library the same way **Import Quicklinks** does. Importing at least

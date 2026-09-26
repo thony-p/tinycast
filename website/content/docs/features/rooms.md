@@ -52,13 +52,13 @@ its own choice.
 | Custom      | Your own side-by-side arrangement, snapped to a grid with even gaps      |
 | As Arranged | Exactly where you placed the windows                                     |
 
-Arrange the windows by hand and choose **Remember Arrangement**: Tinycast recognises the layout and
+Arrange the windows by hand and choose **Remember Arrangement**: Tonycast recognises the layout and
 tidies it, or keeps your arrangement exactly. Apps that refuse to shrink are measured as you go, so
 the layouts make room for them.
 
 ## Getting everything back
 
-Quitting Tinycast, turning Window Management off, or opening Tinycast again after a crash brings
+Quitting Tonycast, turning Window Management off, or opening Tonycast again after a crash brings
 every parked window back: each one's way home is written to disk before it moves. Turning Window
 Management off inside a room also shows the apps it hid.
 

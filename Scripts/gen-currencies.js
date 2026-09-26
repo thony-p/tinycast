@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generate Tinycast/Features/Calculator/Model/CurrencyData.generated.swift.
+// Generate Tonycast/Features/Calculator/Model/CurrencyData.generated.swift.
 //
 // Usage: node Scripts/gen-currencies.js [rates.json cldr-currencies.json cldr-currency-data.json]
 // Downloads the sources when paths aren't given. Run occasionally, commit the output.
@@ -157,7 +157,7 @@ async function main() {
   for (const [sign, code] of unambiguous(narrowClaims)) if (!signs.has(sign)) signs.set(sign, code);
   const aliases = unambiguous(wordClaims);
 
-  const out = path.resolve(__dirname, "..", "Tinycast/Features/Calculator/Model/CurrencyData.generated.swift");
+  const out = path.resolve(__dirname, "..", "Tonycast/Features/Calculator/Model/CurrencyData.generated.swift");
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(
     out,

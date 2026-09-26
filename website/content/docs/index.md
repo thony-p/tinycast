@@ -1,9 +1,9 @@
 ---
 title: Getting started
-description: What Tinycast is, and the few minutes it takes to set up.
+description: What Tonycast is, and the few minutes it takes to set up.
 ---
 
-Tinycast is a small, native launcher for macOS. It lives in your menu bar. Press your shortcut, a
+Tonycast is a small, native launcher for macOS. It lives in your menu bar. Press your shortcut, a
 palette floats in over whatever you are doing, you type, and it gets out of the way.
 
 It is built with SwiftUI and AppKit, with zero third-party dependencies, and it stays under 100 MB of
@@ -11,12 +11,12 @@ memory. There is no Electron, no account, no sign-in and no telemetry.
 
 ## Set it up
 
-The first time Tinycast opens, a short welcome takes you through these steps. You can skip any of
+The first time Tonycast opens, a short welcome takes you through these steps. You can skip any of
 them and come back later.
 
 ### 1. Pick a shortcut
 
-**Tinycast ships with no shortcut bound.** Nothing happens until you choose one. That is on purpose:
+**Tonycast ships with no shortcut bound.** Nothing happens until you choose one. That is on purpose:
 a launcher should never grab a key combination you already use.
 
 The welcome screen asks for one. Later you can change it in **Settings → General → App Launcher**:
@@ -25,16 +25,16 @@ click the field, then press the keys you want. <kbd>⌥</kbd><kbd>Space</kbd> is
 You can also use a double-tap of one modifier key, like pressing <kbd>⌘</kbd> twice. See
 [Hotkeys](/docs/reference/hotkeys).
 
-The same step has a **Launch at login** switch, so Tinycast is ready after a restart.
+The same step has a **Launch at login** switch, so Tonycast is ready after a restart.
 
 ### 2. Allow pasting (optional)
 
-Tinycast asks for Accessibility so it can paste a clip or an emoji back into the app you came from.
+Tonycast asks for Accessibility so it can paste a clip or an emoji back into the app you came from.
 The launcher itself needs no permission. See [Permissions](/docs/permissions).
 
 ### 3. Bring your Raycast setup (optional)
 
-If you used Raycast, pick its `.rayconfig` export. Tinycast brings your shortcuts, favorites,
+If you used Raycast, pick its `.rayconfig` export. Tonycast brings your shortcuts, favorites,
 snippets, quicklinks and clipboard history across. See
 [Import from Raycast](/docs/reference/import-from-raycast).
 
@@ -68,4 +68,4 @@ see every other action for what is selected, and <kbd>esc</kbd> to go back.
 <kbd>⌘</kbd><kbd>K</kbd> matters more than it sounds. Every screen lists all of its actions there,
 with the shortcut for each one printed beside it. It is the fastest way to learn the app.
 
-Next: [the palette](/docs/palette), or [install Tinycast](/docs/install) if you have not yet.
+Next: [the palette](/docs/palette), or [install Tonycast](/docs/install) if you have not yet.

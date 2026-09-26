@@ -51,15 +51,15 @@ struct ExtensionCleanupTests {
         let (roots, base) = makeRoots()
         defer { try? FileManager.default.removeItem(at: base) }
 
-        makeDirectory(roots.temp, "tinycast-install-ABC123")
-        makeDirectory(roots.temp, "tinycast-install-DEF456")
+        makeDirectory(roots.temp, "tonycast-install-ABC123")
+        makeDirectory(roots.temp, "tonycast-install-DEF456")
         makeDirectory(roots.temp, "keep-me")
         makeFile(roots.temp, "unrelated.txt")
 
         ExtensionCleanup.sweepWorkspaces(in: roots.temp)
 
-        expect(!exists(roots.temp, "tinycast-install-ABC123"), "a stale workspace is swept")
-        expect(!exists(roots.temp, "tinycast-install-DEF456"), "every stale workspace is swept")
+        expect(!exists(roots.temp, "tonycast-install-ABC123"), "a stale workspace is swept")
+        expect(!exists(roots.temp, "tonycast-install-DEF456"), "every stale workspace is swept")
         expect(exists(roots.temp, "keep-me"), "another app's directory survives")
         expect(exists(roots.temp, "unrelated.txt"), "an unrelated file survives")
     }
@@ -73,7 +73,7 @@ struct ExtensionCleanupTests {
         makeDirectory(roots.support, "speedtest")
         makeFile(roots.data, "kill-process.json")
         makeFile(roots.data, "speedtest.json")
-        makeDirectory(roots.temp, "tinycast-install-STRAY")
+        makeDirectory(roots.temp, "tonycast-install-STRAY")
 
         let report = ExtensionCleanup.clean(installed: ["kill-process"], in: roots)
 
@@ -81,7 +81,7 @@ struct ExtensionCleanupTests {
         expect(exists(roots.data, "kill-process.json"), "an installed extension keeps its data")
         expect(!exists(roots.support, "speedtest"), "an orphaned scratch dir goes")
         expect(!exists(roots.data, "speedtest.json"), "an orphaned data file goes")
-        expect(!exists(roots.temp, "tinycast-install-STRAY"), "a stray workspace goes")
+        expect(!exists(roots.temp, "tonycast-install-STRAY"), "a stray workspace goes")
         expect(report.items == 3, "the report counts every removal: \(report.items)")
         expect(report.bytes > 0, "the report measures what it freed: \(report.bytes)")
     }

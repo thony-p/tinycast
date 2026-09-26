@@ -19,7 +19,7 @@ struct CodexTurnTests {
     static func main() async {
         await stopBeforeTurnStartedStillInterrupts()
         await aTurnNamedTwiceIsInterruptedOnce()
-        await tinycastsServersAreLaunchedAndTheUsersOwnAreNot()
+        await tonycastsServersAreLaunchedAndTheUsersOwnAreNot()
         await anElicitationIsAnsweredByTheTrustDialog()
         await aRefusedCallIsAFailedRowAndAnHonestReply()
         await aForeignServersElicitationIsNeverAsked()
@@ -42,7 +42,7 @@ struct CodexTurnTests {
     }
 
     /// The launch is the boundary: ours named, the reader's disabled, their config never written.
-    static func tinycastsServersAreLaunchedAndTheUsersOwnAreNot() async {
+    static func tonycastsServersAreLaunchedAndTheUsersOwnAreNot() async {
         guard let server = StubServer(mode: "mcp") else {
             expect(false, "the stub app-server installs")
             return
@@ -55,13 +55,13 @@ struct CodexTurnTests {
         turn.cancel()
 
         let argv = server.argv
-        let key = "mcp_servers.tinycast-probe"
+        let key = "mcp_servers.tonycast-probe"
         expect(
             argv.contains(#"\#(key).command="/bin/sh""#)
                 && argv.contains {
                     $0.hasPrefix("\(key).args=") && $0.hasSuffix(#""/bin/echo","probe"]"#)
                 },
-            "Tinycast's server is on the launch line under its own name, behind the renaming shell")
+            "Tonycast's server is on the launch line under its own name, behind the renaming shell")
         expect(
             argv.contains(#"\#(key).default_tools_approval_mode="prompt""#),
             "in the mode that asks for every tool, so one marked read-only cannot run unasked")
@@ -72,7 +72,7 @@ struct CodexTurnTests {
         expect(
             argv.contains("mcp_servers.probe.enabled=false")
                 && !argv.contains { $0.hasPrefix("mcp_servers.probe.") && !$0.hasSuffix("=false") },
-            "including the reader's own `probe`, which Tinycast's `probe` never merges into")
+            "including the reader's own `probe`, which Tonycast's `probe` never merges into")
         expect(
             server.listArgv.contains("mcp") && server.listArgv.contains("--json"),
             "which were read by a short-lived `mcp list`, so none of them ever started")
@@ -94,7 +94,7 @@ struct CodexTurnTests {
             "the thread asks before a tool runs, rather than refusing every call")
     }
 
-    /// A reader's server Tinycast cannot switch off would start inside the chat, so none do.
+    /// A reader's server Tonycast cannot switch off would start inside the chat, so none do.
     static func aListThatCannotBeReadRefusesToStart() async {
         let cases = [
             ("list-fails", "could not read which MCP servers"),
@@ -227,7 +227,7 @@ struct CodexTurnTests {
         let finished = await turn.value
         expect(
             finished && server.launches == 1
-                && server.argv.contains { $0.hasPrefix("mcp_servers.tinycast-probe.") },
+                && server.argv.contains { $0.hasPrefix("mcp_servers.tonycast-probe.") },
             "a status check during a turn's launch joins it, and the turn keeps its servers")
     }
 
@@ -333,7 +333,7 @@ struct CodexTurnTests {
             "and its completion settles that row")
     }
 
-    /// Consent is for Tinycast's servers; a question about any other is declined, never asked.
+    /// Consent is for Tonycast's servers; a question about any other is declined, never asked.
     static func aForeignServersElicitationIsNeverAsked() async {
         guard let server = StubServer(mode: "mcp-foreign") else {
             expect(false, "the stub app-server installs")
@@ -346,10 +346,10 @@ struct CodexTurnTests {
             toolServers: server.session(allowing: true, asked: asked))
         expect(
             asked.calls.isEmpty && server.received.contains(#"elicitation:{"action":"decline"}"#),
-            "a call on the reader's own `probe` is declined without asking about Tinycast's")
+            "a call on the reader's own `probe` is declined without asking about Tonycast's")
         expect(
             events.contains(.toolCall(id: "call-1", origin: "probe", title: "safe_echo")),
-            "and its row keeps Codex's name, never the title of Tinycast's same-handle server")
+            "and its row keeps Codex's name, never the title of Tonycast's same-handle server")
     }
 
     static func aRefusedCallIsAFailedRowAndAnHonestReply() async {
@@ -437,7 +437,7 @@ struct CodexTurnTests {
             "reasoning effort belongs to the turn and does not mutate Codex settings")
         expect(
             !server.received.contains("config/value/write"),
-            "a Tinycast turn never writes the user's Codex configuration")
+            "a Tonycast turn never writes the user's Codex configuration")
 
         turn.cancel()
         let dropped = await server.awaitCondition { !server.runner.isActive }
@@ -640,9 +640,9 @@ final class StubServer {
         // The locator asks a login shell first; the user's rc files would put a real `codex` ahead.
         setenv("ZDOTDIR", root.path, 1)
         // `/etc/zprofile`'s path_helper puts a Homebrew `codex` ahead of the stub; undo that.
-        try? #"export TINYCAST_SAVED_PATH="$PATH""#.write(
+        try? #"export TONYCAST_SAVED_PATH="$PATH""#.write(
             to: root.appending(path: ".zshenv"), atomically: true, encoding: .utf8)
-        try? #"[ -n "$TINYCAST_SAVED_PATH" ] && export PATH="$TINYCAST_SAVED_PATH""#.write(
+        try? #"[ -n "$TONYCAST_SAVED_PATH" ] && export PATH="$TONYCAST_SAVED_PATH""#.write(
             to: root.appending(path: ".zprofile"), atomically: true, encoding: .utf8)
         setenv("TC_STUB_ROOT", root.path, 1)
         setenv("TC_STUB_MODE", mode, 1)

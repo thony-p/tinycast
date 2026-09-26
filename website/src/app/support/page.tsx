@@ -11,13 +11,13 @@ import {
 } from "../../data/support";
 
 const description =
-  "Tinycast is free and open source. If you enjoy it, you can support its development monthly or once, securely through Polar.";
+  "Tonycast is free and open source. If you enjoy it, you can support its development monthly or once, securely through Polar.";
 
 export const metadata: Metadata = {
   title: "Support",
   description,
   alternates: { canonical: "/support/" },
-  openGraph: { title: "Support Tinycast", description, url: "/support/" },
+  openGraph: { title: "Support Tonycast", description, url: "/support/" },
 };
 
 function Intro() {

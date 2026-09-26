@@ -5,7 +5,7 @@ struct RankingTest {
     @MainActor
     static func main() async {
         let fileURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("tinycast-ranking-\(UUID().uuidString).json")
+            .appendingPathComponent("tonycast-ranking-\(UUID().uuidString).json")
 
         var clock = Date(timeIntervalSince1970: 2_000_000_000)
         let store = LauncherRankingStore(fileURL: fileURL) { clock }

@@ -4,12 +4,12 @@
 // The page title and meta description, shared by the layout and /llms.txt. Google truncates a
 // description near 160 characters, so `summary` is written to land under it rather than be cut.
 export const pageTitle =
-  "Tinycast — everything on your Mac, one keystroke away";
+  "Tonycast — everything on your Mac, one keystroke away";
 export const summary =
   "Free and open source, fully native macOS launcher: app search, clipboard manager, snippets, custom commands, window management, BYOK AI and Raycast extensions.";
 
 export const site = {
-  name: "Tinycast",
+  name: "Tonycast",
   tagline: "The essentials, without the bloat.",
   repo: "https://github.com/abue-ammar/tinycast",
   url: "https://tinycast.dev",

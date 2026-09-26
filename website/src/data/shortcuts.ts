@@ -1,5 +1,5 @@
 // A subset of docs/reference/shortcuts.md. The first row is the one chord a
-// user picks themselves; Tinycast ships none, so it is labelled as a choice.
+// user picks themselves; Tonycast ships none, so it is labelled as a choice.
 
 export type ShortcutRow = { keys: string[]; does: string };
 

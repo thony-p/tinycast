@@ -3,14 +3,14 @@
 Effective date: 2026-07-28
 
 This Contributor License and Feedback Agreement ("Agreement") applies to contributions you submit to
-the Tinycast project repository.
+the Tonycast project repository.
 
 By submitting a contribution (including code, documentation, tests, design assets, issue content, or
 any other material), you agree to the terms below.
 
 ## 1. Definitions
 
-- "Project" means the Tinycast repository and related project resources.
+- "Project" means the Tonycast repository and related project resources.
 - "Contribution" means any work you submit to the Project.
 - "Feedback" means suggestions, ideas, bug reports, or improvement proposals.
 
@@ -30,7 +30,7 @@ You agree that each Contribution you submit is licensed under the same license a
 time of submission (currently AGPL-3.0-or-later).
 
 To the extent needed for maintainers and users to use your Contribution in the Project, you grant the
-Tinycast maintainers and all recipients of the Project a worldwide, perpetual, non-exclusive,
+Tonycast maintainers and all recipients of the Project a worldwide, perpetual, non-exclusive,
 royalty-free, irrevocable copyright license to use, reproduce, modify, distribute, publicly perform,
 and publicly display your Contribution under the Project's license terms.
 
@@ -46,7 +46,7 @@ terms.
 
 ## 5. Feedback License
 
-You grant the Tinycast maintainers a worldwide, perpetual, non-exclusive, royalty-free, irrevocable
+You grant the Tonycast maintainers a worldwide, perpetual, non-exclusive, royalty-free, irrevocable
 license to use, copy, modify, publish, and otherwise exploit any Feedback you provide, without
 restriction and without compensation to you.
 

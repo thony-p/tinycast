@@ -8,7 +8,7 @@ struct QuicklinkTests {
     static var passes = 0
 
     /// Injected everywhere a path is resolved, so no assertion depends on the machine.
-    static let home = "/Users/tinycast-harness"
+    static let home = "/Users/tonycast-harness"
 
     static func main() {
         destinationDetection()
@@ -83,7 +83,7 @@ struct QuicklinkTests {
             "a tilde expands against the injected home")
         expect(detect("~") == .path(home), "a bare tilde is the home directory")
         expect(
-            detect("  ~/Projects/Tinycast  ") == .path("\(home)/Projects/Tinycast"),
+            detect("  ~/Projects/Tonycast  ") == .path("\(home)/Projects/Tonycast"),
             "surrounding whitespace is trimmed before detection")
         expect(
             detect("file:///Users/x/notes.md") == .path("/Users/x/notes.md"),
@@ -512,7 +512,7 @@ struct QuicklinkTests {
 
     static func scratchDirectory() -> URL {
         let dir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("tinycast-quicklink-test-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("tonycast-quicklink-test-\(UUID().uuidString)", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }

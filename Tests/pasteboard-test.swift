@@ -1,6 +1,6 @@
 // Standalone test for clipboard capture and paste, compiling the real sources rather than copies.
 // Every case drives `NSPasteboard.withUniqueName()`: writing to `.general` would land in the
-// reader's own running Tinycast as a genuine copy.
+// reader's own running Tonycast as a genuine copy.
 import AppKit
 
 @main
@@ -31,7 +31,7 @@ struct PasteboardTests {
     /// One reader, every flavour: a board naming a file must never fall through to its name.
     static func everyFileFlavourIsRead() {
         withScratch { dir in
-            let file = dir.appendingPathComponent("Tinycast-Settings-2026-08-20.json")
+            let file = dir.appendingPathComponent("Tonycast-Settings-2026-08-20.json")
             try? Data("{}".utf8).write(to: file)
 
             // Finder's real shape: one item carrying the URL and the display name together.
@@ -63,7 +63,7 @@ struct PasteboardTests {
 
             let text = board()
             text.declareTypes([.string], owner: nil)
-            text.setString("Tinycast-Settings-2026-08-20.json", forType: .string)
+            text.setString("Tonycast-Settings-2026-08-20.json", forType: .string)
             expect(
                 PasteboardFiles.urls(on: text).isEmpty,
                 "a bare file name is text, not a file")
@@ -119,7 +119,7 @@ struct PasteboardTests {
 
     /// An app that stages a temp file beside better inline content must keep the inline content.
     static func volatileAndMissingFilesFallThrough() {
-        let temp = URL(fileURLWithPath: "/private/tmp/tinycast-volatile-\(UUID().uuidString).png")
+        let temp = URL(fileURLWithPath: "/private/tmp/tonycast-volatile-\(UUID().uuidString).png")
         try? Data("x".utf8).write(to: temp)
         defer { try? FileManager.default.removeItem(at: temp) }
         let pb = board()
@@ -312,7 +312,7 @@ struct PasteboardTests {
 
     static func withScratch(_ body: (URL) -> Void) {
         let dir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("tinycast-pasteboard-test-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("tonycast-pasteboard-test-\(UUID().uuidString)", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
         body(dir)

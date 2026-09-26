@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="188" height="44" viewBox="0 0 188 44" role="img" aria-label="Support Tinycast">
-  <title>Support Tinycast</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="188" height="44" viewBox="0 0 188 44" role="img" aria-label="Support Tonycast">
+  <title>Support Tonycast</title>
   <defs>
     <linearGradient id="face" x1="0" y1="0" x2="0.85" y2="1">
       <stop offset="0" stop-color="#9B5CFF"/>
@@ -28,5 +28,5 @@
   </g>
 
   <text x="46" y="25" fill="#ffffff" font-size="14" font-weight="600" textLength="126" lengthAdjust="spacingAndGlyphs"
-        font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">Support Tinycast</text>
+        font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">Support Tonycast</text>
 </svg>

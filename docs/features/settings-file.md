@@ -1,7 +1,7 @@
 # Settings file
 
-An opt-in mirror of Tinycast's preferences and all of window management in
-`~/.config/tinycast/settings.json`, switched on in **Settings → Backup → Settings File**. `UserDefaults`
+An opt-in mirror of Tonycast's preferences and all of window management in
+`~/.config/tonycast/settings.json`, switched on in **Settings → Backup → Settings File**. `UserDefaults`
 stays the store; the file follows it, and an edit made to the file applies at once. The machinery lives
 in `Features/Settings/` (`Model/`, `Service/`, `SettingsFileSchema.swift`), and window management's part
 in `Features/WindowManagement/`.
@@ -18,7 +18,7 @@ in `Features/WindowManagement/`.
   asks first. `settings-file-test` checks those paths stay absent.
 - **`SettingsFileSchema`'s switch is exhaustive.** A new `SettingsFileKey` case fails to build until it
   is bound to a property.
-- **A bad edit never costs a setting.** A key the file leaves out keeps its value; a value Tinycast
+- **A bad edit never costs a setting.** A key the file leaves out keeps its value; a value Tonycast
   can't use keeps the current one and is reported; an unknown key is reported and ignored; invalid JSON
   applies nothing. An invalid record in a list is skipped and reported, and the rest still apply.
 - **Applying the file never writes it.** Only a change made in the app rewrites the file, so hand
@@ -48,8 +48,8 @@ in `Features/WindowManagement/`.
 
 ## Location
 
-`~/.config/tinycast/settings.json` on stable; another channel suffixes the folder, so Dev uses
-`tinycast-dev` and a fork its bundle ID. `$XDG_CONFIG_HOME` is not read, because an app opened from
+`~/.config/tonycast/settings.json` on stable; another channel suffixes the folder, so Dev uses
+`tonycast-dev` and a fork its bundle ID. `$XDG_CONFIG_HOME` is not read, because an app opened from
 Finder never sees the shell's environment. A symlink is followed and kept: the write lands in its
 target, so a file linked from a dotfiles repository stays linked.
 
@@ -59,7 +59,7 @@ target, so a file linked from a dotfiles repository stays linked.
 
 - **Turning it on** with no file writes one from the current settings. Over an existing file, a dialog
   asks: **Import** applies the file, **Replace** overwrites it.
-- **At launch**, while on, the file is applied last in `start()`, so an edit made while Tinycast was
+- **At launch**, while on, the file is applied last in `start()`, so an edit made while Tonycast was
   quit reaches every sink. A missing file is written again; an unreadable one is reported and left alone.
 - **App → file.** Every bound value is read inside `withObservationTracking`; a change saves 300 ms
   later, and the save writes only when the whole render differs from the one the two sides last agreed

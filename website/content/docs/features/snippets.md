@@ -57,7 +57,7 @@ your clipboard or asks for an argument.
 
 ## The file format
 
-One Markdown file per snippet, in Tinycast's Application Support folder. Frontmatter is optional.
+One Markdown file per snippet, in Tonycast's Application Support folder. Frontmatter is optional.
 
 ```markdown
 ---
@@ -126,7 +126,7 @@ no modifiers.
 
 ### When a token is wrong
 
-**A token Tinycast cannot read is left in the text exactly as you wrote it**, never silently dropped.
+**A token Tonycast cannot read is left in the text exactly as you wrote it**, never silently dropped.
 If you see `{arguemnt}` in your pasted text, that is the typo pointing at itself.
 
 `{browser-tab}` and `{calculator}` are not supported.
@@ -150,24 +150,24 @@ Give a snippet a keyword and typing it in any app expands the snippet in place.
 - The typing buffer holds at most 256 characters. It resets when you switch apps, on Secure Event
   Input, on arrow keys and shortcuts with modifiers, and after **15 seconds** of no typing.
 - If you keep typing before an expansion lands, it is dropped rather than inserted mid-word.
-- Just before it deletes the keyword and inserts the text, Tinycast checks everything again. If
+- Just before it deletes the keyword and inserts the text, Tonycast checks everything again. If
   anything changed, what you typed is left alone.
 
 Settings shows the status plainly: **Off**, **Needs Accessibility**, or **Active**.
 
-A keyword typed into Tinycast's own search field or Settings never expands. A keyword typed in
+A keyword typed into Tonycast's own search field or Settings never expands. A keyword typed in
 [Notes](/docs/features/notes) expands right into the note.
 
 ### How the text gets there
 
-First choice: one clean replacement through Accessibility, which Tinycast then checks actually
+First choice: one clean replacement through Accessibility, which Tonycast then checks actually
 happened.
 
 Some apps, like Chrome, VS Code, Slack and other Electron apps, do not really accept that, so
-Tinycast types the text instead. Short, single-line expansions of up to 100 characters are typed as
+Tonycast types the text instead. Short, single-line expansions of up to 100 characters are typed as
 keystrokes.
 
-Longer or multi-line text uses a quick temporary paste. Tinycast saves your clipboard, pastes only
+Longer or multi-line text uses a quick temporary paste. Tonycast saves your clipboard, pastes only
 the snippet text, then puts your clipboard back exactly. If you copied something new in the meantime,
 it leaves your new copy alone. None of this ends up in your
 [clipboard history](/docs/features/clipboard).

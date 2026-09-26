@@ -69,7 +69,7 @@ export function Gallery() {
       index={2}
       label="In action"
       title="The real app, not a mockup."
-      intro="The palette up top is a recreation. These are captured from Tinycast itself. Open any of them full size."
+      intro="The palette up top is a recreation. These are captured from Tonycast itself. Open any of them full size."
     >
       <div className="overflow-hidden rounded-xl border border-border/70 bg-surface shadow-xs">
         <div className="flex min-h-11 items-center gap-3 border-b border-border/60 px-4 py-1.5 font-mono text-micro uppercase text-fg-muted">
@@ -77,7 +77,7 @@ export function Gallery() {
             aria-hidden="true"
             className="size-1.5 rounded-full bg-violet"
           />
-          Captured in Tinycast
+          Captured in Tonycast
           <span className="ml-auto hidden sm:inline">Click any to enlarge</span>
         </div>
         {/* The tour video leads at double size and the last still runs double

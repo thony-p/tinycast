@@ -351,8 +351,8 @@ struct MenuSearchTests {
             classify("TextEdit") == .searchable(name: "TextEdit"),
             "a regular app is searchable under its own name")
         expect(
-            classify("Tinycast", isSelf: true, hasMenuBar: false) == .selfTarget,
-            "self wins over the menu-bar check, since Tinycast itself runs accessory")
+            classify("Tonycast", isSelf: true, hasMenuBar: false) == .selfTarget,
+            "self wins over the menu-bar check, since Tonycast itself runs accessory")
         expect(
             classify("Helper", hasMenuBar: false) == .menuLess(name: "Helper"),
             "a background app keeps its name for the empty state")
@@ -366,8 +366,8 @@ struct MenuSearchTests {
             classify("Helper", hasMenuBar: false, isExcluded: true) == .excluded(name: "Helper"),
             "excluded is checked before the menu-bar test, so it never reads as menu-less")
         expect(
-            classify("Tinycast", isSelf: true, isExcluded: true) == .selfTarget,
-            "self still wins: Tinycast has no menu to exclude in the first place")
+            classify("Tonycast", isSelf: true, isExcluded: true) == .selfTarget,
+            "self still wins: Tonycast has no menu to exclude in the first place")
     }
 
     static func sessionPresent() {

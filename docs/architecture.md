@@ -1,6 +1,6 @@
 # Architecture
 
-How Tinycast is wired together. Per-feature internals live in [features/](README.md#features);
+How Tonycast is wired together. Per-feature internals live in [features/](README.md#features);
 conventions for writing new code live in [standards.md](standards.md).
 
 ## The layering
@@ -119,7 +119,7 @@ handed an input path and answers with bounded text down a pipe.
 
 ## Entry points and windows
 
-`TinycastApp` (`@main`) declares only two `MenuBarExtra` scenes — Tinycast's own item and the
+`TonycastApp` (`@main`) declares only two `MenuBarExtra` scenes — Tonycast's own item and the
 calendar's, each inserted by one preference and independent of the other; everything else visible is
 driven imperatively from AppKit. Extension menu extras are dynamic `NSStatusItem`s owned entirely by
 `Features/Extensions/`, through `ExtensionManager`, with no scene or lifecycle wiring in the core.
@@ -145,7 +145,7 @@ driven imperatively from AppKit. Extension menu extras are dynamic `NSStatusItem
   `NSSplitViewController` with a collapsible sidebar of saved chats beside the open conversation, as
   Settings is built. The conversation lives on `AppCore.aiChats`, not the window, so closing it cancels
   nothing. Quick AI is the same feature's palette screen. See [features/ai.md](features/ai.md).
-- **The main menu** — shaped by `TinycastApp`'s `.commands`, which rebinds ⌘Q to Close Window: the AI
+- **The main menu** — shaped by `TonycastApp`'s `.commands`, which rebinds ⌘Q to Close Window: the AI
   Chat window when it is key, otherwise Settings. It is only ever on screen while a titled window is
   open, so it is those windows' menu bar. It must stay declarative.
 - **Dialogs** — borderless `DialogPanel`s driven by `DialogController`, the app's only presenter for
@@ -213,7 +213,7 @@ The folder layout is the layering above, made navigable — one folder per featu
 everything that feature owns.
 
 ```
-Tinycast/
+Tonycast/
   App/              @main, AppDelegate, AppCore — the composition root
   DesignSystem/     Theme (the token source), KeyCapChip, Tooltip, SymbolImage,
                     GlassEffectView, PopoverMenu, SettingsComponents, Scrolling/, Interaction/

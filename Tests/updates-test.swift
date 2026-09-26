@@ -103,11 +103,17 @@ struct UpdatesTests {
         let stable = ReleaseChannel(bundleID: "com.tinycast.app")
         let beta = ReleaseChannel(bundleID: "com.tinycast.app.beta")
         let dev = ReleaseChannel(bundleID: "com.tinycast.app.dev")
+        // A renamed fork's ids belong to no release stream: stable/beta accept upstream
+        // artifacts, and installing one would overwrite the fork.
+        let fork = ReleaseChannel(bundleID: "com.tonycast.app")
+        let forkBeta = ReleaseChannel(bundleID: "com.tonycast.app.beta")
 
         expect(stable == .stable, "the stable bundle id is the stable channel")
         expect(beta == .beta, "the beta bundle id is the beta channel")
         expect(dev == .development, "the dev bundle id is a local build")
         expect(ReleaseChannel(bundleID: nil) == .development, "a missing bundle id never updates")
+        expect(fork == .development, "a renamed fork never updates from upstream")
+        expect(forkBeta == .development, "nor from upstream's beta channel")
 
         expect(stable.updatesItself && beta.updatesItself, "both shipped channels update")
         expect(!dev.updatesItself, "a local build does not update itself")
@@ -129,7 +135,7 @@ struct UpdatesTests {
     }
 
     static func entry(
-        tag: String, prerelease: Bool, draft: Bool = false, assets: [String] = ["Tinycast-x.zip"],
+        tag: String, prerelease: Bool, draft: Bool = false, assets: [String] = ["Tonycast-x.zip"],
         body: String = "Notes."
     ) -> String {
         let list = assets.map {
@@ -194,7 +200,7 @@ struct UpdatesTests {
             "a release with no assets is skipped")
         expect(
             ReleaseFeed.newest(
-                from: feed(entry(tag: "v0.3.0", prerelease: false, assets: ["Tinycast-x.dmg"])),
+                from: feed(entry(tag: "v0.3.0", prerelease: false, assets: ["Tonycast-x.dmg"])),
                 channel: .stable, architecture: .appleSilicon) == nil,
             "a DMG-only release is not installable, so it is not offered")
         expect(
@@ -221,7 +227,7 @@ struct UpdatesTests {
         let both = feed(
             entry(
                 tag: "v0.3.0", prerelease: false,
-                assets: ["Tinycast-0.3.0.zip", "Tinycast-Universal-0.3.0.zip"]))
+                assets: ["Tonycast-0.3.0.zip", "Tonycast-Universal-0.3.0.zip"]))
         expect(
             ReleaseFeed.newest(from: both, channel: .stable, architecture: .intel)?
                 .assetURL.absoluteString.contains("-Universal-") == true,
@@ -231,13 +237,13 @@ struct UpdatesTests {
                 .assetURL.absoluteString.contains("-Universal-") == false,
             "Apple silicon prefers the thin zip, and never pays for the Intel slice")
 
-        let thinOnly = feed(entry(tag: "v0.3.0", prerelease: false, assets: ["Tinycast-0.3.0.zip"]))
+        let thinOnly = feed(entry(tag: "v0.3.0", prerelease: false, assets: ["Tonycast-0.3.0.zip"]))
         expect(
             ReleaseFeed.newest(from: thinOnly, channel: .stable, architecture: .intel) == nil,
             "Intel is offered nothing rather than an arm64 build it cannot launch")
 
         let universalOnly = feed(
-            entry(tag: "v0.3.0", prerelease: false, assets: ["Tinycast-Universal-0.3.0.zip"]))
+            entry(tag: "v0.3.0", prerelease: false, assets: ["Tonycast-Universal-0.3.0.zip"]))
         expect(
             ReleaseFeed.newest(from: universalOnly, channel: .stable, architecture: .appleSilicon)?
                 .version == AppVersion("0.3.0"),
@@ -328,7 +334,7 @@ struct UpdatesTests {
         let feedNotes = ReleaseFeed.newest(
             from: feed(
                 entry(
-                    tag: "v0.3.0", prerelease: false, body: "Changes.\\n\\n<!-- tinycast:install -->\\nBrew.")
+                    tag: "v0.3.0", prerelease: false, body: "Changes.\\n\\n<!-- tonycast:install -->\\nBrew.")
             ),
             channel: .stable, architecture: .appleSilicon)?.notes
         expect(feedNotes == "Changes.", "the feed stores the cut summary, so the cache holds it too")

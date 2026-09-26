@@ -45,7 +45,7 @@ export function Features() {
       index={1}
       label="Features"
       title="One palette for everything you do all day."
-      intro="Almost everything ships off until you ask for it, so Tinycast is exactly as big as you make it."
+      intro="Almost everything ships off until you ask for it, so Tonycast is exactly as big as you make it."
     >
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {coreFeatures.map((feature) => (

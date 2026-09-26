@@ -3,12 +3,12 @@ title: Hotkeys
 description: Recording global shortcuts, double-tap modifiers, and the Hyper key.
 ---
 
-**Tinycast ships with nothing bound.** Every global shortcut is one you record.
+**Tonycast ships with nothing bound.** Every global shortcut is one you record.
 
 ## What can have a shortcut
 
 - The palette itself (**App Launcher**, in Settings → General)
-- Every built-in command, except Open in Browser, Run Shell Command and Quit Tinycast. See
+- Every built-in command, except Open in Browser, Run Shell Command and Quit Tonycast. See
   [Commands](/docs/launcher/commands).
 - Every app, and every System Settings pane
 - Every quicklink, custom command, custom Quick Action and extension command
@@ -52,7 +52,7 @@ This needs [Accessibility](/docs/permissions), and **never asks for it on its ow
 saved anyway, the recorder shows a warning that opens System Settings, and the shortcut starts working
 the moment you grant access.
 
-Tinycast only watches for double taps **while at least one shortcut uses one**, so if you never do,
+Tonycast only watches for double taps **while at least one shortcut uses one**, so if you never do,
 it costs nothing.
 
 ## Hyper key
@@ -63,7 +63,7 @@ or <kbd>⌃</kbd><kbd>⌥</kbd><kbd>⇧</kbd><kbd>⌘</kbd> with **Include Shift
 You can choose **Caps Lock**, **Right Control**, **Right Shift**, **Right Option** or
 **Right Command**.
 
-Function keys are not offered. Their media functions fire before Tinycast can see them, so turning F1
+Function keys are not offered. Their media functions fire before Tonycast can see them, so turning F1
 into Hyper would still dim your screen.
 
 Shortcuts you already use with those modifiers work with Hyper right away.
@@ -94,12 +94,12 @@ Escape is the favorite choice for Caps Lock users.
 ### Caps Lock details
 
 While Caps Lock is your Hyper key, it is remapped at the hardware level. The remap is removed when you
-pick another key, when Tinycast quits, and it never survives a restart.
+pick another key, when Tonycast quits, and it never survives a restart.
 
 In the brief moment before the remap takes hold, the Caps Lock light can still switch. That is the
-hardware, not something Tinycast can stop.
+hardware, not something Tonycast can stop.
 
-Hyper needs Accessibility and never asks for it on its own. Tinycast keeps checking, starts working as
+Hyper needs Accessibility and never asks for it on its own. Tonycast keeps checking, starts working as
 soon as access is granted, notices if access is removed, and clears a key that looks stuck. When you
 switch to another user, it pauses until you are back.
 
@@ -122,5 +122,5 @@ exactly as it does in the palette.
 
 Shortcuts are included in [backups](/docs/reference/backup), except for custom Quick Actions.
 
-Shortcuts for things you deleted while Tinycast was not running are cleaned up the next time it
+Shortcuts for things you deleted while Tonycast was not running are cleaned up the next time it
 starts.

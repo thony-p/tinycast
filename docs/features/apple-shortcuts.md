@@ -1,7 +1,7 @@
 # Apple Shortcuts
 
 The shortcuts a user builds in Apple's Shortcuts app appear in the launcher as their own section,
-searchable by name and runnable with ↵, a favorite slot or a global shortcut. Tinycast lists and runs
+searchable by name and runnable with ↵, a favorite slot or a global shortcut. Tonycast lists and runs
 them and nothing else: creating, editing, permissions and the actions themselves stay with Shortcuts.
 
 The feature ships **off**. **Settings → Apple Shortcuts** carries the one switch, and lists the
@@ -45,7 +45,7 @@ unchanged list publishes nothing.
 ## Sweeping deleted shortcuts
 
 A read that differs from the last one — and the first read after launch, so a shortcut deleted while
-Tinycast wasn't running is caught too — sweeps. `AppleShortcut.staleIDs` collects every
+Tonycast wasn't running is caught too — sweeps. `AppleShortcut.staleIDs` collects every
 `apple-shortcut:` key the alias, favorite, visibility and ranking stores hold, plus
 `boundAppleShortcutIDs`, and returns those the library no longer names. Each is unbound and its
 per-entry preferences removed, the way deleting a quicklink unwinds them. A shortcut renamed in
@@ -60,7 +60,7 @@ shortcut's references linger until the library holds one again.
 `shortcuts run <uuid>` runs the shortcut headless. The palette hides first and hands focus back, since
 a shortcut usually acts on the app the user was in. There is **no timeout** — a shortcut can wait on a
 dialog of its own for as long as it likes. Success is silent; a non-zero exit shows the tool's last
-lines in Tinycast's own dialog.
+lines in Tonycast's own dialog.
 
 ## Launcher and Settings
 

@@ -73,7 +73,7 @@ const Keyboard = {
   },
 };
 
-/// Surfaces Tinycast doesn't implement. They exist so a bundle that merely imports them still loads;
+/// Surfaces Tonycast doesn't implement. They exist so a bundle that merely imports them still loads;
 /// calling one gives the extension (and the user) a clear reason instead of a TypeError.
 function rejectingNamespace(name, members) {
   const target = {};

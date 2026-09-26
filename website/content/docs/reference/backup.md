@@ -5,7 +5,7 @@ description: Save your setup to one file, choose what goes in and what comes bac
 
 **Settings → Backup**
 
-A backup is one `.tinycast` file. You tick what goes into it, and you tick again what comes back out
+A backup is one `.tonycast` file. You tick what goes into it, and you tick again what comes back out
 when you import. The two choices are separate, so a file with everything in it can still restore only
 your snippets.
 
@@ -22,10 +22,10 @@ there is no room for checkboxes there.
 
 ## Read this before relying on it
 
-**The format belongs to Tinycast and may change between versions. The only promise is that a backup
+**The format belongs to Tonycast and may change between versions. The only promise is that a backup
 imports into the same version that made it.**
 
-The file records which version wrote it. A Tinycast that does not recognize it says so clearly,
+The file records which version wrote it. A Tonycast that does not recognize it says so clearly,
 instead of importing half of it. A backup is for moving your setup to another Mac today, or restoring
 after a reinstall. It is not a long-term archive.
 
@@ -85,7 +85,7 @@ had them.
 
 ## Where your data actually lives
 
-Everything a backup carries is also an ordinary file, in `~/Library/Application Support/com.tinycast.app/`:
+Everything a backup carries is also an ordinary file, in `~/Library/Application Support/com.tonycast.app/`:
 
 | What                                          | Where                                          |
 | --------------------------------------------- | ---------------------------------------------- |
@@ -96,4 +96,4 @@ Everything a backup carries is also an ordinary file, in `~/Library/Application 
 | [AI chats](/docs/ai)                          | `ai-chats.sqlite3`, never in a backup          |
 
 Snippets and notes are plain Markdown. Copying those folders is a perfectly good backup, and you can
-read them without Tinycast. That is the point of keeping them that way.
+read them without Tonycast. That is the point of keeping them that way.

@@ -74,7 +74,7 @@ enum ExtensionFetchTests {
 
     static func runChecks() async {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "tinycast-fetch-\(UUID())")
+            "tonycast-fetch-\(UUID())")
         let stateFile = directory.appendingPathComponent("state.json")
         let server = Process()
         defer {

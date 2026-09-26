@@ -45,7 +45,7 @@ struct FuzzTest {
         let pinned: [(String, String, Int)] = [
             ("s", "Safari", 4), ("s", "Clipboard History", 2), ("sa", "Safari", 6), ("sa", "Slack", 5),
             ("vsc", "Visual Studio Code", 8), ("gc", "Google Chrome", 6), ("ss", "System Settings", 6),
-            ("settings", "System Settings", 17), ("settings", "Tinycast Settings", 17),
+            ("settings", "System Settings", 17), ("settings", "Tonycast Settings", 17),
             ("sett", "System Settings", 9), ("chrome", "Google Chrome", 13),
             ("chrome", "Chrome Remote Desktop", 14), ("olu", "Set Volume", 6), ("code", "Xcode", 8),
             ("code", "Visual Studio Code", 9), ("sfr", "Safari", 6), ("notes", "Search Notes", 11),
@@ -279,10 +279,10 @@ struct FuzzTest {
             first("ap", [Item(name: "App Store"), Item(name: "AirPort Utility", frecency: 200)])
                 == "AirPort Utility")
         check(
-            "an app wins the tie a Tinycast command ties it on",
+            "an app wins the tie a Tonycast command ties it on",
             first(
                 "settings",
-                [Item(name: "Tinycast Settings", priority: 3), Item(name: "System Settings", priority: 4)])
+                [Item(name: "Tonycast Settings", priority: 3), Item(name: "System Settings", priority: 4)])
                 == "System Settings")
         check(
             "names compare numerically last",
@@ -333,7 +333,7 @@ struct FuzzTest {
             Item(name: "Contacts", alternates: ["Address Book"], priority: 4),
             Item(name: "Visual Studio Code", keywords: ["Code"], priority: 4),
             Item(name: "Game Center", priority: 1), Item(name: "Sound", priority: 1),
-            Item(name: "Tinycast Settings"), Item(name: "Calculator History"),
+            Item(name: "Tonycast Settings"), Item(name: "Calculator History"),
             Item(name: "AI Chat", boosted: ["ai", "chat"]), Item(name: "Search Files"),
             Item(name: "Search Notes"), Item(name: "Show Notes"), Item(name: "Set Volume"),
             Item(name: "Search", subtitle: "Brew"), Item(name: "Upgrade", subtitle: "Brew"),
@@ -359,7 +359,7 @@ struct FuzzTest {
     static func denseIndex() {
         print("\n# a dense index")
         let cases: [(query: String, first: String, why: String)] = [
-            ("settings", "System Settings", "Apple's alternate name beats Tinycast Settings"),
+            ("settings", "System Settings", "Apple's alternate name beats Tonycast Settings"),
             ("sett", "System Settings", "…and so does its prefix"),
             ("preferences", "System Settings", "an old name Apple still declares"),
             ("ical", "Calendar", "a vendor's old name for itself"),
@@ -495,7 +495,7 @@ struct FuzzTest {
         print("\n# properties")
         let names = [
             "Safari", "System Settings", "Visual Studio Code", "Google Chrome", "Clipboard History",
-            "Search Emoji & Symbols", "Tinycast Settings", "Activity Monitor", "Wi-Fi", "Date & Time",
+            "Search Emoji & Symbols", "Tonycast Settings", "Activity Monitor", "Wi-Fi", "Date & Time",
             "Move to Next Display", "1Password 7", "Set Volume to 25%", "微信", "Телеграм"
         ]
         let alphabet = Array("abcdefghijklmnopqrstuvwxyz -.")

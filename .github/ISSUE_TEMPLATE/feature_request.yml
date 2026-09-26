@@ -12,9 +12,9 @@ body:
   - type: textarea
     id: why
     attributes:
-      label: Why does it belong in Tinycast?
+      label: Why does it belong in Tonycast?
       description: >
-        Tinycast stays small on purpose — quality over quantity. It has already borrowed what it
+        Tonycast stays small on purpose — quality over quantity. It has already borrowed what it
         wanted from Raycast, so "Raycast has it" is not a reason. Tell us why this is worth its
         weight.
     validations:

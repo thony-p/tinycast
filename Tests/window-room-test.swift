@@ -800,7 +800,7 @@ struct WindowRoomTests {
     }
 
     static func storeCRUD() {
-        let suite = "tinycast-window-room-test-\(UUID().uuidString)"
+        let suite = "tonycast-window-room-test-\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suite) else {
             return expect(false, "a scratch suite opens")
         }
@@ -855,7 +855,7 @@ struct WindowRoomTests {
     }
 
     static func minimumSizeStore() {
-        let suite = "tinycast-window-room-minimums-\(UUID().uuidString)"
+        let suite = "tonycast-window-room-minimums-\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suite) else {
             return expect(false, "a scratch suite opens")
         }
@@ -876,7 +876,7 @@ struct WindowRoomTests {
 
     static func parkingLedger() {
         let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("tinycast-window-room-test-\(UUID().uuidString)")
+            .appendingPathComponent("tonycast-window-room-test-\(UUID().uuidString)")
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("room-parking.json")

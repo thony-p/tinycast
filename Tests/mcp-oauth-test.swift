@@ -349,7 +349,7 @@ struct MCPOAuthTests {
         let lent = try await manager.lentToken(for: server)
         expect(
             used == "five-minutes" && lent == "fixture-access",
-            "five minutes serve Tinycast's own request; a CLI's whole turn gets a fresh token")
+            "five minutes serve Tonycast's own request; a CLI's whole turn gets a fresh token")
         try store(refresh: nil)
         let unrefreshable = try await manager.lentToken(for: server)
         expect(
@@ -471,7 +471,7 @@ struct MCPOAuthTests {
             registration: registration, code: "fixture-code", verifier: "fixture-verifier")
         expect(token.accessToken == "fixture-access", "code exchange includes resource")
         let keychain = KeychainSecretStore(
-            scope: "mcp-oauth-test-" + UUID().uuidString, bundleIdentifier: "test.tinycast")
+            scope: "mcp-oauth-test-" + UUID().uuidString, bundleIdentifier: "test.tonycast")
         let secrets = MCPSecretStore(keychain: keychain)
         var configured = MCPServer(name: "Fixture", transport: .http(url: base + "/mcp", headerName: ""))
         configured.oauth = true

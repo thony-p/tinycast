@@ -31,15 +31,15 @@ The title bar holds three buttons: **Create**, **Browse** and **Open Folder**.
 | <kbd>esc</kbd>                | Close the switcher, then hide the window    |
 | <kbd>⌘</kbd><kbd>delete</kbd> | Move the selected switcher row to the Trash |
 
-<kbd>⌘</kbd><kbd>Q</kbd> does nothing here, so **no key press over Notes can quit Tinycast** by
+<kbd>⌘</kbd><kbd>Q</kbd> does nothing here, so **no key press over Notes can quit Tonycast** by
 accident.
 
 ## Files
 
-Notes live in Tinycast's Application Support folder:
+Notes live in Tonycast's Application Support folder:
 
 ```
-~/Library/Application Support/com.tinycast.app/Notes/
+~/Library/Application Support/com.tonycast.app/Notes/
 ```
 
 **One `.md` file is one note, and its file name is its title.** There is no frontmatter, no hidden
@@ -96,7 +96,7 @@ At the bottom right of the note is a round button. Click it, or press
 <kbd>⌥</kbd><kbd>⌘</kbd><kbd>T</kbd>, and a
 button for each of those keys slides out, plus a heading menu. Click one to format the selection or
 the word at the caret; click a lit button to remove that formatting again. Hover a button to see its
-shortcut. Tinycast remembers whether you left it open. When the window is narrow, the character count
+shortcut. Tonycast remembers whether you left it open. When the window is narrow, the character count
 makes room for the buttons.
 
 Don't want it? Turn off **Show Formatting Bar** in **Settings → Notes**. The keys keep working. The bar
@@ -118,8 +118,8 @@ Each row offers VoiceOver actions to open, rename and move that note to the Tras
 
 Changes save automatically 300 ms after you stop typing.
 
-**A save overwrites whatever is on disk.** Tinycast does not watch the folder. If you edit the note
-that is _open in Tinycast_ in another app, that edit is lost at the next autosave.
+**A save overwrites whatever is on disk.** Tonycast does not watch the folder. If you edit the note
+that is _open in Tonycast_ in another app, that edit is lost at the next autosave.
 
 <kbd>⌘</kbd><kbd>O</kbd> invites exactly this, and it is the trade for having no database.
 

@@ -13,7 +13,7 @@ Open it with the **Search Files** command, its own global shortcut, or the **Sea
 
 ## It asks for nothing
 
-Tinycast requests **no file permission** for this. Hidden files and the insides of app bundles are
+Tonycast requests **no file permission** for this. Hidden files and the insides of app bundles are
 always left out, and no setting can bring them back. That is exactly what keeps the feature
 permission-free.
 
@@ -22,7 +22,7 @@ If Spotlight has not indexed something, you get fewer results rather than a Full
 ## The screen
 
 With nothing typed, the list shows **Recently Used**: files you opened in the last 30 days or changed
-in the last 3 days, inside your search scopes. This comes from macOS's own records. Tinycast keeps no
+in the last 3 days, inside your search scopes. This comes from macOS's own records. Tonycast keeps no
 history of its own.
 
 Type and it becomes **Results**. Each row shows the file's icon and name. A folder also shows its
@@ -67,7 +67,7 @@ Copies from here land in your [clipboard history](/docs/features/clipboard) like
 **Settings → File Search → Search Scopes**, set to your home folder by default.
 
 Your home folder means its **visible** folders, plus `Library/CloudStorage` and your iCloud Drive.
-**Tinycast never adds `~/Library` on its own.** If you add a folder inside it yourself, you get what
+**Tonycast never adds `~/Library` on its own.** If you add a folder inside it yourself, you get what
 you asked for.
 
 **An empty scope list searches nothing**, rather than quietly falling back to home.

@@ -39,16 +39,16 @@ A local server runs with your own user account, so only add commands you trust.
 ### Signing into an OAuth server
 
 Choose **HTTP**, paste the server's MCP URL, and select **OAuth**. Choose **Sign In**, complete the
-provider's browser sign-in and review its access request. Return to Tinycast when the browser says
+provider's browser sign-in and review its access request. Return to Tonycast when the browser says
 you can close the tab. **Signed in** confirms completion; **Test Connection** checks the authenticated
 session and reports its tool count. Save the server to use it in chat.
 
 Leave Client ID and Client secret blank when the provider supports automatic registration. If it
 requires your own registered OAuth client, enter its client ID and any required secret. Register
 `http://127.0.0.1:4962/callback` as its redirect URL. Sign-in expires after five minutes; if another
-app uses that port, Tinycast reports the conflict so you can free it and retry.
+app uses that port, Tonycast reports the conflict so you can free it and retry.
 
-Tinycast refreshes expiring tokens automatically. If it shows **Sign-in required**, open the server
+Tonycast refreshes expiring tokens automatically. If it shows **Sign-in required**, open the server
 in Settings and sign in again. **Sign Out** disconnects it and removes its access and refresh tokens
 from this Mac. It keeps the client registration; revoke the app in the provider's settings if you
 also want to withdraw its account access there.
@@ -91,12 +91,12 @@ two the CLI calls the tools itself; the servers, the confirmation and the rows i
 same ones you see everywhere else, except that an OAuth server you are not signed into is left out.
 Nothing is written to either command's settings.
 
-Your own Codex and Claude MCP servers stay out of a Tinycast chat. Claude is told to use Tinycast's
-list alone. Codex is handed Tinycast's servers under names of their own, like `tinycast-github`,
+Your own Codex and Claude MCP servers stay out of a Tonycast chat. Claude is told to use Tonycast's
+list alone. Codex is handed Tonycast's servers under names of their own, like `tonycast-github`,
 and every server in your Codex configuration is switched off for that chat, so a server of yours
-named `github` never mixes with Tinycast's `@github`. If Tinycast cannot read which servers your
+named `github` never mixes with Tonycast's `@github`. If Tonycast cannot read which servers your
 Codex configuration has, or one of them has a dot or `=` in its name, Codex does not start from
-Tinycast at all, and the Codex row in Settings says why.
+Tonycast at all, and the Codex row in Settings says why.
 
 A few things are different on Codex:
 
@@ -116,7 +116,7 @@ Apple Intelligence and the installed Grok, OpenCode and Cursor commands never ge
 chat works exactly as it does without MCP.
 
 If your organization installs a Claude Code MCP policy, MCP on the Claude command is their decision
-and Tinycast passes no servers to it. The Providers row says so.
+and Tonycast passes no servers to it. The Providers row says so.
 
 ## Limits
 
@@ -128,11 +128,11 @@ and Tinycast passes no servers to it. The Providers row says so.
   and a reply keeps running while the palette is hidden, each round billed by your provider or
   counted against your plan.
 - Each tool result, and all results in one reply together, are capped in size.
-- Servers start when you use chat and stop after **10 idle minutes**, or when Tinycast quits.
+- Servers start when you use chat and stop after **10 idle minutes**, or when Tonycast quits.
   While Codex or Claude is the chat model, a server that runs on your Mac is started by that
-  command instead of Tinycast, so it never runs twice. Its row in Settings shows **Stopped** until
+  command instead of Tonycast, so it never runs twice. Its row in Settings shows **Stopped** until
   you choose an API model.
-- Tinycast offers nothing back to a server. Requests from a server, like sampling, are declined.
+- Tonycast offers nothing back to a server. Requests from a server, like sampling, are declined.
 
 ## Backups
 

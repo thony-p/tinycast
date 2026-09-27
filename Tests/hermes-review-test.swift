@@ -137,6 +137,65 @@ struct HermesReviewTest {
             skipped.append("relaunch clears the stop mark")
         }
 
+        // MARK: - A directory is not an executable
+
+        // `FileManager.isExecutableFile` answers true for a directory — X_OK on a directory is search
+        // permission — so a path like `~/bin` passed the override check and `Process` was handed a
+        // directory, failing with an opaque launch error instead of falling back to PATH. Measured:
+        // isExecutableFile("/tmp/some/dir") == true.
+        check(
+            "a directory is not treated as the executable",
+            !ACPClient.isUsableExecutable("/tmp", isDirectory: true, isExecutable: true))
+        check(
+            "an executable file is usable",
+            ACPClient.isUsableExecutable("/opt/bin/hermes", isDirectory: false, isExecutable: true))
+        check(
+            "a non-executable file is not usable",
+            !ACPClient.isUsableExecutable("/tmp/notes.txt", isDirectory: false, isExecutable: false))
+        // A bare name is a PATH lookup, not a file in the process's working directory: resolving it as
+        // `./hermes` would depend on wherever the app was launched from.
+        check(
+            "a bare command name is left to the PATH lookup",
+            ACPClient.executableOverride(connection: .local, configured: "hermes") == nil)
+        check(
+            "an absolute path is honoured",
+            ACPClient.executableOverride(connection: .local, configured: "/opt/bin/hermes")
+                == "/opt/bin/hermes")
+        check(
+            "a relative path is not honoured as an override",
+            ACPClient.executableOverride(connection: .local, configured: "./bin/hermes") == nil)
+
+        // MARK: - Opening a session from the sidebar applies the configured mode too
+
+        // `applyConfiguredMode` was added to `attachSession`'s two branches but not to
+        // `loadContinuable`, which makes the identical `session/load` call for a session opened from
+        // the sidebar. Same wire call, divergent treatment: reattach corrected the mode, sidebar-open
+        // did not, so a session created elsewhere in `default` still prompted before every edit.
+        check(
+            "opening a continuable session corrects a mismatched mode",
+            ACPSessionManager.shouldApplyMode(reported: "default", wanted: "accept_edits"))
+        // Pinned at the source level, because the defect was a missing call site rather than a wrong
+        // decision: every method that establishes a session must apply the mode. Read from the file so
+        // a future path that loads a session without it fails here.
+        // `attachSession` no longer names the mode itself: it routes both its branches through
+        // `adoptSession`, which applies it. So the check is that every found method either applies the
+        // mode or hands off to one that does — the handoff is the fix, and asserting only the direct
+        // call would fail on the correct code.
+        if let body = ACPSessionManager.sessionEstablishingMethodBodies() {
+            check(
+                "every method that establishes a session applies the mode, directly or by handoff",
+                body.allSatisfy {
+                    $0.contains("applyConfiguredMode") || $0.contains("adoptSession")
+                })
+            check("the three session-establishing methods were found", body.count >= 3)
+            check(
+                "exactly one method is the one that actually applies it",
+                body.filter { $0.contains("applyConfiguredMode") }.count == 1)
+        } else {
+            print("SKIP  every session-establishing method applies the mode — source unreadable")
+            skipped.append("session-establishing methods apply the mode")
+        }
+
         // MARK: - Issue 4: a documented setting that nothing read
 
         // `executablePath` was persisted, validated and documented as overriding `hermes` on PATH, and

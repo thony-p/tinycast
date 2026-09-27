@@ -55,8 +55,8 @@ actor ACPClient {
     private var connection: HermesConnection
     private let workingDirectory: String
     /// The user's explicit `hermes` path, honoured for a local connection. Set from settings, so a
-    /// client built for a test carries none and resolves on PATH.
-    private let executablePath: String?
+    /// client built for a test carries none and resolves on PATH. Mutable only while stopped.
+    private var executablePath: String?
     private var process: Process?
     private var input: FileHandle?
     private var outputBuffer = Data()
@@ -108,6 +108,13 @@ actor ACPClient {
     func use(_ connection: HermesConnection) {
         guard !isRunning else { return }
         self.connection = connection
+    }
+
+    /// Sets the explicit `hermes` path used for the next launch. Stopped-only, like `use(_:)`, because a
+    /// running process was already launched from the previous value.
+    func useExecutablePath(_ path: String?) {
+        guard !isRunning else { return }
+        executablePath = path
     }
 
     /// What the client is connected to, for the session layer to report.
@@ -500,23 +507,49 @@ actor ACPClient {
     ///
     /// A remote connection returns nil whatever is configured: its launch command is `ssh`, and a path
     /// to a local `hermes` says nothing about the far host.
+    ///
+    /// The path must be **absolute** after tilde expansion. A bare name (`hermes`) is a PATH lookup,
+    /// and a relative one (`./bin/hermes`) would resolve against whatever directory the app happened to
+    /// be launched from — so both fall through to the PATH lookup instead of naming a file.
     static func executableOverride(connection: HermesConnection, configured: String?) -> String? {
         guard !connection.isRemote else { return nil }
         let trimmed = configured?.trimmingCharacters(in: .whitespaces) ?? ""
-        return trimmed.isEmpty ? nil : trimmed
+        guard !trimmed.isEmpty else { return nil }
+        let expanded = (trimmed as NSString).expandingTildeInPath
+        guard (expanded as NSString).isAbsolutePath else { return nil }
+        return expanded
     }
 
-    /// The executable to launch: the configured override when it is a real executable, else the
+    /// Whether a path is something `Process` can actually launch.
+    ///
+    /// Directory-ness is a parameter because `FileManager.isExecutableFile` answers **true** for a
+    /// directory: X_OK on a directory is search permission. Measured on this machine —
+    /// `isExecutableFile("/tmp") == true` — so without this check a directory pasted into the setting
+    /// passed verification and `Process` was handed a directory, failing with an opaque launch error
+    /// instead of falling back to PATH.
+    static func isUsableExecutable(
+        _ path: String, isDirectory: Bool, isExecutable: Bool
+    ) -> Bool {
+        !isDirectory && isExecutable
+    }
+
+    /// The executable to launch: the configured override when it really is a launchable file, else the
     /// command resolved on PATH.
     ///
-    /// An override that does not exist falls through rather than failing the launch: the setting is a
-    /// convenience, and a stale path in it must not take a working install down with it.
+    /// An override that is absent, a bare name, a directory, or not executable falls through rather
+    /// than failing the launch: the setting is a convenience, and a stale value in it must not take a
+    /// working install down with it.
     private static func resolveExecutable(
         connection: HermesConnection, override: String?
     ) async -> URL? {
         if let override {
-            let url = URL(fileURLWithPath: (override as NSString).expandingTildeInPath)
-            if FileManager.default.isExecutableFile(atPath: url.path) { return url }
+            let url = URL(fileURLWithPath: override)
+            var isDirectory: ObjCBool = false
+            let exists = FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory)
+            let usable = isUsableExecutable(
+                url.path, isDirectory: exists && isDirectory.boolValue,
+                isExecutable: FileManager.default.isExecutableFile(atPath: url.path))
+            if usable { return url }
         }
         return await ExecutableLocator.locate(connection.command)
     }

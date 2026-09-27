@@ -124,6 +124,56 @@ final class ACPSessionManager {
         return reported != wanted
     }
 
+    /// The bodies of the methods that establish a session, so a harness can check each one applies the
+    /// configured mode.
+    ///
+    /// This exists because the defect was a **missing call site**, not a wrong decision: the sidebar's
+    /// path made the identical `session/load` call and simply never corrected the mode. Asserting the
+    /// decision cannot catch that; reading the source can. Each body is found by matching braces from
+    /// the method's own opening one, because neither a fixed line count nor the next declaration is
+    /// reliable: the last method in a file has no next declaration, so its body would run to the end
+    /// of the file and appear to contain every call in every later method. Returns nil when the source
+    /// cannot be read, which the harness reports as a skip rather than a pass.
+    static func sessionEstablishingMethodBodies() -> [String]? {
+        guard let text = try? String(contentsOf: sourceFileURL, encoding: .utf8) else { return nil }
+        let markers = [
+            "private func loadContinuable(",
+            "private func attachSession(",
+            "private func adoptSession(",
+        ]
+        return markers.compactMap { body(ofMethodStarting: $0, in: text) }
+    }
+
+    /// The full text of the method whose declaration contains `marker`, with its braces balanced.
+    ///
+    /// The declaration is searched from the end of the type's own body, not from the start of the file:
+    /// this method's list of markers contains those same declaration strings, so a search from the top
+    /// finds the helper's own literal and returns its enclosing block.
+    private static func body(ofMethodStarting marker: String, in text: String) -> String? {
+        guard let region = text.range(of: "// MARK: - Session adoption"),
+            let declaration = text.range(of: marker, range: region.upperBound..<text.endIndex),
+            let open = text.range(of: "{", range: declaration.upperBound..<text.endIndex)
+        else { return nil }
+        var depth = 0
+        var index = open.lowerBound
+        while index < text.endIndex {
+            switch text[index] {
+            case "{": depth += 1
+            case "}":
+                depth -= 1
+                if depth == 0 { return String(text[declaration.lowerBound...index]) }
+            default: break
+            }
+            index = text.index(after: index)
+        }
+        return nil
+    }
+
+    /// Where this file lives, resolved from the source path the compiler recorded.
+    private static var sourceFileURL: URL {
+        URL(fileURLWithPath: #filePath)
+    }
+
     /// The mode the agent last reported for the attached session, for the harness that proves the
     /// configured mode is actually in force.
     var reportedSessionMode: String? { reportedModeValue }
@@ -148,6 +198,9 @@ final class ACPSessionManager {
         }
         status = .launching
         lastError = nil
+        // Read on each launch rather than only at init: the setting is editable, and a client built
+        // once would otherwise keep the value it was created with until the app restarted.
+        await client.useExecutablePath(settings.executablePath)
         await client.onEvent { [weak self] event in
             Task { @MainActor in self?.handle(event) }
         }
@@ -236,13 +289,13 @@ final class ACPSessionManager {
         }
     }
 
+    // MARK: - Session adoption
+
     private func loadContinuable(_ summary: HermesSessionSummary) async {
         // A session's cwd is fixed at creation, so it is loaded with its own, not the setting.
         do {
-            sessionID = try await client.loadSession(sessionID: summary.id, cwd: summary.cwd)
-            liveSessionCwd = summary.cwd
-            settings.rememberSession(sessionID: summary.id, cwd: summary.cwd)
-            status = .ready
+            let id = try await client.loadSession(sessionID: summary.id, cwd: summary.cwd)
+            await adoptSession(id: id, cwd: summary.cwd)
         } catch {
             // The row stays listed: the session exists, this attempt to open it did not work.
             lastError = Self.describe(error)
@@ -250,6 +303,20 @@ final class ACPSessionManager {
             liveSessionCwd = nil
             status = .failed(Self.describe(error))
         }
+    }
+
+    /// Attaches the session the client just established, and puts it in the configured mode.
+    ///
+    /// Every path that establishes a session goes through here, and that is the point: applying the
+    /// mode at each call site is how the sidebar's path was missed. It makes the identical
+    /// `session/load` call as the reattach path, and only one of the two corrected the mode, so a
+    /// session opened from the sidebar still prompted before every edit.
+    private func adoptSession(id: String, cwd: String) async {
+        sessionID = id
+        liveSessionCwd = cwd
+        settings.rememberSession(sessionID: id, cwd: cwd)
+        await applyConfiguredMode()
+        status = .ready
     }
 
     private func loadReadOnly(_ summary: HermesSessionSummary) async {
@@ -372,22 +439,17 @@ final class ACPSessionManager {
         // fixed at creation, so resuming elsewhere hands the agent a stale working root.
         if !forceNew, settings.canReattach(to: cwd), let saved = settings.savedSessionID {
             do {
-                sessionID = try await client.loadSession(sessionID: saved, cwd: cwd)
-                liveSessionCwd = cwd
-                await applyConfiguredMode()
-                status = .ready
+                let id = try await client.loadSession(sessionID: saved, cwd: cwd)
                 // History is replayed by the agent as notifications, so nothing is restored here.
                 appendSystemNote("Reattached to your previous Hermes session.")
+                await adoptSession(id: id, cwd: cwd)
                 return
             } catch {
                 appendSystemNote("Could not reattach the previous session; starting a new one.")
             }
         }
-        sessionID = try await client.newSession(cwd: cwd)
-        liveSessionCwd = cwd
-        await applyConfiguredMode()
-        settings.rememberSession(sessionID: sessionID ?? "", cwd: cwd)
-        status = .ready
+        let id = try await client.newSession(cwd: cwd)
+        await adoptSession(id: id, cwd: cwd)
     }
 
     /// Puts the session into the configured edit-approval mode when the agent did not already.

@@ -109,8 +109,25 @@ final class ACPSessionManager {
         self.settings = settings
         self.broker = broker
         self.client = ACPClient(
-            connection: settings.connection, workingDirectory: settings.launchDirectory)
+            connection: settings.connection, workingDirectory: settings.launchDirectory,
+            executablePath: settings.executablePath)
     }
+
+    /// Whether the agent's reported edit-approval mode has to be corrected to the configured one.
+    ///
+    /// A mismatch is the defect this exists to prevent: Hermes defaults a new session to `default`,
+    /// which asks before every edit, so a client that never compares the two cannot notice that the
+    /// setting did nothing. An agent that reports no mode is left alone — guessing there would send a
+    /// mode id the agent may not advertise.
+    static func shouldApplyMode(reported: String?, wanted: String) -> Bool {
+        guard let reported, !reported.isEmpty, !wanted.isEmpty else { return false }
+        return reported != wanted
+    }
+
+    /// The mode the agent last reported for the attached session, for the harness that proves the
+    /// configured mode is actually in force.
+    var reportedSessionMode: String? { reportedModeValue }
+    private var reportedModeValue: String?
 
     // MARK: - Lifecycle
 
@@ -176,6 +193,10 @@ final class ACPSessionManager {
     /// a fact the caller has to be able to report, or a stale list looks like a working one.
     func refreshSidebar() async {
         guard status.isReady else { return }
+        // Cleared on the way out of every path, including the early return below: a stranded flag
+        // leaves the pane saying "Reading sessions…" for the life of the object, and the host-switch
+        // path that returns early is exactly the one that used to strand it.
+        defer { isLoadingSidebar = false }
         isLoadingSidebar = true
         sidebarError = nil
         let connection = settings.connection
@@ -190,7 +211,6 @@ final class ACPSessionManager {
         if found.isEmpty && listed.isEmpty {
             sidebarError = "\(connection.name) did not answer"
         }
-        isLoadingSidebar = false
     }
 
     /// Opens an existing session, replacing the transcript with its history.
@@ -354,6 +374,7 @@ final class ACPSessionManager {
             do {
                 sessionID = try await client.loadSession(sessionID: saved, cwd: cwd)
                 liveSessionCwd = cwd
+                await applyConfiguredMode()
                 status = .ready
                 // History is replayed by the agent as notifications, so nothing is restored here.
                 appendSystemNote("Reattached to your previous Hermes session.")
@@ -364,8 +385,29 @@ final class ACPSessionManager {
         }
         sessionID = try await client.newSession(cwd: cwd)
         liveSessionCwd = cwd
+        await applyConfiguredMode()
         settings.rememberSession(sessionID: sessionID ?? "", cwd: cwd)
         status = .ready
+    }
+
+    /// Puts the session into the configured edit-approval mode when the agent did not already.
+    ///
+    /// Hermes defaults a new session to `default`, which asks before every edit, so without this the
+    /// setting had no effect at all. A failure is surfaced rather than swallowed: a session still in
+    /// `default` prompts for edits the user believes they allowed, and silence would make that look
+    /// like the agent's choice.
+    private func applyConfiguredMode() async {
+        reportedModeValue = await client.reportedMode
+        let wanted = settings.sessionMode
+        guard Self.shouldApplyMode(reported: reportedModeValue, wanted: wanted), let sessionID else {
+            return
+        }
+        do {
+            try await client.setMode(sessionID: sessionID, modeID: wanted)
+            reportedModeValue = wanted
+        } catch {
+            lastError = "Hermes did not accept the \(wanted) mode; it will ask before each edit."
+        }
     }
 
     /// Where this session is filed in Hermes' own sidebar: `Home` when it has no working

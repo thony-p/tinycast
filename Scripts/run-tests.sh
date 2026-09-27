@@ -652,6 +652,28 @@ run hermes-features-test  Tonycast/Features/Updates/Model/AppVersion.swift \
                            Tonycast/Features/Hermes/Service/HermesTranscriptReader.swift \
                            Tonycast/Features/Hermes/Service/ACPProtocol.swift \
                            Tonycast/Features/Hermes/Service/ACPMessage.swift
+run hermes-review-test  Tonycast/Features/AI/Model/JSONValue.swift \
+                           Tonycast/Platform/ExecutableLocator.swift \
+                           Tonycast/Platform/ProcessExit.swift \
+                           Tonycast/Features/Hermes/Model/ACPTranscriptItem.swift \
+                           Tonycast/Features/Hermes/Model/ACPAttachment.swift \
+                           Tonycast/Features/Hermes/Model/HermesConnection.swift \
+                           Tonycast/Features/Hermes/Model/HermesUsageFormat.swift \
+                           Tonycast/Features/Hermes/Model/HermesWorkspace.swift \
+                           Tonycast/Features/Hermes/Model/HermesSessionSummary.swift \
+                           Tonycast/Features/Hermes/Model/HermesSidebarSection.swift \
+                           Tonycast/Features/Hermes/Model/HermesSessionHandoff.swift \
+                           Tonycast/Features/Hermes/Settings/HermesSettings.swift \
+                           Tonycast/Features/Hermes/Service/ACPProtocol.swift \
+                           Tonycast/Features/Hermes/Service/ACPMessage.swift \
+                           Tonycast/Features/Hermes/Service/ACPFrameWriter.swift \
+                           Tonycast/Features/Hermes/Service/ACPClient.swift \
+                           Tonycast/Features/Hermes/Service/ACPPermissionBroker.swift \
+                           Tonycast/Features/Hermes/Service/HermesHostScript.swift \
+                           Tonycast/Features/Hermes/Service/HermesWorkspaceReader.swift \
+                           Tonycast/Features/Hermes/Service/HermesSessionReader.swift \
+                           Tonycast/Features/Hermes/Service/HermesTranscriptReader.swift \
+                           Tonycast/Features/Hermes/Service/ACPSessionManager.swift
 run hermes-workspace-test Tonycast/Features/AI/Model/JSONValue.swift \
                            Tonycast/Platform/ExecutableLocator.swift \
                            Tonycast/Platform/ProcessExit.swift \

@@ -54,6 +54,9 @@ actor ACPClient {
 
     private var connection: HermesConnection
     private let workingDirectory: String
+    /// The user's explicit `hermes` path, honoured for a local connection. Set from settings, so a
+    /// client built for a test carries none and resolves on PATH.
+    private let executablePath: String?
     private var process: Process?
     private var input: FileHandle?
     private var outputBuffer = Data()
@@ -62,6 +65,23 @@ actor ACPClient {
     private var pending: [Int: Pending] = [:]
     /// Set when the user asked to stop, so a late exit is not reported as a crash.
     private var intentionalStop = false
+
+    /// Whether a stop is pending, so a later exit is reported as expected rather than a crash.
+    var isStoppingIntentionally: Bool { intentionalStop }
+
+    /// Puts the client in the state a completed `stop()` leaves it in.
+    ///
+    /// Only a harness calls this. It exists because that state is the defect: `stop()` sets
+    /// `intentionalStop` and also clears `process`, so `didExit` never runs for that client and the
+    /// flag stayed set. Nothing else clears it, so the next launch swallowed its own exit report and a
+    /// real crash showed no reason at all. `start()` is what must repair it.
+    func markStoppedIntentionally() {
+        intentionalStop = true
+    }
+
+    /// The edit-approval mode the agent reported for the attached session, or nil when it reported
+    /// none. Cleared by `start()`, because a fresh process has no session yet.
+    private(set) var reportedMode: String?
     /// Serial, off-actor writer. Writes never touch the actor's thread.
     private let writer = ACPFrameWriter()
 
@@ -74,9 +94,13 @@ actor ACPClient {
     /// A turn can legitimately run for minutes; the per-method timeouts below cover control calls.
     private static let defaultTimeout: Duration = .seconds(60)
 
-    init(connection: HermesConnection = .local, workingDirectory: String) {
+    init(
+        connection: HermesConnection = .local, workingDirectory: String,
+        executablePath: String? = nil
+    ) {
         self.connection = connection
         self.workingDirectory = workingDirectory
+        self.executablePath = executablePath
     }
 
     /// Points this client at another Hermes. Only meaningful while stopped: the running process
@@ -99,9 +123,19 @@ actor ACPClient {
 
     func start() async throws {
         if isRunning { return }
+        // A launch is a fresh process with no session, and a stop from the previous one must not
+        // describe this one. `stop()` cannot clear it: it also clears `process`, so the exit it was
+        // waiting to explain never arrives and the flag would outlive the process it belonged to.
+        intentionalStop = false
+        reportedMode = nil
         // `ssh` is resolved like `hermes`: both are commands a user may have put somewhere unusual,
         // and neither is at a path this app can assume.
-        guard let executable = await ExecutableLocator.locate(connection.command) else {
+        // A user who installed `hermes` somewhere unusual can name it outright; that wins over the
+        // PATH lookup, which is why the setting exists.
+        let override = Self.executableOverride(
+            connection: connection, configured: executablePath)
+        guard let executable = await Self.resolveExecutable(connection: connection, override: override)
+        else {
             throw ACPError.launchFailed(Self.missingCommandMessage(connection))
         }
         // A concurrent start may have won the race during the async lookup.
@@ -241,12 +275,15 @@ actor ACPClient {
         guard let sessionID = response.objectValue?["sessionId"]?.stringValue else {
             throw ACPError.malformedResponse
         }
+        reportedMode = Self.reportedMode(from: response)
         emit(.sessionReady(sessionID: sessionID))
         return sessionID
     }
 
     func loadSession(sessionID: String, cwd: String) async throws -> String {
-        _ = try await request({ try ACPMessage.loadSession(id: $0, sessionID: sessionID, cwd: cwd) })
+        let response = try await request(
+            { try ACPMessage.loadSession(id: $0, sessionID: sessionID, cwd: cwd) })
+        reportedMode = Self.reportedMode(from: response)
         emit(.sessionReady(sessionID: sessionID))
         return sessionID
     }
@@ -446,6 +483,42 @@ actor ACPClient {
             return "`ssh` was not found, so Tonycast cannot reach \(connection.name)."
         }
         return "`\(connection.command)` was not found on this Mac. Install Hermes, or set its path in settings."
+    }
+
+    /// The edit-approval mode the agent reports for a session, as `modes.currentModeId`.
+    ///
+    /// Read rather than assumed: Hermes defaults a new session to `default` ("Ask before edits"), so a
+    /// client that believes its own preferred mode was applied cannot tell whether it was.
+    static func reportedMode(from response: JSONValue) -> String? {
+        guard let mode = response.objectValue?["modes"]?.objectValue?["currentModeId"]?.stringValue,
+            !mode.isEmpty
+        else { return nil }
+        return mode
+    }
+
+    /// The explicit `hermes` path for a local connection, or nil to resolve on PATH.
+    ///
+    /// A remote connection returns nil whatever is configured: its launch command is `ssh`, and a path
+    /// to a local `hermes` says nothing about the far host.
+    static func executableOverride(connection: HermesConnection, configured: String?) -> String? {
+        guard !connection.isRemote else { return nil }
+        let trimmed = configured?.trimmingCharacters(in: .whitespaces) ?? ""
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    /// The executable to launch: the configured override when it is a real executable, else the
+    /// command resolved on PATH.
+    ///
+    /// An override that does not exist falls through rather than failing the launch: the setting is a
+    /// convenience, and a stale path in it must not take a working install down with it.
+    private static func resolveExecutable(
+        connection: HermesConnection, override: String?
+    ) async -> URL? {
+        if let override {
+            let url = URL(fileURLWithPath: (override as NSString).expandingTildeInPath)
+            if FileManager.default.isExecutableFile(atPath: url.path) { return url }
+        }
+        return await ExecutableLocator.locate(connection.command)
     }
 
     /// The app inherits Finder's PATH, so the agent's own toolchain has to be put back on it.

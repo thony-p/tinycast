@@ -170,8 +170,9 @@ struct HermesView: View {
     private func submit() {
         let text = draft
         guard canSend else { return }
-        // The draft is cleared only once the session took it. A refused or failed send leaves the
-        // text in place, so a lost connection never silently discards what the user typed.
+        // Cleared once the agent has taken the message, not when the turn ends: a turn runs for minutes,
+        // and the sent text sitting in the field that whole time reads as a failed send. A send that
+        // cannot start leaves the text in place, so a lost connection never discards what was typed.
         Task {
             if await session.send(text) { draft = "" }
         }

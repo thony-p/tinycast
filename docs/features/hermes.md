@@ -128,6 +128,15 @@ memory, running on a machine you choose.
   other. Tool and thinking items are dropped from the handover — they were 186 kB of one 220 kB
   session and none of its meaning, while the exchange itself was 33 kB — and the bound keeps the
   newest turns, which is what a continuation needs.
+- **`send` returns when the agent has taken the message, and the turn runs detached.** `client.prompt`
+  answers only at `end_turn`, which for real work is minutes, so awaiting it inside `send` meant the
+  composer could not clear its draft until the turn finished — the sent text sat in the input field the
+  whole time and read as a failed send. `send` now appends the message, marks the turn active and
+  dispatches `runTurn` in a `Task`, returning on acceptance; the reply still arrives through the same
+  event stream. Acceptance is what the caller needs, and a send that cannot start still reports false,
+  so a lost connection never discards what was typed. **One turn at a time is enforced in `send`**, not
+  only by the composer hiding the button, because nothing else now stops a second prompt while the
+  first is detached.
 - **The sidebar never reports a failure by emptying itself.** A host that cannot answer leaves the pane
   showing what it had, and a session that fails to open keeps its row and puts the reason next to the
   composer. An empty list reads as "no sessions", which is a different and wrong claim.

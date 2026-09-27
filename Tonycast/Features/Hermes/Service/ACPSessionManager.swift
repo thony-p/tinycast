@@ -413,18 +413,28 @@ final class ACPSessionManager {
 
     // MARK: - Turns
 
-    /// Sends a prompt and reports whether a turn actually began, so the composer only discards the
-    /// draft once it has been handed over. Clearing first would lose the text when the send fails.
+    /// Sends a prompt and reports whether the agent **took** it, so the composer can clear its draft
+    /// the moment the message is on its way.
+    ///
+    /// The turn itself is not awaited. `client.prompt` answers only when the agent ends its turn, which
+    /// for real work is minutes — so awaiting it here left the sent message sitting in the input field
+    /// for the whole turn, which reads as though the send failed. Acceptance is what the caller needs:
+    /// the transcript has the message, the attachments are gone, and the request is dispatched. A send
+    /// that cannot start still reports false, so a lost connection never discards what was typed.
     @discardableResult
     func send(_ text: String) async -> Bool {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         // Attachments alone are a valid prompt: a screenshot with no words is a real request.
         guard !trimmed.isEmpty || !attachments.isEmpty else { return false }
+        // One turn at a time. The composer already hides Send while a turn runs, but the turn is now
+        // detached from this call, so the model states the rule instead of relying on the view.
+        guard !isTurnActive else { return false }
         if !status.isReady { await connect() }
         guard status.isReady, let sessionID else { return false }
 
         let sent = attachments
-        transcript.append(.user(trimmed.isEmpty ? "Attached \(sent.count) file(s)." : trimmed, attachments: sent))
+        transcript.append(
+            .user(trimmed.isEmpty ? "Attached \(sent.count) file(s)." : trimmed, attachments: sent))
         attachments.removeAll()
         removedAttachments.removeAll()
         isTurnActive = true
@@ -432,9 +442,20 @@ final class ACPSessionManager {
         // The permission sheet must not outlive the turn that raised it.
         pendingPermission = nil
         pendingPermissionOptions = []
+
+        // Detached from this call on purpose: the caller gets control back with the message accepted,
+        // and the reply arrives through the event stream as it always did.
+        Task { [weak self] in
+            await self?.runTurn(sessionID: sessionID, text: trimmed, attachments: sent)
+        }
+        return true
+    }
+
+    /// Runs one turn to completion: the half `send` used to await inline.
+    private func runTurn(sessionID: String, text: String, attachments sent: [ACPAttachment]) async {
         do {
             let measured = try await client.prompt(
-                sessionID: sessionID, text: trimmed, attachments: sent)
+                sessionID: sessionID, text: text, attachments: sent)
             // The measured count replaces the estimate the streamed notifications left behind.
             if let measured {
                 recordUsage(used: measured.inputTokens, size: usage?.size, isEstimated: false)
@@ -444,7 +465,6 @@ final class ACPSessionManager {
             transcript.append(.system("Turn failed: \(Self.describe(error))"))
         }
         isTurnActive = false
-        return true
     }
 
     func cancelTurn() async {

@@ -65,7 +65,7 @@ struct HermesWorkspaceTest {
         let sections = HermesSidebarSection.sections(
             workspaces: projects,
             sessions: [
-                session("a", cwd: "/Users/tony/git/forks/tonycast"),
+                session("a", cwd: "/Users/tony/git/forks/tinycast"),
                 session("b", cwd: "/Users/tony/git/wiki"),
                 session("c", cwd: ""),
                 session("d", cwd: "/Users/tony/git/forks"),
@@ -91,14 +91,14 @@ struct HermesWorkspaceTest {
         // A project holds folders, so a session matches on its cwd or the git root recorded.
         let byRoot = HermesSidebarSection.sections(
             workspaces: [
-                workspace("p_setup", "Tonycast", start: "/Users/tony/git/forks/tonycast",
-                          folders: ["/Users/tony/git/tonycast-setup"])
+                workspace("p_setup", "Tonycast", start: "/Users/tony/git/forks/tinycast",
+                          folders: ["/Users/tony/git/tinycast-setup"])
             ],
             sessions: [
-                session("in-repo", cwd: "/Users/tony/git/forks/tonycast"),
-                session("in-second-folder", cwd: "/Users/tony/git/tonycast-setup"),
+                session("in-repo", cwd: "/Users/tony/git/forks/tinycast"),
+                session("in-second-folder", cwd: "/Users/tony/git/tinycast-setup"),
                 // A session whose cwd is elsewhere but whose root is the project's second folder.
-                session("by-root", cwd: "/tmp/scratch", root: "/Users/tony/git/tonycast-setup"),
+                session("by-root", cwd: "/tmp/scratch", root: "/Users/tony/git/tinycast-setup"),
             ])
         check("a session is filed by its cwd or its git root",
               byRoot.first?.sessions.count == 3)
@@ -170,7 +170,7 @@ struct HermesWorkspaceTest {
             {"sessions":[
               {"sessionId":"s1","cwd":"","title":"Home thread",
                "updatedAt":"2026-09-25T16:45:21.272327+00:00"},
-              {"sessionId":"s2","cwd":"/Users/tony/git/forks/tonycast","title":"",
+              {"sessionId":"s2","cwd":"/Users/tony/git/forks/tinycast","title":"",
                "updatedAt":null},
               {"cwd":"/w","title":"no id"}
             ]}
@@ -179,7 +179,7 @@ struct HermesWorkspaceTest {
         check("every usable row decodes", decoded.count == 2)
         check("a row with no session id is dropped", !decoded.contains { $0.title == "no id" })
         check("the id is read from sessionId", decoded.first?.id == "s1")
-        check("the cwd is normalized on decode", decoded[1].cwd == "/Users/tony/git/forks/tonycast")
+        check("the cwd is normalized on decode", decoded[1].cwd == "/Users/tony/git/forks/tinycast")
         check("a fractional-second timestamp parses", decoded[0].updatedAt != nil)
         check("a null timestamp is nil rather than a date",
               decoded[1].updatedAt == nil)

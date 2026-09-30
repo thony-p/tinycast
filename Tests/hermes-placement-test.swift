@@ -54,7 +54,7 @@ struct HermesPlacementTest {
         check("the Home label does not mention a path separator",
               !manager.sessionLocationLabel.contains("/"))
 
-        settings.sessionDirectory = "/Users/tony/git/forks/tonycast"
+        settings.sessionDirectory = "/Users/tony/git/forks/tinycast"
         check("a real directory is labelled by its last component",
               manager.sessionLocationLabel == "tonycast")
 

@@ -37,8 +37,9 @@ commands and global shortcuts can show, search, or extend the collection.
   clamps it to the floor below which the title bar's own parts collide.
 - **The editor is the one surface snippets expand into.** `NoteTextView` adopts `InjectableTextView`,
   so a typed keyword — and the Snippets browser's ↵ — is written straight into the text storage
-  rather than posted as events at whichever app happens to be frontmost. Nothing else in Tonycast
-  adopts it: see [snippets.md](snippets.md#text-delivery-and-pasteboard-safety).
+  rather than posted as events at whichever app happens to be frontmost. Quick Actions also read and
+  replace its selected text in process. Nothing else in Tonycast adopts it: see
+  [snippets.md](snippets.md#text-delivery-and-pasteboard-safety).
 
 ## Storage and identity
 
@@ -120,6 +121,8 @@ claims ⌘N, ⌘P, ⌘O, ⌘F and ⌘W, and the switcher reads ⌘N plus ⌘W an
 AppKit draws the note window's chrome. Its 52-point title bar holds the traffic lights, the centred
 active title, and one frosted capsule of Create, Browse, and Open Folder. The title is drawn, not
 native, so it centres on the window; it is not hit-testable, so dragging it moves the window.
+The yellow and green traffic lights are disabled; double-clicking the free title bar moves the
+unchanged window to the top-right of its current screen's visible area.
 
 The switcher is a borderless child window centred on its host and hung below the title bar, not an
 in-window screen — a note window may be 180pt tall, and the list must not be. It carries the same glass

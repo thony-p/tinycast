@@ -82,7 +82,7 @@ struct AboutView: View {
     }
 
     private var footer: some View {
-        Text("Private build · AGPL-3.0")
+        Text("Private build · Based on Tinycast by Abue Ammar, AGPL-3.0")
             .font(.caption2)
             .foregroundStyle(.tertiary)
     }

@@ -23,6 +23,7 @@ buildServer.json
 .swiftpm/
 .build/
 build-dv/
+._*
 
 # Build output
 build/

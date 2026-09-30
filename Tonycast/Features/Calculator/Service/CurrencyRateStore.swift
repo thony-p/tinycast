@@ -65,8 +65,7 @@ final class CurrencyRateStore {
         return URLSession(configuration: config)
     }()
 
-    /// Off-main; only the plain-value `CurrencyRates` crosses back. A decoded-count floor in
-    /// `CurrencyFeed.snapshot` beats a byte floor, which whitespace padding would defeat.
+    /// Off-main; only the plain-value `CurrencyRates` crosses back. `CurrencyFeed` counts decoded rates, not bytes.
     private nonisolated static func fetch() async -> CurrencyRates? {
         let request = URLRequest(url: endpoint, timeoutInterval: 20)
         guard let (data, response) = try? await session.data(for: request),

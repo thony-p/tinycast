@@ -56,7 +56,7 @@ struct HermesPlacementTest {
 
         settings.sessionDirectory = "/Users/tony/git/forks/tinycast"
         check("a real directory is labelled by its last component",
-              manager.sessionLocationLabel == "tonycast")
+              manager.sessionLocationLabel == "tinycast")
 
         settings.sessionDirectory = "/Users/tony/git/"
         check("a trailing slash does not produce an empty label",

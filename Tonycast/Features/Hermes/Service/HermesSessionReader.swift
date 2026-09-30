@@ -52,18 +52,24 @@ enum HermesSessionReader {
         return """
             import json, os, sqlite3, sys
             from datetime import datetime, timezone
+            from urllib.parse import quote
             home = os.environ.get("HERMES_HOME") or os.path.join(os.path.expanduser("~"), ".hermes")
             path = os.path.join(home, "state.db")
             sources = [\(sources)]
             out = {"sessions": []}
             db = None
-            for uri in ("file:%s?mode=ro" % path, path):
+            for uri in ("file:" + quote(path) + "?mode=ro", "file:" + quote(path) + "?mode=rw"):
+                candidate = None
                 try:
-                    candidate = sqlite3.connect(uri, uri=uri.startswith("file:"))
+                    candidate = sqlite3.connect(uri, uri=True)
                     candidate.execute("select 1 from sqlite_master limit 1")
                     db = candidate
                     break
                 except Exception:
+                    # A failed candidate is closed here, and neither mode creates a missing file:
+                    # `rw` fails rather than writing an empty state.db into Hermes' own directory.
+                    if candidate is not None:
+                        candidate.close()
                     db = None
             try:
                 placeholders = ",".join("?" * len(sources))
@@ -101,8 +107,11 @@ enum HermesSessionReader {
             """
     }
 
-    nonisolated static func read(_ connection: HermesConnection) async -> [Row] {
+    /// Rows, or nil when the host could not be read. Nil and an empty list are different facts: an
+    /// empty list is a host that answered with no sessions, and nil is a host that did not answer.
+    nonisolated static func read(_ connection: HermesConnection) async -> [Row]? {
         let output = await HermesHostScript.run(connection, script: script, timeout: 30)
+        guard !output.isEmpty else { return nil }
         return decode(output)
     }
 
@@ -112,8 +121,10 @@ enum HermesSessionReader {
     static func decode(_ data: Data) -> [Row] {
         guard
             let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-            let rows = root["sessions"] as? [[String: Any]]
+            let entries = root["sessions"] as? [Any]
         else { return [] }
+        // One malformed row costs that row, not the list: the store belongs to another application.
+        let rows = entries.compactMap { $0 as? [String: Any] }
         return rows.compactMap { row in
             guard let id = row["id"] as? String, !id.isEmpty else { return nil }
             return Row(

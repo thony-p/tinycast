@@ -228,6 +228,20 @@ struct HermesWorkspaceTest {
             """
         let decodedRows = HermesSessionReader.decode(Data(rows_payload.utf8))
         check("every usable session row decodes", decodedRows.count == 2)
+        // One malformed row must cost only itself: the store belongs to another application, so a
+        // single odd entry cannot be allowed to drop a whole project's sessions.
+        let mixedRows = HermesSessionReader.decode(Data("""
+            {"sessions":[
+              {"id":"a","title":"one","cwd":"/w","repoRoot":"/w","source":"desktop",
+               "updatedAt":null},
+              null,
+              "a bare string",
+              {"id":"b","title":"two","cwd":"/w","repoRoot":"/w","source":"acp","updatedAt":null}
+            ]}
+            """.utf8))
+        check("a non-object row costs only that row", mixedRows.count == 2)
+        check("a listing with no sessions key decodes to nothing",
+              HermesSessionReader.decode(Data("{}".utf8)).isEmpty)
         check("a row with no id is dropped", !decodedRows.contains { $0.title == "no id" })
         check("the source is read", decodedRows[0].source == "desktop")
         check("the git root is read", decodedRows[0].repoRoot == "/w")

@@ -351,7 +351,7 @@ enum AIEndpointPolicy {
     static func validate(_ value: String) throws -> URL {
         let value = value.trimmingCharacters(in: .whitespacesAndNewlines)
         // Only the two schemes the transport speaks: `ftp://localhost` was once a valid provider.
-        guard let url = URL(string: value), let host = url.host(),
+        guard let url = URL(string: value), url.host() != nil,
             url.scheme == "https" || url.scheme == "http"
         else {
             throw ValidationError.invalidURL

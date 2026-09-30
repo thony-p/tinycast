@@ -18,6 +18,9 @@ enum ACPProtocol {
         case notification(method: String, params: JSONValue)
         /// An agent → client request, which this client must answer.
         case request(id: JSONValue, method: String, params: JSONValue)
+        /// A peer reporting it could not read a request, answered with a null id. JSON-RPC requires
+        /// this reply, and it is the only diagnostic for the frame that failed.
+        case nullIDError(code: Int, message: String)
         case invalid
     }
 
@@ -51,27 +54,46 @@ enum ACPProtocol {
         guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             return .invalid
         }
-        // A bool bridges to NSNumber, so it has to be excluded before reading an id as a number.
-        let numericID = (object["id"] as? NSNumber).flatMap {
-            CFGetTypeID($0) == CFBooleanGetTypeID() ? nil : $0.intValue
-        }
         let params = JSONValue(object["params"] ?? [:])
 
         if let method = object["method"] as? String {
-            guard let id = object["id"], !(id is NSNull) else {
+            // A bool bridges to NSNumber; echoing one back as an id makes an invalid JSON-RPC reply.
+            guard let id = object["id"], Self.isValidRequestID(id) else {
                 return .notification(method: method, params: params)
             }
             return .request(id: JSONValue(id), method: method, params: params)
         }
-        guard let id = numericID else { return .invalid }
         if let error = object["error"] as? [String: Any] {
-            return .failure(
-                id: id,
-                code: (error["code"] as? NSNumber)?.intValue ?? -1,
-                message: error["message"] as? String ?? "Hermes reported an error.")
+            let code = (error["code"] as? NSNumber)?.intValue ?? -1
+            let message = error["message"] as? String ?? "The agent reported an error with no message."
+            // JSON-RPC answers an unreadable request with `id: null`; dropping it loses the reason.
+            guard let id = object["id"], !(id is NSNull) else {
+                return .nullIDError(code: code, message: message)
+            }
+            guard let numericID = Self.numericID(id) else { return .invalid }
+            return .failure(id: numericID, code: code, message: message)
         }
-        guard let result = object["result"] else { return .invalid }
-        return .response(id: id, result: JSONValue(result))
+        guard let result = object["result"], let id = object["id"],
+            let numericID = Self.numericID(id)
+        else { return .invalid }
+        return .response(id: numericID, result: JSONValue(result))
+    }
+
+    /// A request id the reply can be addressed to: JSON-RPC allows a number or a string, never a bool.
+    private static func isValidRequestID(_ value: Any) -> Bool {
+        value is String || Self.isNumber(value)
+    }
+
+    /// The id as a number, or nil for a bool, a string, or a non-number.
+    private static func numericID(_ value: Any) -> Int? {
+        guard let number = value as? NSNumber, CFGetTypeID(number) != CFBooleanGetTypeID()
+        else { return nil }
+        return number.intValue
+    }
+
+    private static func isNumber(_ value: Any) -> Bool {
+        guard let number = value as? NSNumber else { return false }
+        return CFGetTypeID(number) != CFBooleanGetTypeID()
     }
 
     private static func encode(_ object: [String: Any]) throws -> Data {

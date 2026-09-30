@@ -65,7 +65,9 @@ struct ACPPermissionBroker: Sendable {
         let command = Self.commandLine(of: request)
         // No recoverable command means the verdict cannot rest on matching, so it fails safe.
         let isUnverified = command == nil
-        let haystack = (command ?? "\(request.title)\n\(request.detail)").lowercased()
+        // Only the recovered command is matched. Falling back to the title and detail would classify
+        // prose about a command, and every pattern below is a substring of ordinary English.
+        let haystack = (command ?? "").lowercased()
         // Both sides are normalized: the patterns carry uppercase flags (`-R`, `-fdx`), so matching
         // them against a lowercased haystack would silently never fire.
         let destructive =
@@ -85,14 +87,23 @@ struct ACPPermissionBroker: Sendable {
         // The fallback is built from the agent's non-persistent ids only — falling back to the full
         // list would re-offer exactly the session grants that were just stripped.
         let usable = options.isEmpty ? Self.safeFallback(from: request.options) : options
-        let recommended =
-            destructive
-            ? nil
-            : usable.first { $0.optionID == "allow_once" }?.optionID ?? usable.first?.optionID
+        // Never a session-scoped grant by default: when the agent offers only a persistent allow and
+        // a deny, the first element is the grant, and preselection is what the sheet acts on.
+        let recommended = destructive ? nil : Self.recommendedOption(in: usable)
 
         return Verdict(
             options: usable, isDestructive: destructive, recommended: recommended,
             isUnverified: isUnverified)
+    }
+
+    /// The option to preselect, from the non-persistent range only.
+    ///
+    /// `allow_once` first, then a deny, then anything not session-scoped. A deny is preferred over
+    /// the agent's own first option because that first option is the grant when no allow-once came.
+    private static func recommendedOption(in options: [ACPClient.PermissionOption]) -> String? {
+        options.first { $0.optionID == "allow_once" }?.optionID
+            ?? options.first { $0.kind.hasPrefix("reject") }?.optionID
+            ?? options.first { !sessionScopedIDs.contains($0.optionID) }?.optionID
     }
 
     /// The `$ <command>` line the agent prints with a permission request, if it sent one.
@@ -100,12 +111,29 @@ struct ACPPermissionBroker: Sendable {
     /// Matching this instead of the whole payload is the difference between classifying a command and
     /// classifying prose about it: a title reading "this does not run rm -rf" must not decide it.
     private static func commandLine(of request: ACPClient.PermissionRequest) -> String? {
-        let lines = request.detail.split(separator: "\n", omittingEmptySubsequences: false)
-        let commands = lines
+        let lines = request.detail
+            .split(separator: "\n", omittingEmptySubsequences: false)
             .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { $0.hasPrefix("$ ") }
-            .map { String($0.dropFirst(2)) }
-            .filter { !$0.isEmpty }
+        var commands: [String] = []
+        var index = 0
+        while index < lines.count {
+            guard lines[index].hasPrefix("$ ") else {
+                index += 1
+                continue
+            }
+            // A `\`-continued command keeps its arguments on lines that carry no `$ ` prefix.
+            // Reading only the first line classifies `rm \` as harmless, which fails open.
+            var command = String(lines[index].dropFirst(2))
+            while command.hasSuffix("\\"), index + 1 < lines.count {
+                index += 1
+                // The backslash leaves a trailing space, so collapse it before joining — two spaces
+                // is what stops `rm -rf` from matching.
+                command = String(command.dropLast()).trimmingCharacters(in: .whitespaces)
+                    + " " + lines[index]
+            }
+            if !command.isEmpty { commands.append(command) }
+            index += 1
+        }
         guard !commands.isEmpty else { return nil }
         return commands.joined(separator: "\n")
     }

@@ -45,6 +45,9 @@ final class ACPSessionManager {
     private(set) var transcript: [ACPTranscriptItem] = []
     /// Set while a turn is in flight, so the composer can disable Send and offer Stop.
     private(set) var isTurnActive = false
+    /// True from the moment a session-establishing action is claimed until it settles, so a second
+    /// action arriving during the suspension cannot start a parallel one.
+    private(set) var isEstablishingSession = false
     private(set) var sessionID: String?
 
     /// A permission prompt waiting on the user. The broker decides which options are offered.
@@ -198,6 +201,10 @@ final class ACPSessionManager {
         }
         status = .launching
         lastError = nil
+        // Claimed for the whole launch: two connect calls would both tear down and both start,
+        // racing the same client.
+        isEstablishingSession = true
+        defer { isEstablishingSession = false }
         // Read on each launch rather than only at init: the setting is editable, and a client built
         // once would otherwise keep the value it was created with until the app restarted.
         await client.useExecutablePath(settings.executablePath)
@@ -255,14 +262,16 @@ final class ACPSessionManager {
         let connection = settings.connection
         async let projects = HermesWorkspaceReader.read(connection)
         async let rows = HermesSessionReader.read(connection)
-        let (found, listed) = await (projects, rows)
+        let (readProjects, readRows) = await (projects, rows)
         // A host switch mid-read must not publish the old host's projects over the new one's.
         guard connection == settings.connection else { return }
-        workspaces = found
-        // A failed read yields nothing, so a list being read is only replaced when it answered.
-        if !listed.isEmpty { sessions = listed.map(HermesSessionSummary.from) }
-        if found.isEmpty && listed.isEmpty {
-            sidebarError = "\(connection.name) did not answer"
+        // Only a read that answered replaces a list. An empty answer is a real answer — every
+        // session on the host may have been deleted — and keeping the stale list would show rows
+        // that no longer exist. A failed read (nil) leaves the previous list alone.
+        if let readProjects { workspaces = readProjects }
+        if let readRows { sessions = readRows.map(HermesSessionSummary.from) }
+        if readProjects == nil && readRows == nil {
+            sidebarError = "\(connection.name) answered nothing; the list may be incomplete"
         }
     }
 
@@ -297,11 +306,12 @@ final class ACPSessionManager {
             let id = try await client.loadSession(sessionID: summary.id, cwd: summary.cwd)
             await adoptSession(id: id, cwd: summary.cwd)
         } catch {
-            // The row stays listed: the session exists, this attempt to open it did not work.
+            // The row stays listed and the process stays usable: one session that would not load
+            // says nothing about the connection, and marking it failed would block the sidebar,
+            // refuse every other session, and make the next send start a second process.
             lastError = Self.describe(error)
             sessionID = nil
             liveSessionCwd = nil
-            status = .failed(Self.describe(error))
         }
     }
 
@@ -387,7 +397,7 @@ final class ACPSessionManager {
     func switchConnection(to connection: HermesConnection) async {
         guard connection != settings.connection else { return }
         // A switch kills the running agent, so it is refused mid-turn rather than cancelling one.
-        guard status != .launching, !isTurnActive else { return }
+        guard status != .launching, !isTurnActive, !isEstablishingSession else { return }
         status = .launching
         agentVersion = nil
         sessionID = nil
@@ -414,7 +424,7 @@ final class ACPSessionManager {
 
     /// New session in the configured working directory, discarding the current conversation.
     func startNewSession() async {
-        guard !isTurnActive else { return }
+        guard !isTurnActive, !isEstablishingSession else { return }
         transcript.removeAll()
         usage = nil
         clearAttachments()
@@ -434,6 +444,11 @@ final class ACPSessionManager {
     }
 
     private func attachSession(forceNew: Bool = false) async throws {
+        // Claimed for the two suspensions below. `connect` already holds it on the launch path; this
+        // covers the calls that reach here directly, such as a new session from the composer.
+        let ownsClaim = !isEstablishingSession
+        if ownsClaim { isEstablishingSession = true }
+        defer { if ownsClaim { isEstablishingSession = false } }
         let cwd = settings.sessionDirectory
         // Reattach only when the previous session ran in the same directory: a session's cwd is
         // fixed at creation, so resuming elsewhere hands the agent a stale working root.
@@ -533,8 +548,15 @@ final class ACPSessionManager {
         // One turn at a time. The composer already hides Send while a turn runs, but the turn is now
         // detached from this call, so the model states the rule instead of relying on the view.
         guard !isTurnActive else { return false }
+        // Claimed before the first suspension. Two sends arriving while the connection is not ready
+        // would otherwise both pass the guard, both await `connect()`, and both dispatch a turn —
+        // interleaving two on one session. The second check after the suspension is what makes the
+        // claim hold across it.
+        guard !isEstablishingSession else { return false }
         if !status.isReady { await connect() }
-        guard status.isReady, let sessionID else { return false }
+        guard !isTurnActive, !isEstablishingSession, status.isReady, let sessionID else {
+            return false
+        }
 
         let sent = attachments
         transcript.append(
@@ -573,28 +595,49 @@ final class ACPSessionManager {
 
     func cancelTurn() async {
         guard let sessionID, isTurnActive else { return }
-        try? await client.cancel(sessionID: sessionID)
+        do {
+            try await client.cancel(sessionID: sessionID)
+        } catch {
+            // Surfaced rather than swallowed: a rejected cancel leaves Stop looking dead while the
+            // turn keeps running.
+            lastError = Self.describe(error)
+        }
     }
 
     /// The session mode controls whether edits need approval; `accept_edits` is the practical
     /// default.
     func setMode(_ modeID: String) async {
         guard let sessionID else { return }
-        try? await client.setMode(sessionID: sessionID, modeID: modeID)
+        do {
+            try await client.setMode(sessionID: sessionID, modeID: modeID)
+            reportedModeValue = modeID
+        } catch {
+            // The policy this file states for `applyConfiguredMode` holds here too: silence would
+            // leave the window showing a mode that is not in force.
+            lastError = "Hermes did not accept the \(modeID) mode; it will ask before each edit."
+        }
     }
 
     // MARK: - Permissions
 
     func answerPermission(optionID: String?) async {
         guard let request = pendingPermission else { return }
+        // The broker's narrowing is enforced here, not only in the sheet: an option it withheld must
+        // not be answerable by any caller holding the raw request.
+        let allowed = pendingPermissionOptions
+        let chosen = allowed.first { $0.optionID == optionID }
+        guard optionID == nil || chosen != nil else { return }
         pendingPermission = nil
         pendingPermissionOptions = []
         await client.answerPermission(request, optionID: optionID)
-        if let optionID {
-            transcript.append(.system("Approved: \(optionID)"))
-        } else {
-            transcript.append(.system("Denied."))
-        }
+        transcript.append(.system(Self.permissionNote(option: chosen)))
+    }
+
+    /// The transcript note for a decision, named for what it did rather than assumed to be approval.
+    /// The kinds are ACP's own (`allow_once`, `reject_once`), so the wording follows the option.
+    private static func permissionNote(option: ACPClient.PermissionOption?) -> String {
+        guard let option else { return "Denied." }
+        return option.kind.hasPrefix("reject") ? "Denied." : "Approved: \(option.name)."
     }
 
     // MARK: - Event handling
@@ -613,6 +656,12 @@ final class ACPSessionManager {
         case .notification(let method, let params):
             consume(method: method, params: params)
         case .permission(let request):
+            // An unanswered request would leave the agent waiting forever, so a request that
+            // arrives while one is pending is denied first rather than silently overwritten.
+            if let previous = pendingPermission {
+                Task { await client.answerPermission(previous, optionID: nil) }
+                transcript.append(.system("Denied an earlier request that arrived unanswered."))
+            }
             // The broker narrows the menu: a destructive command never gets a session-scoped grant.
             let verdict = broker.evaluate(request)
             pendingPermission = request

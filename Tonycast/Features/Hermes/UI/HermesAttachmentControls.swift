@@ -218,7 +218,7 @@ struct HermesRefreshButton: View {
 
     /// Says what changed, or that nothing did — never nothing at all.
     private func result(before: Int) -> String {
-        if let error = session.sidebarError { return "Could not reach \(session.connection.name)" }
+        if let error = session.sidebarError { return error }
         let added = session.sessions.count - before
         if added > 0 { return added == 1 ? "1 new session" : "\(added) new sessions" }
         return "Up to date"

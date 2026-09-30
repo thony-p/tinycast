@@ -61,6 +61,9 @@ actor ACPClient {
     private var input: FileHandle?
     private var outputBuffer = Data()
     private var stderrBuffer = Data()
+    /// Bumped on every teardown so a read already in flight from the old process is discarded
+    /// instead of re-appending its bytes to the buffers cleared for the next one.
+    private var generation = 0
     private var nextID = 1
     private var pending: [Int: Pending] = [:]
     /// Set when the user asked to stop, so a late exit is not reported as a crash.
@@ -84,6 +87,14 @@ actor ACPClient {
     private(set) var reportedMode: String?
     /// Serial, off-actor writer. Writes never touch the actor's thread.
     private let writer = ACPFrameWriter()
+    /// One ordered read from the child, so a frame cannot be reassembled out of order.
+    private enum Read: Sendable {
+        case stdout(Data)
+        case stderr(Data)
+        case exited(Int32)
+    }
+    private var readTask: Task<Void, Never>?
+    private var finishReads: (@Sendable () -> Void)?
 
     /// Fan-out for notifications the session layer consumes.
     private var eventHandler: (@Sendable (Event) -> Void)?
@@ -161,19 +172,27 @@ actor ACPClient {
         process.standardOutput = stdout
         process.standardError = stderr
 
-        stdout.fileHandleForReading.readabilityHandler = { [weak self] handle in
-            let data = handle.availableData
-            guard !data.isEmpty else { return }
-            Task { await self?.consumeOutput(data) }
+        // Each read is enqueued to the actor from the pipe's own thread, and actor jobs hold no
+        // cross-task order — so two chunks could append as B, A and corrupt a frame. A serial
+        // channel preserves arrival order with a single consumer, which is what the framing needs.
+        let reads = AsyncStream<Read>.makeStream()
+        let reader = Task { [weak self] in
+            for await read in reads.stream { await self?.consume(read) }
         }
-        stderr.fileHandleForReading.readabilityHandler = { [weak self] handle in
+        stdout.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
-            guard !data.isEmpty else { return }
-            Task { await self?.consumeStderr(data) }
+            reads.continuation.yield(.stdout(data))
         }
-        process.terminationHandler = { [weak self] process in
+        stderr.fileHandleForReading.readabilityHandler = { handle in
+            let data = handle.availableData
+            reads.continuation.yield(.stderr(data))
+        }
+        readTask = reader
+        finishReads = { reads.continuation.finish() }
+        process.terminationHandler = { process in
             let status = process.terminationStatus
-            Task { await self?.didExit(status: status) }
+            reads.continuation.yield(.exited(status))
+            reads.continuation.finish()
         }
 
         do {
@@ -181,10 +200,17 @@ actor ACPClient {
         } catch {
             stdout.fileHandleForReading.readabilityHandler = nil
             stderr.fileHandleForReading.readabilityHandler = nil
+            reads.continuation.finish()
+            reader.cancel()
+            readTask = nil
+            finishReads = nil
             throw ACPError.launchFailed(error.localizedDescription)
         }
         self.process = process
         input = stdin.fileHandleForWriting
+        // A dead reader must fail the write, not kill Tonycast by SIGPIPE — the sibling transports
+        // set this for the same reason.
+        _ = fcntl(stdin.fileHandleForWriting.fileDescriptor, F_SETNOSIGPIPE, 1)
         // A frame is written off the actor: a pipe write blocks once the buffer fills (~64 KB), and
         // writing on the actor would freeze the reader and every timeout watchdog with it.
         writer.start(handle: stdin.fileHandleForWriting)
@@ -212,8 +238,14 @@ actor ACPClient {
         process.terminationHandler = nil
         (process.standardOutput as? Pipe)?.fileHandleForReading.readabilityHandler = nil
         (process.standardError as? Pipe)?.fileHandleForReading.readabilityHandler = nil
+        // Closed before the fd is released so a read still in flight is told to stop, not left
+        // waiting on a stream nobody will finish.
         try? input?.close()
         input = nil
+        generation += 1
+        finishReads?()
+        finishReads = nil
+        readTask = nil
         Task.detached {
             try? await Task.sleep(for: .seconds(2))
             if process.isRunning { process.terminate() }
@@ -248,7 +280,9 @@ actor ACPClient {
                 writer.enqueue(frame)
             }
         } onCancel: {
-            Task { await self.expire(id) }
+            // A cancelled caller gets a cancellation, not a timeout: reporting "did not respond in
+            // time" for a request the caller itself dropped is a lie the UI would repeat.
+            Task { await self.cancelRequest(id) }
         }
     }
 
@@ -349,6 +383,9 @@ actor ACPClient {
             emit(.notification(method: method, params: params))
         case .request(let id, let method, let params):
             handleAgentRequest(id: id, method: method, params: params)
+        case .nullIDError(let code, let message):
+            // A peer's parse failure is a diagnostic, not a turn failure: kept for the exit report.
+            consumeStderr(Data("hermes acp: \(message) (code \(code))\n".utf8))
         case .invalid:
             // A line neither side can parse is not fatal; the next frame may be fine.
             break
@@ -408,7 +445,23 @@ actor ACPClient {
         return texts.joined(separator: "\n")
     }
 
+    /// Consumes one ordered read. Frames, diagnostics and the exit are handled in arrival order, so
+    /// a response written just before the exit is parsed rather than dropped on the floor.
+    private func consume(_ read: Read) {
+        switch read {
+        case .stdout(let data):
+            consumeOutput(data)
+        case .stderr(let data):
+            consumeStderr(data)
+        case .exited(let status):
+            finishReads?()
+            finishReads = nil
+            didExit(status: status)
+        }
+    }
+
     private func consumeOutput(_ data: Data) {
+        guard !data.isEmpty else { return }
         outputBuffer.append(data)
         while let newline = outputBuffer.firstIndex(of: 0x0A) {
             let line = outputBuffer[..<newline]
@@ -432,6 +485,11 @@ actor ACPClient {
 
     private func expire(_ id: Int) {
         finish(id, with: .failure(ACPError.timedOut))
+    }
+
+    /// The caller's task was cancelled, so the waiting continuation is resumed as a cancellation.
+    private func cancelRequest(_ id: Int) {
+        finish(id, with: .failure(CancellationError()))
     }
 
     private func finish(_ id: Int, with result: Result<JSONValue, Error>) {
@@ -475,9 +533,16 @@ actor ACPClient {
     private func cleanup() {
         (process?.standardOutput as? Pipe)?.fileHandleForReading.readabilityHandler = nil
         (process?.standardError as? Pipe)?.fileHandleForReading.readabilityHandler = nil
+        // Before the handle is closed: a write racing the close can land in an unrelated fd, since
+        // the number is reused the moment this process's copy goes away.
+        writer.stop()
         try? input?.close()
         process = nil
         input = nil
+        generation += 1
+        finishReads?()
+        finishReads = nil
+        readTask = nil
         outputBuffer.removeAll(keepingCapacity: false)
         stderrBuffer.removeAll(keepingCapacity: false)
     }

@@ -245,6 +245,54 @@ struct HermesReviewTest {
             }
         }
 
+        // MARK: - Frame parsing: an id the reply can be addressed to
+
+        // A bool bridges to NSNumber in Swift, and the request branch read it as an id — so an
+        // answer would echo `"id": true`, which is not a legal JSON-RPC id. A null id on an error is
+        // the spec's reply to an unreadable request; discarding it as `.invalid` lost the reason.
+        func parse(_ json: String) -> ACPProtocol.Message {
+            ACPProtocol.parse(Data(json.utf8))
+        }
+        func notificationMethod(_ message: ACPProtocol.Message) -> String? {
+            if case .notification(let method, _) = message { return method }
+            return nil
+        }
+        if case .nullIDError(let code, let text) = parse(
+            #"{"jsonrpc":"2.0","id":null,"error":{"code":-32700,"message":"Parse error"}}"#)
+        {
+            check("a null-id error keeps its code and message", code == -32700 && text == "Parse error")
+        } else {
+            check("a null-id error keeps its code and message", false)
+        }
+        if case .failure(let id, let code, let text) = parse(
+            #"{"jsonrpc":"2.0","id":7,"error":{"code":-1,"message":"boom"}}"#)
+        {
+            check("a numeric-id error reads its id, code and message", id == 7 && code == -1
+                && text == "boom")
+        } else {
+            check("a numeric-id error reads its id, code and message", false)
+        }
+        check("a bool id is not addressable, so it is not a request",
+            notificationMethod(parse(#"{"jsonrpc":"2.0","id":true,"method":"foo"}"#)) == "foo")
+        if case .request(let id, let method, _) = parse(
+            #"{"jsonrpc":"2.0","id":"abc","method":"foo"}"#)
+        {
+            check("a string id is a legal request id, kept not dropped",
+                id.stringValue == "abc" && method == "foo")
+        } else {
+            check("a string id is a legal request id, kept not dropped", false)
+        }
+        if case .request(let id, _, _) = parse(#"{"jsonrpc":"2.0","id":3,"method":"bar"}"#) {
+            check("a numeric id is a request id", id.intValue == 3)
+        } else {
+            check("a numeric id is a request id", false)
+        }
+        if case .notification = parse(#"{"jsonrpc":"2.0","method":"bar"}"#) {
+            check("a request with no id is a notification", true)
+        } else {
+            check("a request with no id is a notification", false)
+        }
+
         if failures > 0 {
             print("\n\(failures) check(s) failed.")
             exit(1)

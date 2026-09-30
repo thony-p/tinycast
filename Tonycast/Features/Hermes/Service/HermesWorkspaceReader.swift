@@ -26,17 +26,22 @@ enum HermesWorkspaceReader {
     /// nothing and the failure otherwise waits for the first statement.
     static let script = """
         import json, os, sqlite3, sys
+        from urllib.parse import quote
         home = os.environ.get("HERMES_HOME") or os.path.join(os.path.expanduser("~"), ".hermes")
         path = os.path.join(home, "projects.db")
         out = {"projects": []}
         db = None
-        for uri in ("file:%s?mode=ro" % path, path):
+        for uri in ("file:" + quote(path) + "?mode=ro", "file:" + quote(path) + "?mode=rw"):
+            candidate = None
             try:
-                candidate = sqlite3.connect(uri, uri=uri.startswith("file:"))
+                candidate = sqlite3.connect(uri, uri=True)
                 candidate.execute("select 1 from sqlite_master limit 1")
                 db = candidate
                 break
             except Exception:
+                # Neither mode creates a missing file, so a read never writes to Hermes' directory.
+                if candidate is not None:
+                    candidate.close()
                 db = None
         try:
             folders = {}
@@ -65,8 +70,11 @@ enum HermesWorkspaceReader {
         sys.stdout.write(json.dumps(out))
         """
 
-    nonisolated static func read(_ connection: HermesConnection) async -> [HermesWorkspace] {
+    /// Projects, or nil when the host could not be read. Nil and an empty list are different facts:
+    /// an empty list is a host that answered with no projects, and nil is a host that did not answer.
+    nonisolated static func read(_ connection: HermesConnection) async -> [HermesWorkspace]? {
         let output = await HermesHostScript.run(connection, script: script, timeout: 20)
+        guard !output.isEmpty else { return nil }
         return HermesWorkspace.decodeListing(output)
     }
 }

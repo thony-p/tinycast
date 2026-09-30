@@ -162,6 +162,55 @@ struct HermesPermissionBrokerTest {
         check("mixed case is caught",
             broker.evaluate(request(title: "Run", command: "Git Push --Force")).isDestructive)
 
+        // --- a backslash continuation must not hide the arguments -------------------------------
+
+        // `$ rm \` puts its arguments on lines carrying no `$ ` prefix. Reading only the first line
+        // left the pattern unmatched, so the full option list survived with `allow_always` offered.
+        let continued = ACPClient.PermissionRequest(
+            rpcID: .null, requestID: "tool-4", title: "Run a shell command",
+            detail: "Run a shell command\n$ rm \\\n  -rf ~/important",
+            options: [option("allow_once"), option("allow_session"), option("allow_always")])
+        let continuedVerdict = broker.evaluate(continued)
+        check("a backslash-continued rm is caught", continuedVerdict.isDestructive)
+        check(
+            "a backslash-continued rm keeps no session grant",
+            !continuedVerdict.options.map(\.optionID)
+                .contains { $0 == "allow_session" || $0 == "allow_always" })
+
+        // A continuation of an innocent command must stay innocent, so the joining is not a blanket.
+        let continuedBenign = ACPClient.PermissionRequest(
+            rpcID: .null, requestID: "tool-5", title: "Run a shell command",
+            detail: "Run a shell command\n$ git commit \\\n  -m 'a status message'",
+            options: [option("allow_once"), option("allow_session"), option("allow_always")])
+        check("a continued benign command stays benign", !broker.evaluate(continuedBenign).isDestructive)
+
+        // --- prose alone must not fire a pattern -------------------------------------------------
+
+        // Matching the title as a fallback classified English prose: "shutdown" appears in
+        // "the shutdown failed", so a request with no command was flagged by wording alone. It is
+        // already destructive as unverified; the point is that a real command is what decides it.
+        let proseAboutShutdown = ACPClient.PermissionRequest(
+            rpcID: .null, requestID: "tool-6", title: "Read the log",
+            detail: "Earlier the shutdown was clean.\n$ cat ~/git/log.txt",
+            options: [option("allow_once"), option("deny")])
+        check("a benign command is not made destructive by its own title",
+            !broker.evaluate(proseAboutShutdown).isDestructive)
+
+        // --- the recommendation is never a lasting grant -----------------------------------------
+
+        // With no `allow_once` offered, the old fallback returned the agent's first option, which is
+        // the persistent grant — so Return approved forever. A deny must win instead.
+        let noOnce = ACPClient.PermissionRequest(
+            rpcID: .null, requestID: "tool-7", title: "Run a shell command",
+            detail: "Run a shell command\n$ echo hello",
+            options: [option("allow_always"), ACPClient.PermissionOption(
+                optionID: "deny", name: "Deny", kind: "reject_once")])
+        let noOnceVerdict = broker.evaluate(noOnce)
+        check("a persistent grant is not the recommendation",
+            noOnceVerdict.recommended != "allow_always")
+        check("a deny is preferred when no allow-once exists",
+            noOnceVerdict.recommended == "deny")
+
         print(failures == 0 ? "\nAll permission broker checks passed." : "\n\(failures) check(s) failed.")
         exit(failures == 0 ? 0 : 1)
     }
